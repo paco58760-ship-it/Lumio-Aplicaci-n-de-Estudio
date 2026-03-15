@@ -397,23 +397,38 @@ button:active{transform:scale(.97)}
       <div class="sl">¿Cómo te llamas?</div>
       <input class="inp" id="ob-name" placeholder="Escribe tu nombre..." maxlength="20" style="font-size:16px;text-align:center">
     </div>
-    <div class="ob-dots"><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <div class="ob-dots"><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
     <button class="mbtn" onclick="obNext(1)" style="max-width:280px">Continuar →</button>
   </div>
-  <!-- Step 2: Materias -->
+
+  <!-- Step 2: Curso -->
   <div class="ob-step" id="ob-2">
-    <div class="ob-ico">📚</div>
-    <div class="ob-title">Tus materias</div>
-    <div class="ob-sub">Selecciona las que estudias este curso. Puedes cambiarlas después.</div>
-    <div class="ob-mats-grid" id="ob-mats-grid"></div>
-    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div></div>
+    <div class="ob-ico">🎓</div>
+    <div class="ob-title">¿En qué curso estás?</div>
+    <div class="ob-sub">Lumio adaptará las materias y el contenido a tu nivel.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%" id="ob-curso-grid"></div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
     <div style="display:flex;gap:8px;width:100%">
       <button class="gbtn" onclick="obBack(2)" style="flex:1">← Atrás</button>
       <button class="mbtn" onclick="obNext(2)" style="flex:2">Continuar →</button>
     </div>
   </div>
-  <!-- Step 3: Horario -->
+
+  <!-- Step 3: Materias -->
   <div class="ob-step" id="ob-3">
+    <div class="ob-ico">📚</div>
+    <div class="ob-title">Tus materias</div>
+    <div class="ob-sub">Selecciona las que estudias este curso. Puedes cambiarlas después.</div>
+    <div class="ob-mats-grid" id="ob-mats-grid"></div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <div style="display:flex;gap:8px;width:100%">
+      <button class="gbtn" onclick="obBack(3)" style="flex:1">← Atrás</button>
+      <button class="mbtn" onclick="obNext(3)" style="flex:2">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Horario -->
+  <div class="ob-step" id="ob-4">
     <div class="ob-ico">⏰</div>
     <div class="ob-title">¿Cuándo estudias?</div>
     <div class="ob-sub">Lumio organizará tus recordatorios para esos momentos.</div>
@@ -423,14 +438,15 @@ button:active{transform:scale(.97)}
       <div class="ob-time" data-t="noche" onclick="selTime(this)"><div class="ob-time-ico">🌙</div><div class="ob-time-lbl">Noche</div><div class="ob-time-sub">19:00 – 22:00</div></div>
       <div class="ob-time" data-t="variable" onclick="selTime(this)"><div class="ob-time-ico">🔀</div><div class="ob-time-lbl">Variable</div><div class="ob-time-sub">Cuando puedo</div></div>
     </div>
-    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div></div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div></div>
     <div style="display:flex;gap:8px;width:100%">
-      <button class="gbtn" onclick="obBack(3)" style="flex:1">← Atrás</button>
-      <button class="mbtn" onclick="obNext(3)" style="flex:2">Continuar →</button>
+      <button class="gbtn" onclick="obBack(4)" style="flex:1">← Atrás</button>
+      <button class="mbtn" onclick="obNext(4)" style="flex:2">Continuar →</button>
     </div>
   </div>
-  <!-- Step 4: Objetivo -->
-  <div class="ob-step" id="ob-4">
+
+  <!-- Step 5: Objetivo -->
+  <div class="ob-step" id="ob-5">
     <div class="ob-ico">🎯</div>
     <div class="ob-title">Tu primer objetivo</div>
     <div class="ob-sub">¿Cuántos minutos al día quieres estudiar? Puedes cambiarlo cuando quieras.</div>
@@ -440,14 +456,13 @@ button:active{transform:scale(.97)}
       <div class="ob-time" data-m="90" onclick="selObGoal(this)"><div class="ob-time-ico">💪</div><div class="ob-time-lbl">1h 30m</div><div class="ob-time-sub">Dedicado</div></div>
       <div class="ob-time" data-m="120" onclick="selObGoal(this)"><div class="ob-time-ico">🏆</div><div class="ob-time-lbl">2 horas</div><div class="ob-time-sub">Intensivo</div></div>
     </div>
-    <!-- Resumen antes de entrar -->
     <div id="ob-summary" style="background:var(--bg1);border:1px solid var(--yb);border-radius:13px;padding:14px;width:100%;display:none">
       <div style="font-size:11px;font-weight:700;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tu configuración</div>
       <div id="ob-summary-content" style="font-size:12px;color:var(--t2);line-height:1.8"></div>
     </div>
-    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div></div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div></div>
     <div style="display:flex;gap:8px;width:100%">
-      <button class="gbtn" onclick="obBack(4)" style="flex:1">← Atrás</button>
+      <button class="gbtn" onclick="obBack(5)" style="flex:1">← Atrás</button>
       <button class="mbtn" onclick="obFinish()" style="flex:2">¡Empezar! 🚀</button>
     </div>
   </div>
@@ -618,6 +633,7 @@ button:active{transform:scale(.97)}
       <button onclick="resetPom()" style="background:none;border:1px solid var(--bd2);color:var(--t2);border-radius:9px;padding:8px 16px;font-size:12px;cursor:pointer;font-family:var(--font)">↺ Reiniciar</button>
       <button onclick="enterFocus()" style="background:none;border:1px solid var(--bd2);color:var(--t2);border-radius:9px;padding:8px 16px;font-size:12px;cursor:pointer;font-family:var(--font)">🎯 Modo foco</button>
     </div>
+    <div id="wakelock-indicator" style="font-size:10px;color:var(--t3);display:none">📺 Pantalla siempre encendida activada</div>
   </div>
 
   <!-- Historial hoy -->
@@ -859,7 +875,7 @@ button:active{transform:scale(.97)}
     <div style="font-size:11px;color:var(--t2)">Pregunta cualquier duda de 2º ESO</div>
   </div>
   <div class="chat-msgs" id="chat-msgs">
-    <div class="msg msg-ai">¡Hola Raúl! 👋 Soy tu tutor de IA. Puedes preguntarme cualquier duda de tus clases de 2º ESO. ¿En qué te ayudo?</div>
+    <div class="msg msg-ai">¡Hola! 👋 Soy tu tutor de IA de Lumio. Puedes preguntarme cualquier duda de tus clases. ¿En qué te ayudo?</div>
   </div>
   <div class="chat-input-row">
     <input class="chat-inp" id="chat-inp" placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter')sendChat()">
@@ -1183,6 +1199,14 @@ button:active{transform:scale(.97)}
     <div style="font-size:11px;color:var(--t3);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);line-height:1.5">💡 La app se actualiza automáticamente al abrirla si hay conexión. Tus datos siempre se conservan.</div>
   </div>
 
+  <!-- Curso -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Curso</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Curso actual: <b id="aj-curso-actual" style="color:var(--t1)">2º ESO</b></div>
+    <div class="chip-row" id="aj-curso-chips"></div>
+    <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5">⚠️ Cambiar de curso resetea las materias. Apuntes y flashcards se conservan.</div>
+  </div>
+
   <!-- Objetivo diario -->
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Objetivo de estudio</div>
   <div class="card" style="margin-bottom:14px">
@@ -1218,6 +1242,41 @@ button:active{transform:scale(.97)}
       <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Borrar todos los datos</div><div style="font-size:11px;color:var(--t2)">Reinicia la app por completo</div></div>
       <button onclick="if(confirm('¿Seguro? Se borrará TODO: apuntes, flashcards, progreso…'))resetApp()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:#f87171;cursor:pointer;font-family:var(--font)">🗑 Borrar</button>
     </div>
+  </div>
+
+  <!-- Feedback -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Contacto y feedback</div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="font-size:28px">💬</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">Enviar feedback</div>
+        <div style="font-size:11px;color:var(--t2)">Ideas, bugs o sugerencias directamente al desarrollador</div>
+      </div>
+    </div>
+    <button class="mbtn" style="margin-bottom:8px" onclick="showFeedback()">✉️ Enviar mensaje</button>
+  </div>
+  <div class="card" style="margin-bottom:14px" id="gas-setup-card">
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚙️ Configurar envío automático</div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:10px">Para que el mensaje llegue solo sin abrir el correo, pega la URL de tu Google Apps Script:</div>
+    <input class="inp" id="gas-url-inp" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:8px">
+    <button class="mbtn" onclick="saveGasUrl()" style="margin-bottom:8px">💾 Guardar URL</button>
+    <div style="font-size:11px;color:var(--t3);line-height:1.6;padding:8px;background:var(--bg2);border-radius:8px">
+      <b style="color:var(--t1)">Cómo obtener la URL (2 min):</b><br>
+      1. Ve a <b>script.google.com</b><br>
+      2. Crea proyecto → pega el código que está debajo<br>
+      3. Implementar → Nueva implementación → Aplicación web<br>
+      4. Ejecutar como: <b>Yo</b> · Acceso: <b>Cualquier usuario</b><br>
+      5. Copia la URL y pégala aquí
+    </div>
+    <div style="margin-top:8px;padding:8px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--teal);line-height:1.8;font-family:monospace;word-break:break-all" id="gas-code-display">
+      function doPost(e){<br>
+      &nbsp;&nbsp;var d=JSON.parse(e.postData.contents);<br>
+      &nbsp;&nbsp;GmailApp.sendEmail(d.to,d.subject,d.body);<br>
+      &nbsp;&nbsp;return ContentService.createTextOutput('ok');<br>
+      }
+    </div>
+    <button onclick="copyGasCode()" class="gbtn" style="width:100%;margin-top:6px;font-size:11px">📋 Copiar código del script</button>
   </div>
 </div>
 </div>
@@ -1561,6 +1620,34 @@ button:active{transform:scale(.97)}
 <!-- MODALS -->
 <!-- API key not needed - built into Lumio -->
 
+<!-- MODAL FEEDBACK -->
+<div class="mo" id="feedback-mo" style="display:none"><div class="mobox">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
+    <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
+  </div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
+  <div><div class="sl">Tipo</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
+      <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
+      <div class="chip" data-t="bug" onclick="fbTipo(this)">🐛 Bug</div>
+      <div class="chip" data-t="pregunta" onclick="fbTipo(this)">❓ Pregunta</div>
+      <div class="chip" data-t="otro" onclick="fbTipo(this)">✉️ Otro</div>
+    </div>
+  </div>
+  <div><div class="sl">Asunto</div>
+    <input class="inp" id="fb-asunto" placeholder="Ej: No funciona el pomodoro" style="margin-bottom:8px">
+  </div>
+  <div><div class="sl">Mensaje</div>
+    <textarea class="inp ta" id="fb-msg" style="min-height:90px" placeholder="Cuéntanos qué pasó o qué mejorarías..."></textarea>
+  </div>
+  <div style="font-size:11px;color:var(--t2);margin-top:4px;line-height:1.5" id="fb-info">Cargando...</div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="gbtn" style="flex:1" onclick="clsMo('feedback')">Cancelar</button>
+    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="sendFeedback()">📧 Enviar mensaje</button>
+  </div>
+</div></div>
+
 <!-- MODAL CREAR / EDITAR FLASHCARD -->
 <div class="mo" id="fc-add-mo" style="display:none"><div class="mobox">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
@@ -1728,11 +1815,14 @@ button:active{transform:scale(.97)}
 // ════════════════════════════════════════════════════════
 const APP_VERSION='3.1.0';
 // Cambia esta URL por la raw de tu archivo en GitHub:
-// https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/index.html
 const GITHUB_RAW_URL='';
 
+// ── Google Apps Script — pega aquí la URL de tu web app desplegada ──
+// Instrucciones más abajo en la pantalla de Ajustes → Feedback
+const GAS_FEEDBACK_URL = '';   // p.ej: https://script.google.com/macros/s/XXXXX/exec
+
 const D={
-  user:{name:'Raúl',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
+  user:{name:'Raúl',curso:'2º ESO',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
   mats:[
     {id:'m1',n:'Matemáticas',      c:'#f5c518',e:'📐',p:0,h:0,t:10,ok:0},
     {id:'m2',n:'Biología y Geo.',  c:'#4ade80',e:'🧬',p:0,h:0,t:8, ok:0},
@@ -1776,6 +1866,7 @@ function loadState(){
     const saved=JSON.parse(localStorage.getItem('lumio_state')||'null');
     if(!saved)return;
     if(saved.user)Object.assign(D.user,saved.user);
+    if(!D.user.curso)D.user.curso='2º ESO'; // compatibilidad versiones anteriores
     if(saved.mats&&saved.mats.length)D.mats=saved.mats;
     // Strip old default cards — user starts fresh, only keeps cards they created
     if(saved.cards){
@@ -2089,6 +2180,33 @@ function confirmPomStart(){
   if(!po.run)tgPom();
 }
 
+// ════════════════════════════════════════════════════════
+// WAKE LOCK — evita que se apague la pantalla durante el Pomodoro
+// ════════════════════════════════════════════════════════
+let wakeLock=null;
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',()=>{
+      wakeLock=null;
+      const ind=document.getElementById('wakelock-indicator');
+      if(ind)ind.style.display='none';
+    });
+    const ind=document.getElementById('wakelock-indicator');
+    if(ind)ind.style.display='block';
+  }catch(e){/* sin permisos o no soportado */}
+}
+function releaseWakeLock(){
+  if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null;}
+  const ind=document.getElementById('wakelock-indicator');
+  if(ind)ind.style.display='none';
+}
+// Re-adquirir el wake lock si la página vuelve a estar visible (volver del multitarea)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&po.run)requestWakeLock();
+});
+
 function tgPom(){
   // Fix: always clear existing interval first to prevent duplication
   if(po.t){clearInterval(po.t);po.t=null;}
@@ -2100,10 +2218,12 @@ function tgPom(){
   const outer=document.getElementById('pom-circle-outer');
   if(outer)outer.classList.toggle('pom-running',po.run);
   if(po.run){
+    requestWakeLock(); // ← pantalla siempre encendida
     po.t=setInterval(()=>{
       po.s--;upPom();
       if(po.s<=0){
         clearInterval(po.t);po.t=null;po.run=false;
+        releaseWakeLock(); // ← liberamos al terminar
         if(btn)btn.textContent='▶ Iniciar';
         if(outer)outer.classList.remove('pom-running');
         if(!po.brk){
@@ -2124,10 +2244,13 @@ function tgPom(){
         upPom();renderStudyToday();saveState();
       }
     },1000);
+  }else{
+    releaseWakeLock(); // ← liberamos al pausar
   }
 }
 function resetPom(){
   if(po.t){clearInterval(po.t);po.t=null;}
+  releaseWakeLock();
   po.run=false;po.s=pomSettings.W;po.brk=false;
   const btn=document.getElementById('pom-b');if(btn)btn.textContent='▶ Iniciar';
   const outer=document.getElementById('pom-circle-outer');if(outer)outer.classList.remove('pom-running');
@@ -2768,7 +2891,7 @@ async function genFlashcardsIA(){
   btn.disabled=true;
   document.getElementById('fc-gen-loading').style.display='block';
   try{
-    const prompt=`Eres un profesor de 2º ESO experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt}"`:mat}.
+    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt}"`:mat}.
 Responde SOLO con JSON sin backticks:
 {"tarjetas":[{"pregunta":"...","respuesta":"..."}]}
 Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 frases.`;
@@ -2946,7 +3069,7 @@ async function genTest(){
   if(!txt){toast('⚠️ Escribe tus apuntes primero');return;}
   iaV('l');
   try{
-    const prompt=`Eres un profesor experto de 2º ESO. Genera ${ia.n} preguntas tipo test con 4 opciones (A,B,C,D) sobre "${ia.mat}" basadas en este texto.\n\nTEXTO: ${txt}\n\nResponde SOLO JSON sin backticks:\n{"preguntas":[{"id":1,"pregunta":"...","opciones":{"A":"...","B":"...","C":"...","D":"..."},"correcta":"A","explicacion":"..."}]}`;
+    const prompt=`Eres un profesor experto de ${D.user.curso||'ESO'}. Genera ${ia.n} preguntas tipo test con 4 opciones (A,B,C,D) sobre "${ia.mat}" basadas en este texto.\n\nTEXTO: ${txt}\n\nResponde SOLO JSON sin backticks:\n{"preguntas":[{"id":1,"pregunta":"...","opciones":{"A":"...","B":"...","C":"...","D":"..."},"correcta":"A","explicacion":"..."}]}`;
     const res=await callClaude(prompt,2000);
     ia.test=JSON.parse(res.replace(/```json|```/g,'').trim());
     ia.idx=0;ia.ans={};iaV('q');rnQ();gainXP(5);
@@ -3009,7 +3132,7 @@ async function genResumen(){
   const btn=document.querySelector('#s-resumenia .mbtn');
   if(btn){btn.disabled=true;btn.textContent='Resumiendo...';}
   try{
-    const prompt=`Eres un profesor de 2º ESO experto en ${resMat}. Resume el siguiente texto en bullet points claros y concisos, organizados por conceptos clave. Máximo 10 bullets. Usa lenguaje simple para un alumno de 2º ESO. Responde en español.\n\nTEXTO:\n${txt}`;
+    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${resMat}. Resume el siguiente texto en bullet points claros y concisos, organizados por conceptos clave. Máximo 10 bullets. Usa lenguaje simple para un alumno de 2º ESO. Responde en español.\n\nTEXTO:\n${txt}`;
     const res=await callClaude(prompt,800);
     lastResumen=res;
     document.getElementById('res-content').innerHTML=res.split('\n').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start"><span style="color:var(--y);flex-shrink:0;margin-top:2px">•</span><span style="font-size:13px;color:var(--t1);line-height:1.5;flex:1">${l.replace(/^[-•*]\s*/,'')}</span></div>`).join('');
@@ -3037,7 +3160,7 @@ async function genMapa(){
   const btn=document.querySelector('#s-mapa .mbtn');
   if(btn){btn.disabled=true;btn.textContent='Generando...';}
   try{
-    const prompt=`Genera un mapa mental sobre "${tema}" para un alumno de 2º ESO. ${info?'Información adicional: '+info:''}
+    const prompt=`Genera un mapa mental sobre "${tema}" para un alumno de ${D.user.curso||'ESO'}. ${info?'Información adicional: '+info:''}
 Responde SOLO con JSON sin backticks:
 {"centro":"${tema}","ramas":[{"titulo":"Rama 1","color":"#f5c518","nodos":["punto1","punto2","punto3"]},{"titulo":"Rama 2","color":"#4ade80","nodos":["punto1","punto2","punto3"]},{"titulo":"Rama 3","color":"#60a5fa","nodos":["punto1","punto2","punto3"]},{"titulo":"Rama 4","color":"#fb923c","nodos":["punto1","punto2","punto3"]}]}`;
     const res=await callClaude(prompt,800);
@@ -3607,22 +3730,97 @@ function toggleTheme(){
 // ════════════════════════════════════════════════════════
 // ONBOARDING
 // ════════════════════════════════════════════════════════
-const ALL_MATS=[
-  {n:'Matemáticas',e:'📐'},{n:'Biología y Geo.',e:'🧬'},{n:'Física y Química',e:'⚗️'},
-  {n:'Geografía e Hist.',e:'🗺️'},{n:'Lengua',e:'📖'},{n:'Inglés',e:'🌐'},
-  {n:'Tecnología',e:'🔧'},{n:'Ed. Plástica',e:'🎨'},{n:'Música',e:'🎵'},
-  {n:'Ed. Física',e:'🏃'},{n:'Religión',e:'✝️'},{n:'Francés',e:'🥐'},
+// Cursos disponibles
+const CURSOS=[
+  {id:'1eso', label:'1º ESO', ico:'🌱'},
+  {id:'2eso', label:'2º ESO', ico:'📗'},
+  {id:'3eso', label:'3º ESO', ico:'📘'},
+  {id:'4eso', label:'4º ESO', ico:'📙'},
+  {id:'1bach',label:'1º Bach',ico:'🎓'},
+  {id:'2bach',label:'2º Bach',ico:'🏆'},
+  {id:'fp',   label:'FP',          ico:'🔧'},
+  {id:'otro', label:'Otro',        ico:'📚'},
 ];
+const MATS_POR_CURSO={
+  '1eso':['Matemáticas','Lengua','Inglés','Ciencias Naturales','Ciencias Sociales','Tecnología','Ed. Plástica','Ed. Física','Música','Religión'],
+  '2eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés'],
+  '3eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés'],
+  '4eso':['Matemáticas Académicas','Matemáticas Aplicadas','Lengua','Inglés','Biología','Física y Química','Historia','Geografía','Tecnología','Economía','Latín','Francés'],
+  '1bach':['Matemáticas I','Lengua y Literatura','Inglés','Física','Química','Biología','Historia del Mundo','Filosofía','Economía','Dibujo Técnico','Latín','Francés'],
+  '2bach':['Matemáticas II','Lengua y Literatura','Inglés','Física','Química','Biología','Historia de España','Historia del Arte','Filosofía','Economía','Latín','Griego'],
+  'fp':   ['Módulo 1','Módulo 2','Módulo 3','Módulo 4','FCT/Prácticas'],
+  'otro': ['Asignatura 1','Asignatura 2','Asignatura 3','Asignatura 4','Asignatura 5'],
+};
+const MAT_COLORS={
+  'Matemáticas':'#f5c518','Matemáticas I':'#f5c518','Matemáticas II':'#f5c518',
+  'Matemáticas Académicas':'#f5c518','Matemáticas Aplicadas':'#e0a800',
+  'Biología y Geo.':'#4ade80','Biología':'#4ade80','Ciencias Naturales':'#4ade80',
+  'Física y Química':'#60a5fa','Física':'#60a5fa','Química':'#38bdf8',
+  'Geografía e Hist.':'#fb923c','Historia del Mundo':'#fb923c',
+  'Historia de España':'#fb923c','Historia':'#fb923c','Geografía':'#f97316',
+  'Ciencias Sociales':'#fb923c','Historia del Arte':'#a3e635',
+  'Lengua':'#f472b6','Lengua y Literatura':'#f472b6',
+  'Inglés':'#c084fc','Francés':'#a78bfa','Latín':'#e879f9','Griego':'#d946ef',
+  'Tecnología':'#2dd4bf','Dibujo Técnico':'#14b8a6',
+  'Ed. Plástica':'#e879f9','Economía':'#34d399','Filosofía':'#94a3b8',
+  'Ed. Física':'#f87171','Música':'#fbbf24','Religión':'#e2e8f0',
+  'Módulo 1':'#60a5fa','Módulo 2':'#34d399','Módulo 3':'#f472b6',
+  'Módulo 4':'#fb923c','FCT/Prácticas':'#f5c518',
+  'Asignatura 1':'#60a5fa','Asignatura 2':'#4ade80','Asignatura 3':'#f472b6',
+  'Asignatura 4':'#fb923c','Asignatura 5':'#c084fc',
+};
+const MAT_EMOJI={
+  'Matemáticas':'📐','Matemáticas I':'📐','Matemáticas II':'📐',
+  'Matemáticas Académicas':'📐','Matemáticas Aplicadas':'📐',
+  'Biología y Geo.':'🧬','Biología':'🧬','Ciencias Naturales':'🌿',
+  'Física y Química':'⚗️','Física':'⚡','Química':'🧪',
+  'Geografía e Hist.':'🗺️','Historia del Mundo':'🌍',
+  'Historia de España':'🏛️','Historia':'📜','Geografía':'🌎',
+  'Ciencias Sociales':'🌍','Historia del Arte':'🖼️',
+  'Lengua':'📖','Lengua y Literatura':'📖',
+  'Inglés':'🇬🇧','Francés':'🇫🇷',
+  'Latín':'📜','Griego':'🏛️',
+  'Tecnología':'🔧','Dibujo Técnico':'📏',
+  'Ed. Plástica':'🎨','Economía':'💰','Filosofía':'🤔',
+  'Ed. Física':'🏃','Música':'🎵','Religión':'✝️',
+  'Módulo 1':'📋','Módulo 2':'📋','Módulo 3':'📋',
+  'Módulo 4':'📋','FCT/Prácticas':'🏭',
+  'Asignatura 1':'📚','Asignatura 2':'📚','Asignatura 3':'📚',
+  'Asignatura 4':'📚','Asignatura 5':'📚',
+};
+
+let obSelCurso='2eso';
 let obSelMats=new Set(['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica']);
 let obSelTime='tarde';
 
 function showOnboarding(){
   document.getElementById('onboarding').style.display='flex';
-  document.getElementById('ob-mats-grid').innerHTML=ALL_MATS.map(m=>`
-    <div class="ob-mat${obSelMats.has(m.n)?' sel':''}" onclick="toggleObMat('${m.n}',this)">
-      <div class="ob-mat-ico">${m.e}</div>
-      <div class="ob-mat-nm">${m.n}</div>
-    </div>`).join('');
+  const cg=document.getElementById('ob-curso-grid');
+  if(cg){
+    cg.innerHTML=CURSOS.map(cur=>`
+      <div class="ob-mat${cur.id===obSelCurso?' sel':''}" style="justify-content:center;text-align:center" data-c="${cur.id}" onclick="selObCurso('${cur.id}',this)">
+        <div style="font-size:22px;margin-bottom:2px">${cur.ico}</div>
+        <div class="ob-mat-nm" style="text-align:center">${cur.label}</div>
+      </div>`).join('');
+  }
+  buildObMatsGrid(obSelCurso);
+}
+function selObCurso(id,el){
+  obSelCurso=id;
+  document.querySelectorAll('#ob-curso-grid .ob-mat').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function buildObMatsGrid(cursoId){
+  const mats=MATS_POR_CURSO[cursoId]||[];
+  obSelMats=new Set(mats.slice(0,Math.min(8,mats.length)));
+  const grid=document.getElementById('ob-mats-grid');
+  if(grid){
+    grid.innerHTML=mats.map(n=>`
+      <div class="ob-mat${obSelMats.has(n)?' sel':''}" onclick="toggleObMat('${n}',this)">
+        <div class="ob-mat-ico">${MAT_EMOJI[n]||'📚'}</div>
+        <div class="ob-mat-nm">${n}</div>
+      </div>`).join('');
+  }
 }
 function toggleObMat(n,el){obSelMats.has(n)?obSelMats.delete(n):obSelMats.add(n);el.classList.toggle('sel',obSelMats.has(n));}
 function selTime(el){obSelTime=el.dataset.t;document.querySelectorAll('.ob-time').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');}
@@ -3631,16 +3829,12 @@ function selObGoal(el){
   obGoalMinutes=parseInt(el.dataset.m)||60;
   document.querySelectorAll('.ob-time-grid .ob-time').forEach(t=>t.classList.remove('sel'));
   el.classList.add('sel');
-  // Show summary
   const summary=document.getElementById('ob-summary');
   const content=document.getElementById('ob-summary-content');
   if(summary&&content){
     summary.style.display='block';
-    const matArr=[...obSelMats];
-    content.innerHTML=`👤 <b>${D.user.name}</b><br>
-📚 ${matArr.slice(0,4).join(', ')}${matArr.length>4?' y '+(matArr.length-4)+' más':''}<br>
-⏰ Horario: ${obSelTime}<br>
-🎯 Objetivo: ${obGoalMinutes} min/día`;
+    const curso=CURSOS.find(cur=>cur.id===obSelCurso);
+    content.innerHTML='👤 <b>'+D.user.name+'</b><br>🎓 '+(curso?curso.label:obSelCurso)+'<br>📚 '+[...obSelMats].slice(0,4).join(', ')+(obSelMats.size>4?' y '+(obSelMats.size-4)+' más':'')+'<br>🎯 Objetivo: '+obGoalMinutes+' min/día';
   }
 }
 function obNext(step){
@@ -3649,15 +3843,13 @@ function obNext(step){
     if(!name){document.getElementById('ob-name').style.borderColor='#f87171';return;}
     D.user.name=name;
   }
+  if(step===2){
+    buildObMatsGrid(obSelCurso);
+  }
   const curr=document.getElementById('ob-'+step);
   const next=document.getElementById('ob-'+(step+1));
   if(curr)curr.classList.remove('active');
   if(next){next.classList.remove('back-anim');next.classList.add('active');}
-  // Show summary step on step 3→4
-  if(step===3){
-    const summary=document.getElementById('ob-summary');
-    if(summary)summary.style.display='none';
-  }
 }
 function obBack(step){
   const curr=document.getElementById('ob-'+step);
@@ -3666,20 +3858,20 @@ function obBack(step){
   if(prev){prev.classList.add('back-anim');prev.classList.add('active');}
 }
 function obFinish(){
-  const MAT_COLORS={'Matemáticas':'#f5c518','Biología y Geo.':'#4ade80','Física y Química':'#60a5fa','Geografía e Hist.':'#fb923c','Lengua':'#f472b6','Inglés':'#c084fc','Tecnología':'#2dd4bf','Ed. Plástica':'#e879f9','Música':'#60a5fa','Ed. Física':'#fb923c','Religión':'#c084fc','Francés':'#4ade80'};
-  const MAT_EMOJI={'Matemáticas':'📐','Biología y Geo.':'🧬','Física y Química':'⚗️','Geografía e Hist.':'🗺️','Lengua':'📖','Inglés':'🌐','Tecnología':'🔧','Ed. Plástica':'🎨','Música':'🎵','Ed. Física':'🏃','Religión':'✝️','Francés':'🥐'};
+  const curso=CURSOS.find(cur=>cur.id===obSelCurso);
+  D.user.curso=curso?curso.label:'2º ESO';
   D.mats=[...obSelMats].map((n,i)=>({id:'m'+(i+1),n,c:MAT_COLORS[n]||'#8a94a6',e:MAT_EMOJI[n]||'📚',p:0,h:0,t:8,ok:0}));
-  const matNames=new Set(D.mats.map(m=>m.n));
-  D.cards=D.cards.filter(c=>matNames.has(c.m));
+  D.cards=[];
   D.user.studyTime=obSelTime;
   D.objetivoDiario=obGoalMinutes||60;
   localStorage.setItem('lumio_seen_onboarding','1');
-  localStorage.setItem('lumio_user',JSON.stringify({name:D.user.name,studyTime:obSelTime}));
+  localStorage.setItem('lumio_user',JSON.stringify({name:D.user.name,studyTime:obSelTime,curso:D.user.curso}));
   saveState();
   document.getElementById('onboarding').classList.add('out');
   setTimeout(()=>{document.getElementById('onboarding').style.display='none';},500);
   bHome();pomMatActiva=D.mats[0]?.n||'Matemáticas';
   const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+  updateCursoLabels();
   setTimeout(startTutorial,800);
 }
 
@@ -4161,7 +4353,7 @@ async function genPPT(){
   if(btn){btn.disabled=true;btn.textContent='Generando...';}
   document.getElementById('ppt-result').style.display='none';
   try{
-    const prompt=`Eres un experto en presentaciones escolares para 2º ESO. Genera un esquema detallado de presentación de ${pptN} diapositivas sobre "${tema}". ${info?'Puntos clave: '+info:''}
+    const prompt=`Eres un experto en presentaciones escolares para ${D.user.curso||'ESO'}. Genera un esquema detallado de presentación de ${pptN} diapositivas sobre "${tema}". ${info?'Puntos clave: '+info:''}
 
 Responde SOLO en JSON sin backticks:
 {"titulo":"${tema}","diapositivas":[{"num":1,"titulo":"Título de la diapositiva","tipo":"portada|contenido|conclusión","puntos":["punto 1","punto 2","punto 3"],"nota":"Consejo para hablar esta diapositiva"}]}`;
@@ -4206,7 +4398,7 @@ async function genEsquema(){
   const btn=document.querySelector('#s-esquemas .mbtn');
   if(btn){btn.disabled=true;btn.textContent='Generando...';}
   try{
-    const prompt=`Eres un experto en técnicas de estudio para 2º ESO. Convierte el siguiente texto en un esquema visual jerárquico con emojis, usando sangría y símbolos para mostrar la jerarquía. Máximo 4 niveles. Usa este formato:
+    const prompt=`Eres un experto en técnicas de estudio para ${D.user.curso||'ESO'}. Convierte el siguiente texto en un esquema visual jerárquico con emojis, usando sangría y símbolos para mostrar la jerarquía. Máximo 4 niveles. Usa este formato:
 📌 TEMA PRINCIPAL
   ├── 🔷 Subtema 1
   │   ├── • Detalle 1.1
@@ -4312,14 +4504,14 @@ async function corregir(){
   document.getElementById('cor-result').style.display='none';
   document.getElementById('cor-loading').style.display='block';
   const prompts={
-    completa:`Eres un profesor de Lengua de 2º ESO. Corrige esta redacción de forma completa y constructiva. Analiza: ortografía, gramática, puntuación, cohesión, coherencia y estructura. Da una nota del 1-10 y sugerencias concretas de mejora. Sé amable y alentador. Usa este formato exacto:
+    completa:`Eres un profesor de Lengua de ${D.user.curso||'ESO'}. Corrige esta redacción de forma completa y constructiva. Analiza: ortografía, gramática, puntuación, cohesión, coherencia y estructura. Da una nota del 1-10 y sugerencias concretas de mejora. Sé amable y alentador. Usa este formato exacto:
 📝 NOTA: X/10
 ✅ LO QUE ESTÁ BIEN: (puntos positivos)
 ❌ ERRORES ENCONTRADOS: (lista de errores con corrección)
 💡 SUGERENCIAS DE MEJORA: (consejos concretos)
 📖 REDACCIÓN CORREGIDA: (texto completo corregido)`,
     ortografia:`Eres un corrector ortográfico de español. Corrige SOLO los errores ortográficos, tildes y puntuación de esta redacción. Lista cada error y su corrección, luego muestra el texto corregido.`,
-    estilo:`Eres un experto en escritura para 2º ESO. Analiza SOLO el estilo y cohesión de esta redacción: conectores, variedad de vocabulario, fluidez, estructura. No corrijas ortografía. Da sugerencias concretas para mejorar el estilo.`,
+    estilo:`Eres un experto en escritura para ${D.user.curso||'ESO'}. Analiza SOLO el estilo y cohesión de esta redacción: conectores, variedad de vocabulario, fluidez, estructura. No corrijas ortografía. Da sugerencias concretas para mejorar el estilo.`,
   };
   try{
     const res=await callClaude(prompts[corTipoSel]+'\n\nREDACCIÓN:\n'+txt,1500);
@@ -4669,6 +4861,141 @@ function bAjustes(){
   if(pb)pb.value=Math.round(pomSettings.B/60);
   // Version label
   document.querySelectorAll('#update-version-lbl,#about-version').forEach(el=>{if(el)el.textContent=APP_VERSION;});
+  // Curso label
+  const curLbl=document.getElementById('aj-curso-actual');
+  if(curLbl)curLbl.textContent=D.user.curso||'2º ESO';
+  // Curso chips
+  const ccEl=document.getElementById('aj-curso-chips');
+  if(ccEl){
+    ccEl.innerHTML=CURSOS.map(cur=>`<div class="chip${D.user.curso===cur.label?' on':''}" onclick="changeCurso('${cur.id}')">${cur.ico} ${cur.label}</div>`).join('');
+  }
+  // Load saved GAS URL
+  const savedGas=localStorage.getItem('lumio_gas_url')||'';
+  const gasInp=document.getElementById('gas-url-inp');
+  if(gasInp)gasInp.value=savedGas;
+  // Show status if already configured
+  const gasCard=document.getElementById('gas-setup-card');
+  if(gasCard&&savedGas){
+    const badge=gasCard.querySelector('.gas-status')||document.createElement('div');
+    badge.className='gas-status';
+    badge.style.cssText='font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px';
+    badge.textContent='✅ Envío automático activo';
+    if(!gasCard.querySelector('.gas-status'))gasCard.insertBefore(badge,gasCard.firstChild);
+  }
+}
+// Update all hardcoded course references throughout the UI
+function updateCursoLabels(){
+  const curso=D.user.curso||'2º ESO';
+  // Update any visible course labels
+  document.querySelectorAll('[data-curso-label]').forEach(el=>{el.textContent=curso;});
+}
+
+// Change course from Ajustes (without full re-onboarding)
+function changeCurso(id){
+  const curso=CURSOS.find(c=>c.id===id);
+  if(!curso)return;
+  D.user.curso=curso.label;
+  // Rebuild mats from the new course defaults
+  const mats=(MATS_POR_CURSO[id]||[]).slice(0,8);
+  const confirm_change=confirm('Cambiar a '+curso.label+'. Esto resetea tus materias (tus apuntes y flashcards se conservan). ¿Continuar?');
+  if(!confirm_change)return;
+  D.mats=mats.map((n,i)=>({id:'m'+(i+1),n,c:MAT_COLORS[n]||'#8a94a6',e:MAT_EMOJI[n]||'📚',p:0,h:0,t:8,ok:0}));
+  saveState();
+  updateCursoLabels();
+  toast('🎓 Curso cambiado a '+curso.label);
+  bHome();
+  // Refresh ajustes
+  setTimeout(bAjustes,100);
+}
+
+function saveGasUrl(){
+  const url=(document.getElementById('gas-url-inp')?.value||'').trim();
+  if(url&&!url.startsWith('https://script.google.com')){
+    toast('⚠️ La URL debe empezar por https://script.google.com');return;
+  }
+  localStorage.setItem('lumio_gas_url',url);
+  // Update the global constant at runtime
+  window._gasUrl=url;
+  toast(url?'✅ URL guardada — el feedback se enviará automáticamente':'🗑 URL eliminada');
+  bAjustes();
+}
+// Override GAS_FEEDBACK_URL with saved value at runtime
+Object.defineProperty(window,'GAS_FEEDBACK_URL',{get:()=>localStorage.getItem('lumio_gas_url')||'',configurable:true});
+function copyGasCode(){
+  const code=`function doPost(e){
+  var d=JSON.parse(e.postData.contents);
+  GmailApp.sendEmail(d.to,d.subject,d.body);
+  return ContentService.createTextOutput('ok');
+}`;
+  navigator.clipboard?.writeText(code)
+    .then(()=>toast('📋 Código copiado — pégalo en script.google.com'))
+    .catch(()=>toast('Copia el código manualmente'));
+}
+
+// ════════════════════════════════════════════════════════
+// FEEDBACK
+// ════════════════════════════════════════════════════════
+let fbTipoSel='idea';
+function showFeedback(){
+  fbTipoSel='idea';
+  document.querySelectorAll('#fb-tipo-row .chip').forEach(c=>c.classList.remove('on'));
+  const defChip=document.querySelector('#fb-tipo-row .chip[data-t="idea"]');
+  if(defChip)defChip.classList.add('on');
+  const asunto=document.getElementById('fb-asunto');
+  const msg=document.getElementById('fb-msg');
+  if(asunto)asunto.value='';
+  if(msg)msg.value='';
+  const info=document.getElementById('fb-info');
+  if(info){
+    info.innerHTML=GAS_FEEDBACK_URL
+      ?'✅ Envío automático activo.'
+      :'⚙️ Configura Google Apps Script para envío automático. Instrucciones en <b>Ajustes → Configurar feedback</b>.';
+  }
+  document.getElementById('feedback-mo').style.display='flex';
+  setTimeout(()=>document.getElementById('fb-asunto')?.focus(),150);
+}
+function fbTipo(el){
+  fbTipoSel=el.dataset.t;
+  document.querySelectorAll('#fb-tipo-row .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+async function sendFeedback(){
+  const asunto=(document.getElementById('fb-asunto')?.value||'').trim();
+  const msg=(document.getElementById('fb-msg')?.value||'').trim();
+  if(!msg){toast('⚠️ Escribe un mensaje antes de enviar');return;}
+  const tipoLabel={'idea':'💡 Idea','bug':'🐛 Bug','pregunta':'❓ Pregunta','otro':'✉️ Otro'}[fbTipoSel]||'Otro';
+  const subject=`[Lumio ${APP_VERSION}] ${tipoLabel}${asunto?' — '+asunto:''}`;
+  const bodyText=`Tipo: ${tipoLabel}\n\nMensaje:\n${msg}\n\n---\nLumio v${APP_VERSION} · ${D.user.name}\nPomodoros: ${D.user.pomodorosDone} · XP: ${D.user.xp}`;
+  // ── Envío automático vía Google Apps Script (tu propia cuenta Google) ──
+  if(GAS_FEEDBACK_URL){
+    const sendBtn=document.querySelector('#feedback-mo .mbtn');
+    if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Enviando...';}
+    try{
+      const res=await fetch(GAS_FEEDBACK_URL,{
+        method:'POST',
+        mode:'no-cors', // GAS no devuelve CORS headers — usamos no-cors
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({to:'paco58760@gmail.com',subject,body:bodyText,user:D.user.name,version:APP_VERSION})
+      });
+      // no-cors siempre devuelve respuesta opaca — asumimos éxito si no hay excepción
+      clsMo('feedback');
+      toast('✅ ¡Mensaje enviado! Gracias por tu feedback');
+    }catch(e){
+      toast('❌ Error al enviar. Comprueba tu conexión.');
+    }finally{
+      if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='📧 Enviar mensaje';}
+    }
+    return;
+  }
+  // ── Fallback: abrir app de correo ──
+  const mailtoUrl='mailto:paco58760@gmail.com'
+    +'?subject='+encodeURIComponent(subject)
+    +'&body='+encodeURIComponent('Hola,\n\n'+bodyText);
+  const link=document.createElement('a');
+  link.href=mailtoUrl;link.target='_blank';
+  document.body.appendChild(link);link.click();document.body.removeChild(link);
+  clsMo('feedback');
+  toast('📧 Abriendo tu app de correo...');
 }
 
 function toggleAnayaPass(){
