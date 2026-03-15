@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Lumio — Tu compañero de estudio</title>
+<meta name="theme-color" content="#f5c518">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lumio">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23f5c518'/%3E%3Ccircle cx='256' cy='220' r='110' fill='none' stroke='%230d0f14' stroke-width='28'/%3E%3Cpath d='M210 340 Q256 380 302 340' fill='none' stroke='%230d0f14' stroke-width='26' stroke-linecap='round'/%3E%3Crect x='218' y='372' width='76' height='22' rx='11' fill='%230d0f14'/%3E%3Crect x='228' y='408' width='56' height='20' rx='10' fill='%230d0f14'/%3E%3C/svg%3E">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -171,6 +177,77 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 /* MODALS */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;z-index:900}
 .mobox{width:100%;max-width:390px;margin:0 auto;background:var(--bg1);border:1px solid var(--bd2);border-radius:18px 18px 0 0;padding:22px 18px 34px;display:flex;flex-direction:column;gap:12px;max-height:88vh;overflow-y:auto}
+/* QUICK NOTES FLOAT */
+#quick-note-btn{position:fixed;bottom:82px;right:14px;width:48px;height:48px;border-radius:50%;background:var(--y);color:#0d0f14;font-size:22px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:500;box-shadow:0 4px 20px rgba(245,197,24,.4);transition:transform .15s}
+#quick-note-btn:active{transform:scale(.92)}
+#quick-note-btn.hidden{display:none}
+/* SPELL CHECK HIGHLIGHT */
+.spell-error{text-decoration:underline;text-decoration-color:#f87171;text-decoration-style:wavy}
+.spell-toolbar{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.spell-tag{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.spell-tag:hover{background:rgba(248,113,113,.25)}
+/* DARK/LIGHT MODE */
+[data-theme="light"]{
+  --bg:#f5f3ee;--bg1:#ffffff;--bg2:#ede9e0;--bg3:#e0dcd0;
+  --t1:#0d0f14;--t2:#555e70;--t3:#9ca3af;
+  --bd:rgba(0,0,0,.09);--bd2:rgba(0,0,0,.16);
+}
+/* ONBOARDING */
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:980;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0;transition:opacity .4s}
+#onboarding.out{opacity:0;pointer-events:none}
+.ob-step{display:none;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:340px;text-align:center}
+.ob-step.active{display:flex}
+.ob-ico{font-size:56px;animation:spul 2s ease-in-out infinite}
+.ob-title{font-size:26px;font-weight:900;color:var(--t1)}
+.ob-sub{font-size:14px;color:var(--t2);line-height:1.6}
+.ob-dots{display:flex;gap:7px;margin-top:6px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:background .2s}
+.ob-dot.on{background:var(--y)}
+.ob-mats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.ob-mat{background:var(--bg1);border:2px solid var(--bd);border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;text-align:left}
+.ob-mat.sel{border-color:var(--y);background:var(--yd)}
+.ob-mat-ico{font-size:22px;flex-shrink:0}
+.ob-mat-nm{font-size:12px;font-weight:700;color:var(--t1);line-height:1.3}
+.ob-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.ob-time{background:var(--bg1);border:2px solid var(--bd);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.ob-time.sel{border-color:var(--y);background:var(--yd)}
+.ob-time-ico{font-size:24px;margin-bottom:4px}
+.ob-time-lbl{font-size:12px;font-weight:700;color:var(--t1)}
+.ob-time-sub{font-size:10px;color:var(--t2);margin-top:2px}
+/* SUB-NAV */
+#sub-nav{flex-shrink:0;background:var(--bg1);border-bottom:1px solid var(--bd);overflow-x:auto;display:none;padding:8px 12px;gap:6px;-webkit-overflow-scrolling:touch}
+#sub-nav::-webkit-scrollbar{display:none}
+#sub-nav.show{display:flex}
+.snb{padding:7px 14px;border-radius:999px;border:1px solid var(--bd);background:transparent;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.snb.active{background:var(--yd);border-color:var(--yb);color:var(--y)}
+/* CONFETTI */
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:970;display:none}
+/* TUTORIAL */
+#tutorial-overlay{position:fixed;inset:0;z-index:960;pointer-events:none;display:none}
+.tut-spot{position:absolute;border:2.5px solid var(--y);border-radius:12px;animation:tutpulse 1.5s ease-in-out infinite;pointer-events:none}
+@keyframes tutpulse{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,.4)}50%{box-shadow:0 0 0 8px rgba(245,197,24,0)}}
+.tut-bubble{position:absolute;background:#0d0f14;border:1px solid var(--yb);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--t1);max-width:200px;line-height:1.5;pointer-events:all;cursor:pointer;z-index:961}
+.tut-bubble::after{content:'Toca para continuar →';display:block;font-size:10px;color:var(--y);margin-top:4px;font-weight:700}
+/* POM SUBJECT MODAL */
+#pom-pre-mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:900}
+#pom-pre-mo.show{display:flex}
+/* MARKDOWN TOOLBAR */
+.md-toolbar{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+.md-btn{background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .15s}
+.md-btn:hover{color:var(--y);border-color:var(--yb)}
+.md-preview{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:13px;font-size:13px;color:var(--t1);line-height:1.7;min-height:100px;display:none}
+.md-preview h1{font-size:18px;font-weight:800;margin-bottom:6px;color:var(--t1)}
+.md-preview h2{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--t1)}
+.md-preview strong{font-weight:700;color:var(--t1)}
+.md-preview em{font-style:italic;color:var(--t2)}
+.md-preview ul{padding-left:16px}.md-preview li{margin-bottom:3px}
+/* ABOUT */
+.about-section{padding:16px;background:var(--bg1);border:1px solid var(--bd);border-radius:13px;margin-bottom:10px}
+/* STUDY TODAY */
+.today-card{background:var(--bg1);border-left:3px solid var(--y);border-radius:0 13px 13px 0;padding:11px 14px;margin-bottom:8px;cursor:pointer;transition:transform .1s}
+.today-card:active{transform:scale(.98)}
+/* THEME TOGGLE */
+#theme-btn{position:fixed;top:12px;right:14px;width:36px;height:36px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:200;transition:all .2s}
 @media(min-width:420px){#phone{box-shadow:0 0 100px rgba(0,0,0,.9)}body{background:#04050a}}
 </style>
 </head>
@@ -182,6 +259,71 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
   <div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.12em;text-transform:uppercase">Tu compañero de estudio</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
+
+<!-- ONBOARDING -->
+<div id="onboarding" style="display:none">
+  <!-- Step 1: Nombre -->
+  <div class="ob-step active" id="ob-1">
+    <div class="ob-ico">💡</div>
+    <div class="ob-title">¡Bienvenido a Lumio!</div>
+    <div class="ob-sub">Tu app de estudio inteligente. En 30 segundos la dejamos lista para ti.</div>
+    <div style="width:100%">
+      <div class="sl">¿Cómo te llamas?</div>
+      <input class="inp" id="ob-name" placeholder="Escribe tu nombre..." maxlength="20" style="font-size:16px;text-align:center">
+    </div>
+    <div class="ob-dots"><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <button class="mbtn" onclick="obNext(1)" style="max-width:280px">Continuar →</button>
+  </div>
+  <!-- Step 2: Materias -->
+  <div class="ob-step" id="ob-2">
+    <div class="ob-ico">📚</div>
+    <div class="ob-title">Tus materias</div>
+    <div class="ob-sub">Selecciona las que estudias este curso. Puedes cambiarlas después.</div>
+    <div class="ob-mats-grid" id="ob-mats-grid"></div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div></div>
+    <div style="display:flex;gap:8px;width:100%">
+      <button class="gbtn" onclick="obBack(2)" style="flex:1">← Atrás</button>
+      <button class="mbtn" onclick="obNext(2)" style="flex:2">Continuar →</button>
+    </div>
+  </div>
+  <!-- Step 3: Horario -->
+  <div class="ob-step" id="ob-3">
+    <div class="ob-ico">⏰</div>
+    <div class="ob-title">¿Cuándo estudias?</div>
+    <div class="ob-sub">Lumio organizará tus recordatorios para esos momentos.</div>
+    <div class="ob-time-grid">
+      <div class="ob-time sel" data-t="manana" onclick="selTime(this)"><div class="ob-time-ico">🌅</div><div class="ob-time-lbl">Mañana</div><div class="ob-time-sub">7:00 – 12:00</div></div>
+      <div class="ob-time" data-t="tarde" onclick="selTime(this)"><div class="ob-time-ico">☀️</div><div class="ob-time-lbl">Tarde</div><div class="ob-time-sub">15:00 – 19:00</div></div>
+      <div class="ob-time" data-t="noche" onclick="selTime(this)"><div class="ob-time-ico">🌙</div><div class="ob-time-lbl">Noche</div><div class="ob-time-sub">19:00 – 22:00</div></div>
+      <div class="ob-time" data-t="variable" onclick="selTime(this)"><div class="ob-time-ico">🔀</div><div class="ob-time-lbl">Variable</div><div class="ob-time-sub">Cuando puedo</div></div>
+    </div>
+    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div></div>
+    <div style="display:flex;gap:8px;width:100%">
+      <button class="gbtn" onclick="obBack(3)" style="flex:1">← Atrás</button>
+      <button class="mbtn" onclick="obFinish()" style="flex:2">¡Empezar! 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- THEME TOGGLE -->
+<button id="theme-btn" onclick="toggleTheme()" title="Modo claro/oscuro">🌙</button>
+
+<!-- CONFETTI -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- TUTORIAL -->
+<div id="tutorial-overlay"></div>
+
+<!-- POMODORO SUBJECT MODAL -->
+<div id="pom-pre-mo"><div class="mobox">
+  <div style="font-size:18px;font-weight:800;color:var(--t1)">⏱ ¿Qué vas a estudiar?</div>
+  <div style="font-size:13px;color:var(--t2)">Elige la materia para este Pomodoro</div>
+  <div class="chip-row" id="pom-pre-chips" style="margin-bottom:4px"></div>
+  <div style="display:flex;gap:8px">
+    <button class="gbtn" style="flex:1" onclick="document.getElementById('pom-pre-mo').classList.remove('show')">Cancelar</button>
+    <button class="mbtn" style="flex:2" onclick="confirmPomStart()">▶ Empezar</button>
+  </div>
+</div></div>
 
 <!-- FOCUS MODE OVERLAY -->
 <div id="focus-mode">
@@ -196,6 +338,8 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 </div>
 
 <div id="phone">
+<!-- SUB-NAV (shown for multi-screen sections) -->
+<div id="sub-nav"></div>
 <div id="screens">
 
 <!-- ══ HOME ══ -->
@@ -217,7 +361,7 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
   </div>
   <!-- greeting -->
   <div class="card" style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
-    <div style="width:36px;height:36px;border-radius:50%;background:var(--y);color:#0d0f14;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">RA</div>
+    <div style="width:36px;height:36px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💡</div>
     <div><div style="font-size:14px;font-weight:700;color:var(--t1)" id="h-nm">Buenas tardes, Raúl</div>
     <div style="font-size:11px;color:var(--t2);margin-top:1px" id="h-obj">Sin objetivo diario definido</div></div>
   </div>
@@ -237,10 +381,13 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
       <div style="font-size:34px;font-weight:900;color:var(--y);letter-spacing:-1px;line-height:1;transition:color .3s" id="pom-d">25:00</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-      <button style="background:var(--t1);color:var(--bg);border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer" id="pom-b" onclick="tgPom()">Iniciar</button>
-      <button style="background:none;border:1px solid var(--bd2);color:var(--t2);border-radius:9px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="enterFocus()">🎯 Foco</button>
+      <button style="background:var(--t1);color:var(--bg);border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer" id="pom-b" onclick="showPomPre()">▶ Iniciar</button>
+      <button style="background:none;border:1px solid var(--bd2);color:var(--t2);border-radius:9px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="enterFocus()">🎯 Modo foco</button>
     </div>
   </div>
+  <!-- QUÉ ESTUDIAR HOY -->
+  <div class="sl">¿Qué estudiar hoy? 🎯</div>
+  <div id="study-today" style="margin-bottom:14px"></div>
   <!-- exámenes -->
   <div class="sl">Exámenes próximos 📅</div>
   <div id="exams-list" style="margin-bottom:14px"><div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Sin exámenes. Ve al Planificador →</div></div>
@@ -342,7 +489,7 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
       </div>
     </div>
     <div style="margin-bottom:12px"><div class="sl">Apuntes</div>
-      <textarea class="inp ta" id="ia-t" placeholder="Pega el texto del tema..."></textarea>
+      <textarea class="inp ta" id="ia-t" spellcheck="true" placeholder="Pega el texto del tema..."></textarea>
       <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:3px" id="ia-cc">0 caracteres</div>
     </div>
     <button class="mbtn" onclick="genTest()">✨ Generar test con IA</button>
@@ -363,7 +510,7 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
   <div class="ps">Texto largo → bullet points clave</div>
   <div style="margin-bottom:12px"><div class="sl">Materia</div><div class="chip-row" id="res-ch"></div></div>
   <div style="margin-bottom:12px"><div class="sl">Texto a resumir</div>
-    <textarea class="inp ta" style="min-height:140px" id="res-txt" placeholder="Pega aquí el texto del libro, apuntes o PDF..."></textarea>
+    <textarea class="inp ta" style="min-height:140px" id="res-txt" spellcheck="true" placeholder="Pega aquí el texto del libro, apuntes o PDF..."></textarea>
     <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:3px" id="res-cc">0 caracteres</div>
   </div>
   <button class="mbtn" style="margin-bottom:14px" onclick="genResumen()">🔍 Resumir con IA</button>
@@ -637,23 +784,89 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 </div>
 </div>
 
-<!-- ══ AMIGOS ══ -->
+<!-- ══ INVITAR ══ -->
 <div class="screen" id="s-amigos">
 <div class="pw">
-  <div class="pt"><em>Amigos</em> 👥</div>
-  <div class="ps">Solo tú por ahora</div>
-  <div class="card card-y" style="margin-bottom:14px">
-    <div style="font-size:9px;font-weight:700;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tu semana</div>
-    <div style="font-size:28px;font-weight:900;color:var(--y)" id="ami-hrs">0h</div>
-    <div style="font-size:11px;color:var(--t2);margin-top:2px">Eres el #1 del ranking 🏆</div>
+  <div class="pt">Invitar <em>amigos</em> 👥</div>
+  <div class="ps">Comparte Lumio con tus compañeros del cole</div>
+  <!-- QR Code visual -->
+  <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px">
+    <div style="width:140px;height:140px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center" id="qr-wrap">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+        <!-- QR pattern visual (decorative) -->
+        <rect width="100" height="100" fill="white"/>
+        <rect x="5" y="5" width="35" height="35" rx="3" fill="none" stroke="#0d0f14" stroke-width="4"/>
+        <rect x="12" y="12" width="21" height="21" rx="1" fill="#0d0f14"/>
+        <rect x="60" y="5" width="35" height="35" rx="3" fill="none" stroke="#0d0f14" stroke-width="4"/>
+        <rect x="67" y="12" width="21" height="21" rx="1" fill="#0d0f14"/>
+        <rect x="5" y="60" width="35" height="35" rx="3" fill="none" stroke="#0d0f14" stroke-width="4"/>
+        <rect x="12" y="67" width="21" height="21" rx="1" fill="#0d0f14"/>
+        <rect x="45" y="5" width="6" height="6" fill="#0d0f14"/><rect x="52" y="5" width="6" height="6" fill="#0d0f14"/>
+        <rect x="45" y="12" width="6" height="6" fill="#0d0f14"/><rect x="45" y="20" width="6" height="6" fill="#0d0f14"/>
+        <rect x="52" y="20" width="6" height="6" fill="#0d0f14"/><rect x="59" y="12" width="6" height="6" fill="#0d0f14"/>
+        <rect x="45" y="45" width="6" height="6" fill="#f5c518"/><rect x="52" y="45" width="6" height="6" fill="#f5c518"/>
+        <rect x="59" y="45" width="6" height="6" fill="#f5c518"/><rect x="66" y="45" width="6" height="6" fill="#f5c518"/>
+        <rect x="73" y="45" width="6" height="6" fill="#f5c518"/><rect x="45" y="52" width="6" height="6" fill="#f5c518"/>
+        <rect x="59" y="52" width="6" height="6" fill="#0d0f14"/><rect x="73" y="52" width="6" height="6" fill="#0d0f14"/>
+        <rect x="45" y="59" width="6" height="6" fill="#0d0f14"/><rect x="52" y="59" width="6" height="6" fill="#f5c518"/>
+        <rect x="66" y="59" width="6" height="6" fill="#0d0f14"/><rect x="73" y="59" width="6" height="6" fill="#f5c518"/>
+        <rect x="45" y="66" width="6" height="6" fill="#f5c518"/><rect x="59" y="66" width="6" height="6" fill="#0d0f14"/>
+        <rect x="66" y="66" width="6" height="6" fill="#f5c518"/><rect x="45" y="73" width="6" height="6" fill="#0d0f14"/>
+        <rect x="52" y="73" width="6" height="6" fill="#f5c518"/><rect x="59" y="73" width="6" height="6" fill="#0d0f14"/>
+        <rect x="66" y="73" width="6" height="6" fill="#0d0f14"/><rect x="73" y="73" width="6" height="6" fill="#f5c518"/>
+        <rect x="45" y="80" width="6" height="6" fill="#f5c518"/><rect x="52" y="80" width="6" height="6" fill="#0d0f14"/>
+        <rect x="45" y="87" width="6" height="6" fill="#0d0f14"/><rect x="59" y="87" width="6" height="6" fill="#f5c518"/>
+        <rect x="66" y="87" width="6" height="6" fill="#0d0f14"/><rect x="73" y="87" width="6" height="6" fill="#f5c518"/>
+        <text x="50" y="96" text-anchor="middle" font-size="5" fill="#0d0f14" font-family="Arial" font-weight="bold">lumio.app</text>
+      </svg>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:14px;font-weight:700;color:var(--t1)">lumio.app/raul</div>
+      <div style="font-size:11px;color:var(--t2);margin-top:3px">Escanea o comparte el enlace</div>
+    </div>
+    <button class="mbtn" onclick="toast('🔗 ¡Enlace copiado al portapapeles!')">📋 Copiar enlace</button>
+    <button class="gbtn" style="width:100%" onclick="if(navigator.share)navigator.share({title:'Lumio',text:'¡Mira esta app de estudio!',url:'https://lumio.app/raul'}).catch(()=>{})">📤 Compartir</button>
   </div>
-  <div class="card" style="margin-bottom:10px;text-align:center;padding:16px">
-    <div style="font-size:36px;margin-bottom:8px">🏅</div>
-    <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:5px">¡Invita a tus amigos!</div>
-    <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Comparte Lumio y competid por estudiar más</div>
-    <button class="mbtn" onclick="toast('🔗 ¡Enlace copiado! Compártelo con tus amigos')">📋 Copiar enlace</button>
+
+  <!-- Acerca de -->
+  <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:10px;margin-top:4px">Acerca de Lumio</div>
+  <div class="about-section">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="width:52px;height:52px;background:var(--y);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">💡</div>
+      <div>
+        <div style="font-size:17px;font-weight:900;color:var(--t1)">Lumio</div>
+        <div style="font-size:11px;color:var(--t2)">Versión 2.0 · 2025</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:12px">
+      App de estudio inteligente diseñada para estudiantes de 2º ESO. Combina el método Pomodoro, flashcards con spaced repetition, IA generativa y herramientas de estudio en un solo lugar.
+    </div>
+    <div style="height:1px;background:var(--bd);margin-bottom:12px"></div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.7">
+      <div><span style="color:var(--t3)">Creado por</span> <span style="font-weight:700;color:var(--t1)" id="about-creator">Raúl</span></div>
+      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)">2º ESO · 2024–2025</span></div>
+      <div><span style="color:var(--t3)">Tecnología</span> <span style="font-weight:700;color:var(--t1)">HTML · CSS · JS · Claude AI</span></div>
+    </div>
   </div>
-  <div id="rank-list"></div>
+
+  <!-- Ajustes -->
+  <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:10px">Ajustes</div>
+  <div class="about-section" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Modo claro</div><div style="font-size:11px;color:var(--t2)">Para proyector o luz solar</div></div>
+      <button onclick="toggleTheme()" id="theme-toggle-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer">🌙 Oscuro</button>
+    </div>
+    <div style="height:1px;background:var(--bd)"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Tutorial</div><div style="font-size:11px;color:var(--t2)">Volver a ver el tutorial</div></div>
+      <button onclick="goTo('home');setTimeout(startTutorial,400)" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer">Ver tutorial</button>
+    </div>
+    <div style="height:1px;background:var(--bd)"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Borrar todos los datos</div><div style="font-size:11px;color:var(--t2)">Reinicia la app completamente</div></div>
+      <button onclick="if(confirm('¿Seguro? Se borrará todo.'))resetApp()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:#f87171;cursor:pointer">Reiniciar</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -700,42 +913,18 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 
 </div><!-- end screens -->
 
-<!-- NAV -->
+<!-- NAV 5 tabs -->
 <nav id="nav">
-  <button class="nb active" data-s="home" onclick="goTo('home')"><div class="ni">🏠</div><span>Inicio</span></button>
-  <button class="nb" data-s="materias" onclick="goTo('materias')"><div class="ni">📚</div><span>Materias</span></button>
-  <button class="nb" data-s="flashcards" onclick="goTo('flashcards')"><div class="ni">🃏</div><span>Tarjetas</span></button>
-  <button class="nb" data-s="testia" onclick="goTo('testia')"><div class="ni">🧠</div><span>Test IA</span></button>
-  <button class="nb" data-s="resumenia" onclick="goTo('resumenia')"><div class="ni">📄</div><span>Resumen</span></button>
-  <button class="nb" data-s="mapa" onclick="goTo('mapa')"><div class="ni">🗺️</div><span>Mapa</span></button>
-  <button class="nb" data-s="chat" onclick="goTo('chat')"><div class="ni">💬</div><span>Chat IA</span></button>
-  <button class="nb" data-s="vocab" onclick="goTo('vocab')"><div class="ni">🌐</div><span>Vocab</span></button>
-  <button class="nb" data-s="calc" onclick="goTo('calc')"><div class="ni">🔢</div><span>Calc</span></button>
-  <button class="nb" data-s="conversor" onclick="goTo('conversor')"><div class="ni">⚖️</div><span>Convers.</span></button>
-  <button class="nb" data-s="tabla" onclick="goTo('tabla')"><div class="ni">⚗️</div><span>Tabla P.</span></button>
-  <button class="nb" data-s="timeline" onclick="goTo('timeline')"><div class="ni">📜</div><span>Historia</span></button>
-  <button class="nb" data-s="horario" onclick="goTo('horario')"><div class="ni">📋</div><span>Horario</span></button>
-  <button class="nb" data-s="planificador" onclick="goTo('planificador')"><div class="ni">🗓️</div><span>Plan</span></button>
-  <button class="nb" data-s="examen" onclick="goTo('examen')"><div class="ni">📈</div><span>Examen</span></button>
-  <button class="nb" data-s="logros" onclick="goTo('logros')"><div class="ni">🏆</div><span>Logros</span></button>
-  <button class="nb" data-s="recordatorios" onclick="goTo('recordatorios')"><div class="ni">🔔</div><span>Avisos</span></button>
-  <button class="nb" data-s="calendario" onclick="goTo('calendario')"><div class="ni">📅</div><span>Calendario</span></button>
-  <button class="nb" data-s="sonidos" onclick="goTo('sonidos')"><div class="ni">🎵</div><span>Sonidos</span></button>
-  <button class="nb" data-s="amigos" onclick="goTo('amigos')"><div class="ni">👥</div><span>Amigos</span></button>
+  <button class="nb active" data-section="home" onclick="navSection('home')"><div class="ni">🏠</div><span>Inicio</span></button>
+  <button class="nb" data-section="estudiar" onclick="navSection('estudiar')"><div class="ni">📖</div><span>Estudiar</span></button>
+  <button class="nb" data-section="herramientas" onclick="navSection('herramientas')"><div class="ni">🔧</div><span>Herramientas</span></button>
+  <button class="nb" data-section="logros" onclick="navSection('logros')"><div class="ni">🏆</div><span>Logros</span></button>
+  <button class="nb" data-section="mas" onclick="navSection('mas')"><div class="ni">☰</div><span>Más</span></button>
 </nav>
 </div>
 
 <!-- MODALS -->
-<div class="mo" id="api-mo" style="display:none"><div class="mobox">
-  <div style="font-size:18px;font-weight:800;color:var(--t1)">🔑 API Key de Claude</div>
-  <div style="font-size:12px;color:var(--t2);line-height:1.6">Para las funciones de IA necesitas tu API key de Anthropic. Se guarda solo en tu navegador.</div>
-  <input class="inp" id="api-i" type="password" placeholder="sk-ant-api03-...">
-  <div style="display:flex;gap:8px">
-    <button class="gbtn" style="flex:1" onclick="clsMo('api')">Cancelar</button>
-    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="savK()">Guardar y continuar</button>
-  </div>
-  <div style="font-size:10px;color:var(--t3)">Consigue tu key en <b style="color:var(--t2)">console.anthropic.com</b></div>
-</div></div>
+<!-- API key not needed - built into Lumio -->
 
 <div class="mo" id="plan-mo" style="display:none"><div class="mobox">
   <div style="font-size:18px;font-weight:800;color:var(--t1)">➕ Nuevo examen</div>
@@ -779,6 +968,27 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
     <button class="gbtn" style="flex:1" onclick="clsMo('tl')">Cancelar</button>
     <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="saveTL()">Añadir</button>
   </div>
+</div></div>
+
+<!-- QUICK NOTE FLOAT -->
+<button id="quick-note-btn" onclick="openQuickNote()" title="Nota rápida">📝</button>
+
+<!-- QUICK NOTE MODAL -->
+<div class="mo" id="qnote-mo" style="display:none"><div class="mobox">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:18px;font-weight:800;color:var(--t1)">📝 Nota rápida</div>
+    <button onclick="clsMo('qnote')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
+  </div>
+  <div>
+    <div class="sl">Materia</div>
+    <div class="chip-row" id="qnote-chips" style="margin-bottom:10px"></div>
+  </div>
+  <textarea class="inp ta" id="qnote-ta" spellcheck="true" placeholder="Escribe tu nota aquí..." style="min-height:160px"></textarea>
+  <div style="display:flex;gap:7px;flex-wrap:wrap">
+    <button class="mbtn" style="flex:2;min-width:120px" onclick="saveQuickNote()">💾 Guardar</button>
+    <button class="gbtn" style="flex:1;min-width:100px" onclick="spellCheckNote('qnote-ta')">✅ Corregir</button>
+  </div>
+  <div id="qnote-status" style="font-size:11px;color:var(--t3);text-align:center;display:none"></div>
 </div></div>
 
 <div id="toast"></div>
@@ -946,19 +1156,48 @@ const RETOS=[
   {nm:'Estudia 3 materias distintas',ico:'📚',xp:35,prog:()=>Math.min(1,D.mats.filter(m=>m.h>0).length/3)},
 ];
 
+
 // ════════════════════════════════════════════════════════
-// NAVIGATION
+// NAVIGATION — 5 sections + sub-nav
 // ════════════════════════════════════════════════════════
-function goTo(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  const s=document.getElementById('s-'+id);
-  if(s)s.classList.add('active');
-  const b=document.querySelector(`.nb[data-s="${id}"]`);
-  if(b)b.classList.add('active');
-  const m={materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos};
-  if(m[id])m[id]();
+const SECTIONS={
+  home:{screens:['home'],labels:[]},
+  estudiar:{screens:['flashcards','testia','examen','resumenia','mapa','chat'],
+    labels:['🃏 Tarjetas','🧠 Test IA','📈 Examen','📄 Resumen','🗺️ Mapa','💬 Chat IA']},
+  herramientas:{screens:['calc','conversor','tabla','timeline','vocab','horario'],
+    labels:['🔢 Calc','⚖️ Conversor','⚗️ Tabla P.','📜 Historia','🌐 Vocab','📋 Horario']},
+  logros:{screens:['logros','recordatorios','calendario','sonidos'],
+    labels:['🏆 Logros','🔔 Avisos','📅 Calendario','🎵 Sonidos']},
+  mas:{screens:['materias','planificador','amigos'],
+    labels:['📚 Materias','🗓️ Planificador','👥 Invitar']},
+};
+let currentSection='home';let currentScreen='home';
+
+function navSection(sec){
+  currentSection=sec;
+  document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.section===sec));
+  const s=SECTIONS[sec];
+  const subNav=document.getElementById('sub-nav');
+  if(sec==='home'){subNav.classList.remove('show');subNav.innerHTML='';goTo('home');}
+  else{
+    subNav.classList.add('show');
+    subNav.innerHTML=s.screens.map((scr,i)=>`<button class="snb" data-scr="${scr}" onclick="goTo('${scr}')">${s.labels[i]}</button>`).join('');
+    const inSec=s.screens.includes(currentScreen);
+    goTo(inSec?currentScreen:s.screens[0]);
+  }
 }
+
+function goTo(id){
+  currentScreen=id;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
+  document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
+  const bldrs={materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos};
+  if(bldrs[id])bldrs[id]();
+  document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
+  const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
+}
+
 
 // ════════════════════════════════════════════════════════
 // HOME
@@ -991,11 +1230,28 @@ function bHome(){
   }
   updateXP();
   updateObjStatus();
+  renderStudyToday();
 }
 
-// ════════════════════════════════════════════════════════
-// XP SYSTEM
-// ════════════════════════════════════════════════════════
+function renderStudyToday(){
+  const el=document.getElementById('study-today');if(!el)return;
+  const recs=[];
+  const due=D.cards.filter(c=>c.lv===1).length;
+  if(due>0)recs.push({ico:'🃏',color:'var(--teal)',title:`Repasar ${due} flashcards pendientes`,sub:'Nivel Nuevo — mejor empezar aquí',action:"navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)"});
+  const nextExam=D.exams.filter(e=>new Date(e.fecha)>new Date()).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha))[0];
+  if(nextExam){const d=Math.ceil((new Date(nextExam.fecha)-Date.now())/864e5);recs.push({ico:nextExam.e,color:nextExam.c,title:`Preparar ${nextExam.mat}`,sub:`Examen en ${d} días · Ver plan`,action:"navSection('mas');setTimeout(()=>goTo('planificador'),50)"});}
+  const worst=[...D.mats].sort((a,b)=>a.p-b.p)[0];
+  if(worst)recs.push({ico:worst.e,color:worst.c,title:`Subir progreso en ${worst.n.split(' ')[0]}`,sub:`Solo ${worst.p}% de progreso`,action:"navSection('estudiar');setTimeout(()=>goTo('testia'),50)"});
+  if(D.week[getCurrentDayIdx()].m===0)recs.push({ico:'⏱',color:'var(--y)',title:'Empieza el primer Pomodoro',sub:'25 minutos de estudio enfocado',action:"showPomPre()"});
+  el.innerHTML=recs.slice(0,3).map(r=>`
+    <div class="today-card" onclick="${r.action}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:8px;background:${r.color}22;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${r.ico}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--t1)">${r.title}</div><div style="font-size:11px;color:var(--t2);margin-top:1px">${r.sub}</div></div>
+        <div style="font-size:14px;color:var(--t3)">→</div>
+      </div>
+    </div>`).join('')||'<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">¡Todo al día! Sigue así 🎉</div>';
+}
 const XP_LEVELS=[0,100,250,450,700,1000,1400,1900,2500,3200,4000];
 const XP_NAMES=['Principiante','Estudiante','Aplicado','Dedicado','Constante','Experto','Maestro','Sabio','Genio','Leyenda'];
 function gainXP(amount){
@@ -1026,28 +1282,41 @@ function updateXP(){
 let pomSettings={W:25*60,B:5*60};
 let po={s:pomSettings.W,run:false,brk:false,done:0,t:null};
 let focusActive=false;
+
+function showPomPre(){
+  const chips=document.getElementById('pom-pre-chips');
+  if(!chips)return;
+  chips.innerHTML=D.mats.map(m=>`<div class="chip${m.n===pomMatActiva?' on':''}" onclick="pomMatActiva='${m.n}';this.closest('#pom-pre-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${m.e} ${m.n.split(' ')[0]}</div>`).join('');
+  document.getElementById('pom-pre-mo').classList.add('show');
+}
+function confirmPomStart(){
+  document.getElementById('pom-pre-mo').classList.remove('show');
+  const btn=document.getElementById('pom-b');if(btn)btn.textContent='⏸ Pausar';
+  if(!po.run)tgPom();
+}
+
 function tgPom(){
   po.run=!po.run;
   const btn=document.getElementById('pom-b');
   const fmBtn=document.getElementById('fm-btn');
-  if(btn)btn.textContent=po.run?'Pausar':'Continuar';
+  if(btn)btn.textContent=po.run?'⏸ Pausar':'▶ Continuar';
   if(fmBtn)fmBtn.textContent=po.run?'Pausar':'Continuar';
   if(po.run){
     po.t=setInterval(()=>{
       po.s--;upPom();
       if(po.s<=0){
         clearInterval(po.t);po.run=false;
-        if(btn)btn.textContent='Iniciar';
+        if(btn)btn.textContent='▶ Iniciar';
         if(!po.brk){
           po.done++;D.user.pomodorosDone++;
           D.week[getCurrentDayIdx()].m+=pomSettings.W/60;
           D.user.hours=+(D.user.hours+(pomSettings.W/60/60)).toFixed(2);
           addHistorial(pomSettings.W/60);
-          gainXP(10);
+          gainXP(10);launchConfetti();
           po.brk=true;po.s=pomSettings.B;
           toast('🍅 ¡Pomodoro completado! +10 XP');
         }else{po.brk=false;po.s=pomSettings.W;toast('☕ ¡A estudiar!');}
-        upPom();
+        upPom();renderStudyToday();
       }
     },1000);
   }else clearInterval(po.t);
@@ -1090,7 +1359,7 @@ function addHistorial(mins){
 // ════════════════════════════════════════════════════════
 // OBJETIVO DIARIO
 // ════════════════════════════════════════════════════════
-let pomMatActiva='Matemáticas';
+let pomMatActiva=D.mats[0]?.n||'Matemáticas';
 function updateObjStatus(){
   const hoy=D.week[getCurrentDayIdx()].m;
   const goal=D.objetivoDiario;
@@ -1228,14 +1497,33 @@ function renderApunte(){
   const m=D.mats.find(x=>x.n===apuMat);
   const saved=apuntesDB[apuMat]||'';
   document.getElementById('apuntes-content').innerHTML=`
-    <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><div style="font-size:20px">${m?m.e:'📝'}</div><div style="font-size:13px;font-weight:700;color:var(--t1)">${apuMat}</div></div>
-    <textarea class="inp ta" id="nota-ta" style="min-height:180px" placeholder="Escribe tus apuntes de ${apuMat}...">${saved}</textarea>
-    <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:3px;margin-bottom:9px" id="nota-meta">${saved.length} chars</div>
-    <div style="display:flex;gap:7px">
-      <button class="mbtn" style="flex:2" onclick="saveApunte()">💾 Guardar</button>
-      <button class="gbtn" style="flex:1" onclick="sendApunteToResumen()">📄 Resumir</button>
-    </div>`;
-  document.getElementById('nota-ta').addEventListener('input',function(){document.getElementById('nota-meta').textContent=this.value.length+' chars';});
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+      <div style="font-size:20px">${m?m.e:'📝'}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--t1);flex:1">${apuMat}</div>
+      <div style="font-size:10px;color:var(--t3)" id="nota-meta">${saved.length} chars</div>
+    </div>
+    <div class="md-toolbar">
+      <button class="md-btn" onclick="mdInsert('**','**')" title="Negrita">B</button>
+      <button class="md-btn" onclick="mdInsert('*','*')" title="Cursiva"><em>I</em></button>
+      <button class="md-btn" onclick="mdInsert('# ','')" title="Título">H1</button>
+      <button class="md-btn" onclick="mdInsert('## ','')" title="Subtítulo">H2</button>
+      <button class="md-btn" onclick="mdInsert('- ','')" title="Lista">• Lista</button>
+      <button class="md-btn" onclick="mdInsert('> ','')" title="Cita">❝</button>
+      <button class="md-btn" onclick="mdInsert('---\\n','')" title="Separador">—</button>
+      <button class="md-btn" style="margin-left:auto" onclick="toggleMdPreview()" id="md-toggle-btn">👁 Vista</button>
+    </div>
+    <textarea class="inp ta" id="nota-ta" spellcheck="true" style="min-height:200px;font-size:13px;line-height:1.7;font-family:monospace" placeholder="Escribe tus apuntes...
+Usa **negrita**, *cursiva*, # Título...">${saved}</textarea>
+    <div class="md-preview" id="md-preview"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px">
+      <button class="mbtn" onclick="saveApunte()">💾 Guardar</button>
+      <button class="gbtn" onclick="spellCheckNote('nota-ta')">✅ Corregir</button>
+      <button class="gbtn" onclick="sendApunteToResumen()">📄 Resumir IA</button>
+      <button class="gbtn" onclick="exportApuntePDF()">🖨️ Exportar PDF</button>
+    </div>
+    <div id="spell-status" style="display:none;margin-top:8px;padding:10px;background:var(--bg2);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.6"></div>`;
+  const ta=document.getElementById('nota-ta');
+  ta.addEventListener('input',function(){document.getElementById('nota-meta').textContent=this.value.length+' chars';});
 }
 function saveApunte(){
   const val=document.getElementById('nota-ta')?.value||'';
@@ -1320,23 +1608,29 @@ function exRep(){document.getElementById('fc-rv').style.display='none';document.
 // ════════════════════════════════════════════════════════
 // IA HELPERS
 // ════════════════════════════════════════════════════════
-let pendCb=null;
+// ── IA BUILT-IN ──────────────────────────────────────────────────
+// La IA está integrada en Lumio — no necesitas ninguna API key
 async function callClaude(prompt,maxTokens=1500){
-  let key=localStorage.getItem('lumio_k');
-  if(!key)return new Promise(res=>{pendCb=async()=>res(await callClaude(prompt,maxTokens));document.getElementById('api-mo').style.display='flex';});
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})});
-  if(!r.ok){const e=await r.json();if(r.status===401){localStorage.removeItem('lumio_k');throw new Error('API key inválida');}throw new Error(e.error?.message||'Error '+r.status);}
-  const d=await r.json();return d.content[0].text;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:maxTokens,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error '+r.status);}
+    const d=await r.json();return d.content[0].text;
+  }catch(e){throw new Error(e.message||'Error de conexión');}
 }
-function clsMo(id){document.getElementById(id+'-mo').style.display='none';if(id==='api')pendCb=null;}
-function savK(){
-  const k=document.getElementById('api-i').value.trim();
-  if(!k.startsWith('sk-')){toast('⚠️ La key debe empezar por sk-');return;}
-  localStorage.setItem('lumio_k',k);document.getElementById('api-mo').style.display='none';
-  if(pendCb){const cb=pendCb;pendCb=null;cb();}
-}
+function clsMo(id){const el=document.getElementById(id+'-mo');if(el)el.style.display='none';}
+function savK(){}
 
 // ════════════════════════════════════════════════════════
 // TEST IA
@@ -1848,14 +2142,8 @@ function reqNotif(){Notification.requestPermission().then(p=>{if(p==='granted'){
 // ════════════════════════════════════════════════════════
 function bAmigos(){
   const myH=+(D.user.hours||0).toFixed(1);
-  document.getElementById('ami-hrs').textContent=myH+'h';
-  document.getElementById('rank-list').innerHTML=`<div style="background:var(--bg1);border:1px solid var(--yb);border-radius:12px;padding:13px;display:flex;align-items:center;gap:11px">
-    <div style="font-size:18px;font-weight:900;color:var(--y);width:26px">🥇</div>
-    <div style="width:38px;height:38px;border-radius:50%;background:rgba(245,197,24,.2);color:var(--y);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center">RA</div>
-    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">Raúl (tú) <span style="font-size:9px;font-weight:900;background:var(--y);color:#0d0f14;padding:2px 6px;border-radius:999px;margin-left:4px">Tú</span></div>
-    <div style="height:4px;background:var(--bg3);border-radius:3px;margin-top:5px;overflow:hidden"><div style="height:100%;width:100%;background:var(--y);border-radius:3px"></div></div></div>
-    <div style="font-size:18px;font-weight:900;color:var(--y)">${myH}h</div>
-  </div>`;
+  const ami=document.getElementById('ami-hrs');if(ami)ami.textContent=myH+'h';
+  const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1894,18 +2182,312 @@ function bCal(){
   </div>`).join(''):'<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Completa tu primer Pomodoro para ver el historial</div>';
 }
 
+function clearApunte(){if(!confirm('¿Borrar todos los apuntes de '+apuMat+'?'))return;apuntesDB[apuMat]='';localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));renderApunte();toast('🗑️ Apuntes borrados');}
+async function spellCheckNote(taId){
+  const ta=document.getElementById(taId);if(!ta||!ta.value.trim()){toast('⚠️ No hay texto para corregir');return;}
+  const statusId=taId==='nota-ta'?'spell-status':'qnote-status';
+  const statusEl=document.getElementById(statusId);
+  if(statusEl){statusEl.style.display='block';statusEl.textContent='✅ Corrigiendo faltas de ortografía...';}
+  const original=ta.value;
+  const btnText='✅ Corregir faltas';
+  try{
+    const prompt=`Eres un corrector de ortografía y gramática en español. Corrige TODOS los errores ortográficos, tildes, signos de puntuación y gramática del siguiente texto. Mantén el formato, saltos de línea y el contenido original intacto. Devuelve ÚNICAMENTE el texto corregido, sin explicaciones ni comentarios.\n\nTEXTO:\n${original}`;
+    const corrected=await callClaude(prompt,1000);
+    ta.value=corrected;
+    // Show diff summary
+    const changes=[];
+    const origWords=original.split(/\s+/);const corrWords=corrected.split(/\s+/);
+    for(let i=0;i<Math.min(origWords.length,corrWords.length);i++){
+      if(origWords[i]!==corrWords[i])changes.push(`"${origWords[i]}" → "${corrWords[i]}"`);
+    }
+    if(statusEl){
+      if(changes.length>0){
+        statusEl.innerHTML='<b style="color:var(--green)">✅ '+changes.length+' corrección'+(changes.length>1?'es':'')+' aplicada'+(changes.length>1?'s':'')+':</b><br>'+changes.slice(0,5).map(c=>`• ${c}`).join('<br>')+(changes.length>5?`<br>• y ${changes.length-5} más...`:'');
+      }else{
+        statusEl.textContent='✅ ¡Sin errores detectados! El texto está correcto.';
+      }
+    }
+    if(taId==='nota-ta'){const meta=document.getElementById('nota-meta');if(meta)meta.textContent=corrected.length+' chars';}
+    gainXP(1);
+  }catch(e){
+    if(statusEl)statusEl.textContent='❌ Error al corregir: '+e.message.slice(0,50);
+    toast('❌ Error al corregir');
+  }
+}
+
+// QUICK NOTE
+let qnoteMat=D.mats[0].n;
+function openQuickNote(){
+  document.getElementById('qnote-chips').innerHTML=D.mats.map(m=>`
+    <div class="chip${m.n===qnoteMat?' on':''}" onclick="setQnoteMat('${m.n}',this)">${m.e} ${m.n.split(' ')[0]}</div>`).join('');
+  // Load existing note for this mat
+  const saved=apuntesDB[qnoteMat]||'';
+  const ta=document.getElementById('qnote-ta');
+  if(ta)ta.value=saved;
+  const st=document.getElementById('qnote-status');if(st)st.style.display='none';
+  document.getElementById('qnote-mo').style.display='flex';
+}
+function setQnoteMat(mat,el){
+  qnoteMat=mat;
+  document.querySelectorAll('#qnote-chips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const saved=apuntesDB[qnoteMat]||'';
+  const ta=document.getElementById('qnote-ta');if(ta)ta.value=saved;
+}
+function saveQuickNote(){
+  const val=document.getElementById('qnote-ta')?.value||'';
+  apuntesDB[qnoteMat]=val;
+  localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
+  clsMo('qnote');
+  gainXP(2);
+  toast('💾 Apuntes de '+qnoteMat.split(' ')[0]+' guardados');
+  // Refresh apuntes view if open
+  if(apuMat===qnoteMat)renderApunte();
+}
 // ════════════════════════════════════════════════════════
-// TOAST
+// CONFETTI
 // ════════════════════════════════════════════════════════
+function launchConfetti(){
+  const c=document.getElementById('confetti-canvas');if(!c)return;
+  c.style.display='block';
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  const pieces=[];const colors=['#f5c518','#4ade80','#60a5fa','#f472b6','#2dd4bf','#fb923c'];
+  for(let i=0;i<80;i++)pieces.push({x:Math.random()*c.width,y:-20,w:8+Math.random()*8,h:4+Math.random()*4,color:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-0.5)*4,vy:3+Math.random()*4,rot:Math.random()*360,vr:(Math.random()-0.5)*8});
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pieces.forEach(p=>{
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=0.1;
+    });
+    frame++;
+    if(frame<120)requestAnimationFrame(draw);
+    else{ctx.clearRect(0,0,c.width,c.height);c.style.display='none';}
+  }
+  requestAnimationFrame(draw);
+}
+
+// ════════════════════════════════════════════════════════
+// THEME (dark / light)
+// ════════════════════════════════════════════════════════
+let isDark=true;
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'':'light');
+  const btn=document.getElementById('theme-btn');
+  const tbtn=document.getElementById('theme-toggle-btn');
+  if(btn)btn.textContent=isDark?'🌙':'☀️';
+  if(tbtn)tbtn.textContent=isDark?'🌙 Oscuro':'☀️ Claro';
+  localStorage.setItem('lumio_theme',isDark?'dark':'light');
+}
+
+// ════════════════════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════════════════════
+const ALL_MATS=[
+  {n:'Matemáticas',e:'📐'},{n:'Biología y Geo.',e:'🧬'},{n:'Física y Química',e:'⚗️'},
+  {n:'Geografía e Hist.',e:'🗺️'},{n:'Lengua',e:'📖'},{n:'Inglés',e:'🌐'},
+  {n:'Tecnología',e:'🔧'},{n:'Ed. Plástica',e:'🎨'},{n:'Música',e:'🎵'},
+  {n:'Ed. Física',e:'🏃'},{n:'Religión',e:'✝️'},{n:'Francés',e:'🥐'},
+];
+let obSelMats=new Set(['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica']);
+let obSelTime='tarde';
+
+function showOnboarding(){
+  document.getElementById('onboarding').style.display='flex';
+  document.getElementById('ob-mats-grid').innerHTML=ALL_MATS.map(m=>`
+    <div class="ob-mat${obSelMats.has(m.n)?' sel':''}" onclick="toggleObMat('${m.n}',this)">
+      <div class="ob-mat-ico">${m.e}</div>
+      <div class="ob-mat-nm">${m.n}</div>
+    </div>`).join('');
+}
+function toggleObMat(n,el){obSelMats.has(n)?obSelMats.delete(n):obSelMats.add(n);el.classList.toggle('sel',obSelMats.has(n));}
+function selTime(el){obSelTime=el.dataset.t;document.querySelectorAll('.ob-time').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');}
+function obNext(step){
+  if(step===1){
+    const name=document.getElementById('ob-name').value.trim();
+    if(!name){document.getElementById('ob-name').style.borderColor='#f87171';return;}
+    D.user.name=name;
+  }
+  document.getElementById('ob-'+step).classList.remove('active');
+  document.getElementById('ob-'+(step+1)).classList.add('active');
+}
+function obBack(step){
+  document.getElementById('ob-'+step).classList.remove('active');
+  document.getElementById('ob-'+(step-1)).classList.add('active');
+}
+function obFinish(){
+  // Apply selected mats
+  const MAT_COLORS={'Matemáticas':'#f5c518','Biología y Geo.':'#4ade80','Física y Química':'#60a5fa','Geografía e Hist.':'#fb923c','Lengua':'#f472b6','Inglés':'#c084fc','Tecnología':'#2dd4bf','Ed. Plástica':'#e879f9','Música':'#60a5fa','Ed. Física':'#fb923c','Religión':'#c084fc','Francés':'#4ade80'};
+  const MAT_EMOJI={'Matemáticas':'📐','Biología y Geo.':'🧬','Física y Química':'⚗️','Geografía e Hist.':'🗺️','Lengua':'📖','Inglés':'🌐','Tecnología':'🔧','Ed. Plástica':'🎨','Música':'🎵','Ed. Física':'🏃','Religión':'✝️','Francés':'🥐'};
+  D.mats=[...obSelMats].map((n,i)=>({id:'m'+(i+1),n,c:MAT_COLORS[n]||'#8a94a6',e:MAT_EMOJI[n]||'📚',p:0,h:0,t:8,ok:0}));
+  // Filter cards to selected mats
+  const matNames=new Set(D.mats.map(m=>m.n));
+  D.cards=D.cards.filter(c=>matNames.has(c.m));
+  // Set study time preference
+  D.user.studyTime=obSelTime;
+  // Save & close
+  localStorage.setItem('lumio_seen_onboarding','1');
+  localStorage.setItem('lumio_user',JSON.stringify({name:D.user.name,studyTime:obSelTime}));
+  document.getElementById('onboarding').classList.add('out');
+  setTimeout(()=>{document.getElementById('onboarding').style.display='none';},500);
+  bHome();pomMatActiva=D.mats[0]?.n||'Matemáticas';
+  // Update about creator name
+  const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+  setTimeout(startTutorial,800);
+}
+
+// ════════════════════════════════════════════════════════
+// TUTORIAL
+// ════════════════════════════════════════════════════════
+const TUT_STEPS=[
+  {id:'pom-d',msg:'⏱ Este es tu Pomodoro. Pulsa "▶ Iniciar" para empezar una sesión de estudio de 25 min.',pos:'bottom'},
+  {id:'study-today',msg:'🎯 Aquí te decimos exactamente qué estudiar hoy. Toca cualquier sugerencia para ir directo.',pos:'bottom'},
+  {id:'nav',msg:'📱 Estos son los 5 menús principales. "Estudiar" tiene flashcards, tests y más. Desliza para ver todos.',pos:'top'},
+  {id:'quick-note-btn',msg:'📝 Botón de nota rápida. Siempre visible para apuntar algo al vuelo sin perder el hilo.',pos:'top'},
+];
+let tutStep=0;
+function startTutorial(){
+  if(localStorage.getItem('lumio_seen_tutorial'))return;
+  tutStep=0;showTutStep();
+}
+function showTutStep(){
+  const ov=document.getElementById('tutorial-overlay');if(!ov)return;
+  if(tutStep>=TUT_STEPS.length){ov.style.display='none';ov.innerHTML='';localStorage.setItem('lumio_seen_tutorial','1');return;}
+  const s=TUT_STEPS[tutStep];
+  const el=document.getElementById(s.id);if(!el){tutStep++;showTutStep();return;}
+  const r=el.getBoundingClientRect();
+  const pad=8;
+  ov.style.display='block';
+  ov.innerHTML=`
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.55)" onclick="tutStep++;showTutStep()"></div>
+    <div class="tut-spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>
+    <div class="tut-bubble" style="${s.pos==='bottom'?`top:${r.bottom+14}px`:`bottom:${window.innerHeight-r.top+14}px`};left:${Math.min(r.left,window.innerWidth-220)}px" onclick="tutStep++;showTutStep()">
+      ${s.msg}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// MARKDOWN HELPERS
+// ════════════════════════════════════════════════════════
+function mdInsert(before,after){
+  const ta=document.getElementById('nota-ta');if(!ta)return;
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  const sel=ta.value.slice(s,e);
+  ta.value=ta.value.slice(0,s)+before+sel+after+ta.value.slice(e);
+  ta.selectionStart=s+before.length;ta.selectionEnd=s+before.length+sel.length;
+  ta.focus();
+}
+function toggleMdPreview(){
+  const ta=document.getElementById('nota-ta');
+  const pre=document.getElementById('md-preview');
+  const btn=document.getElementById('md-toggle-btn');
+  if(!ta||!pre||!btn)return;
+  const show=pre.style.display==='none';
+  pre.style.display=show?'block':'none';
+  ta.style.display=show?'none':'block';
+  btn.textContent=show?'✏️ Editar':'👁 Vista';
+  if(show)pre.innerHTML=mdToHtml(ta.value);
+}
+function mdToHtml(md){
+  return md
+    .replace(/^### (.+)/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^- (.+)/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs,'<ul>$1</ul>')
+    .replace(/^> (.+)/gm,'<blockquote style="border-left:3px solid var(--y);padding-left:10px;color:var(--t2)">$1</blockquote>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">')
+    .replace(/\n/g,'<br>');
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT PDF (apuntes)
+// ════════════════════════════════════════════════════════
+function exportApuntePDF(){
+  const ta=document.getElementById('nota-ta');if(!ta||!ta.value.trim()){toast('⚠️ No hay apuntes para exportar');return;}
+  const m=D.mats.find(x=>x.n===apuMat);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${apuMat} — Lumio</title>
+  <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.7}
+  h1{color:#0d0f14;border-bottom:2px solid #f5c518;padding-bottom:8px}
+  h2{color:#333}strong{font-weight:700}em{font-style:italic}
+  blockquote{border-left:3px solid #f5c518;padding-left:12px;color:#555}
+  hr{border:none;border-top:1px solid #ddd;margin:16px 0}
+  ul{padding-left:20px}li{margin-bottom:4px}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid #eee}
+  .logo{width:40px;height:40px;background:#f5c518;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .meta{font-size:13px;color:#888;margin-top:20px}
+  </style></head><body>
+  <div class="header"><div class="logo">💡</div><div><strong style="font-size:18px">${apuMat}</strong><div style="font-size:12px;color:#888">Apuntes de ${D.user.name} · Lumio · 2º ESO Anaya</div></div></div>
+  ${mdToHtml(ta.value)}
+  <div class="meta">Exportado desde Lumio · ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}</div>
+  </body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`Lumio_${apuMat.replace(/\s/g,'_')}_${D.user.name}.html`;
+  a.click();URL.revokeObjectURL(url);
+  toast('🖨️ Apuntes exportados — ábrelos en el navegador e imprime');gainXP(3);
+}
+
+// ════════════════════════════════════════════════════════
+// RESET APP
+// ════════════════════════════════════════════════════════
+function resetApp(){
+  ['lumio_apuntes','lumio_plan','lumio_tl','lumio_horario','lumio_theme','lumio_seen_onboarding','lumio_seen_tutorial','lumio_user'].forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+
+
 let tt;
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2800);}
+function toast(msg){const el=document.getElementById('toast');if(el){el.textContent=msg;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2800);}}
 
 // ════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',()=>{
+  // Restore theme
+  const savedTheme=localStorage.getItem('lumio_theme');
+  if(savedTheme==='light'){isDark=false;document.documentElement.setAttribute('data-theme','light');const tb=document.getElementById('theme-btn');if(tb)tb.textContent='☀️';}
+
+  // Restore user data
+  const savedUser=JSON.parse(localStorage.getItem('lumio_user')||'null');
+  if(savedUser){D.user.name=savedUser.name;D.user.studyTime=savedUser.studyTime;}
+
+  // PWA Service Worker
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+
+  // PWA install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferredPrompt=e;
+    const btn=document.createElement('button');
+    btn.textContent='📲 Instalar Lumio';
+    btn.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+    btn.onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>btn.remove());};
+    document.body.appendChild(btn);setTimeout(()=>btn.remove(),10000);
+  });
+
+  // Update about creator name
+  const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+
+  // Init screens
   bHome();upPom();bIA();bVocab();bResumen();bExamen();
-  setTimeout(()=>document.getElementById('splash').classList.add('out'),2000);
+
+  // Splash then onboarding or app
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    setTimeout(()=>{
+      if(!localStorage.getItem('lumio_seen_onboarding')){
+        showOnboarding();
+      }else{
+        setTimeout(startTutorial,600);
+      }
+    },600);
+  },1800);
 });
 </script>
 </body>
