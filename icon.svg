@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#f5c518"/>
+  <!-- Bulb body -->
+  <circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="28"/>
+  <!-- Bulb bottom curve -->
+  <path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/>
+  <!-- Base rings -->
+  <rect x="216" y="364" width="80" height="22" rx="11" fill="#0d0f14"/>
+  <rect x="226" y="400" width="60" height="20" rx="10" fill="#0d0f14"/>
+  <rect x="236" y="432" width="40" height="18" rx="9" fill="#0d0f14"/>
+  <!-- Rays -->
+  <line x1="256" y1="82"  x2="256" y2="52"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+  <line x1="366" y1="118" x2="388" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+  <line x1="146" y1="118" x2="124" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+  <line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+  <line x1="76"  y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+</svg>
