@@ -361,6 +361,30 @@ button:active{transform:scale(.97)}
 /* ══ REPASO RAPIDO ══ */
 .quick-rep-badge{background:var(--y);color:#0d0f14;font-size:9px;font-weight:900;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
 </style>
+<!-- UPDATE INTERCEPTOR: en el <head>, ANTES de renderizar el body.
+     Así document.open() no causa pantalla negra porque nada se ha pintado aún. -->
+<script>
+(function(){
+  try{
+    var pending=localStorage.getItem('lumio_pending_html');
+    if(!pending)return;
+    localStorage.removeItem('lumio_pending_html');
+    // Restaurar datos del usuario
+    var raw=localStorage.getItem('lumio_update_backup');
+    if(raw){
+      localStorage.removeItem('lumio_update_backup');
+      var backup=JSON.parse(raw);
+      Object.keys(backup).forEach(function(k){
+        try{localStorage.setItem(k,backup[k]);}catch(e){}
+      });
+    }
+    // Aplicar nuevo HTML — estamos en el head, nada renderizado aún → sin pantalla negra
+    document.open('text/html','replace');
+    document.write(pending);
+    document.close();
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 <!-- SPLASH -->
@@ -1810,31 +1834,6 @@ button:active{transform:scale(.97)}
 <div id="toast"></div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ════════════════════════════════════════════════════════
-// UPDATE INTERCEPTOR — se ejecuta ANTES que cualquier cosa
-// Funciona en PWA (pantalla de inicio), iOS Safari y Android
-// ════════════════════════════════════════════════════════
-(function(){
-  try{
-    const pending=localStorage.getItem('lumio_pending_html');
-    if(!pending)return;
-    // Hay una actualización esperando — aplicarla ahora
-    localStorage.removeItem('lumio_pending_html');
-    // Restaurar datos del usuario
-    const backup=JSON.parse(localStorage.getItem('lumio_update_backup')||'null');
-    if(backup){
-      localStorage.removeItem('lumio_update_backup');
-      Object.entries(backup).forEach(function(e){
-        try{localStorage.setItem(e[0],e[1]);}catch(err){}
-      });
-    }
-    // Reemplazar el documento completo — funciona en arranque limpio (no en PWA standalone sin reload)
-    document.open('text/html','replace');
-    document.write(pending);
-    document.close();
-  }catch(e){}
-})();
-
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
@@ -5317,4 +5316,16 @@ window.addEventListener('DOMContentLoaded',()=>{
 
   // Splash then onboarding or app
   setTimeout(()=>{
-    document.getElementById('splash').classList.
+    document.getElementById('splash').classList.add('out');
+    setTimeout(()=>{
+      if(!localStorage.getItem('lumio_seen_onboarding')){
+        showOnboarding();
+      }else{
+        setTimeout(startTutorial,600);
+      }
+    },600);
+  },1800);
+});
+</script>
+</body>
+</html>
