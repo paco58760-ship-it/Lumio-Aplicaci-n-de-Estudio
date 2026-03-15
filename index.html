@@ -1650,7 +1650,7 @@ button:active{transform:scale(.97)}
     <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
     <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
   </div>
-  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a6d6c7c5c9939e919096e6c1cbc7cfca88c5c9cb">[email&#160;protected]</a></span></div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
   <div><div class="sl">Tipo</div>
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
       <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
@@ -1833,7 +1833,7 @@ button:active{transform:scale(.97)}
 
 <div id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
@@ -2069,7 +2069,7 @@ function bHome(){
   if(dateEl)dateEl.textContent=days[now.getDay()]+' '+now.getDate()+' de '+months[now.getMonth()];
   const tot=D.week.reduce((a,b)=>a+b.m,0);
   document.getElementById('pc-h').textContent=tot>=60?Math.floor(tot/60)+'h '+(tot%60)+'m':Math.round(tot)+'m';
-  const pct=Math.round(D.mats.reduce((a,m)=>a+m.p,0)/D.mats.length);
+  const pct=D.mats.length?Math.round(D.mats.reduce((a,m)=>a+m.p,0)/D.mats.length):0;
   document.getElementById('pc-p').textContent=pct+'%';
   setTimeout(()=>{const el=document.getElementById('pc-f');if(el)el.style.width=pct+'%';},350);
   document.getElementById('h-fc').textContent=D.cards.length?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
@@ -5277,54 +5277,87 @@ function toast(msg){const el=document.getElementById('toast');if(el){el.textCont
 // INIT
 // ════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',()=>{
-  // Load full persisted state FIRST
-  loadState();
 
-  // Restore theme
-  const savedTheme=localStorage.getItem('lumio_theme');
-  if(savedTheme==='light'){isDark=false;document.documentElement.setAttribute('data-theme','light');const tb=document.getElementById('theme-btn');if(tb)tb.textContent='☀️';}
+  // ── Garantía absoluta: la splash siempre desaparece ──────────────
+  // Si cualquier cosa falla, este timer fuerza la salida a los 4s
+  const splashGuard=setTimeout(()=>{
+    const sp=document.getElementById('splash');
+    if(sp&&sp.style.opacity!=='0'){
+      sp.classList.add('out');
+      setTimeout(()=>{
+        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
+      },600);
+    }
+  },4000);
 
-  // Restore user data (legacy key compatibility)
-  const savedUser=JSON.parse(localStorage.getItem('lumio_user')||'null');
-  if(savedUser){D.user.name=savedUser.name;if(savedUser.studyTime)D.user.studyTime=savedUser.studyTime;}
+  try{
+    // Load full persisted state FIRST
+    loadState();
 
-  // PWA Service Worker
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+    // Restore theme
+    const savedTheme=localStorage.getItem('lumio_theme');
+    if(savedTheme==='light'){isDark=false;document.documentElement.setAttribute('data-theme','light');const tb=document.getElementById('theme-btn');if(tb)tb.textContent='☀️';}
 
-  // PWA install prompt
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt',e=>{
-    e.preventDefault();deferredPrompt=e;
-    const btn=document.createElement('button');
-    btn.textContent='📲 Instalar Lumio';
-    btn.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
-    btn.onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>btn.remove());};
-    document.body.appendChild(btn);setTimeout(()=>btn.remove(),10000);
-  });
+    // Restore user data (legacy key compatibility)
+    const savedUser=JSON.parse(localStorage.getItem('lumio_user')||'null');
+    if(savedUser){D.user.name=savedUser.name;if(savedUser.studyTime)D.user.studyTime=savedUser.studyTime;}
 
-  // Update about creator name
-  const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+    // PWA Service Worker
+    if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 
-  // Init screens
-  bHome();upPom();bIA();bVocab();bResumen();bExamen();
+    // PWA install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt',e=>{
+      e.preventDefault();deferredPrompt=e;
+      const btn=document.createElement('button');
+      btn.textContent='📲 Instalar Lumio';
+      btn.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+      btn.onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>btn.remove());};
+      document.body.appendChild(btn);setTimeout(()=>btn.remove(),10000);
+    });
 
-  // Init swipe on flashcards (delayed so DOM is ready)
-  setTimeout(initSwipe, 500);
+    // Update about creator name
+    const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
 
-  // Check for imminent exams
-  setTimeout(checkImminentExam, 2000);
+    // Init screens — each wrapped so one crash doesn't stop the rest
+    try{bHome();}catch(e){}
+    try{upPom();}catch(e){}
+    try{bIA();}catch(e){}
+    try{bVocab();}catch(e){}
+    try{bResumen();}catch(e){}
+    try{bExamen();}catch(e){}
 
-  // Splash then onboarding or app
-  setTimeout(()=>{
-    document.getElementById('splash').classList.add('out');
+    // Init swipe on flashcards (delayed so DOM is ready)
+    setTimeout(()=>{try{initSwipe();}catch(e){}}, 500);
+
+    // Check for imminent exams
+    setTimeout(()=>{try{checkImminentExam();}catch(e){}}, 2000);
+
+    // Splash → onboarding or app
     setTimeout(()=>{
-      if(!localStorage.getItem('lumio_seen_onboarding')){
-        showOnboarding();
-      }else{
-        setTimeout(startTutorial,600);
-      }
-    },600);
-  },1800);
+      clearTimeout(splashGuard); // ya no necesitamos el guard
+      const sp=document.getElementById('splash');
+      if(sp)sp.classList.add('out');
+      setTimeout(()=>{
+        if(!localStorage.getItem('lumio_seen_onboarding')){
+          showOnboarding();
+        }else{
+          setTimeout(()=>{try{startTutorial();}catch(e){}},600);
+        }
+      },600);
+    },1800);
+
+  }catch(e){
+    // Si algo falla en el arranque, al menos quitamos la splash
+    clearTimeout(splashGuard);
+    console.error('Lumio init error:',e);
+    setTimeout(()=>{
+      const sp=document.getElementById('splash');if(sp)sp.classList.add('out');
+      setTimeout(()=>{
+        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
+      },600);
+    },500);
+  }
 });
 </script>
 </body>
