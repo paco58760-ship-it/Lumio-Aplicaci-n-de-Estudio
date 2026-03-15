@@ -226,6 +226,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:970;display:none}
 /* TUTORIAL */
 #tutorial-overlay{position:fixed;inset:0;z-index:960;display:none}
+@keyframes tutCardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 /* POM SUBJECT MODAL */
 #pom-pre-mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:900}
 #pom-pre-mo.show{display:flex}
@@ -543,7 +544,7 @@ button:active{transform:scale(.97)}
 
   <!-- BIG POMODORO BUTTON -->
   <div style="margin-bottom:16px">
-    <button onclick="navSection('pomodoro')" style="width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:16px;padding:18px 16px;font-size:17px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font);transition:transform .12s,opacity .15s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
+    <button onclick="navSection('estudiar');setTimeout(()=>goTo('pom-screen'),50)" style="width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:16px;padding:18px 16px;font-size:17px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font);transition:transform .12s,opacity .15s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
       <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#0d0f14" stroke-width="2.5" fill="none"/><path d="M10 8.5l5 3.5-5 3.5V8.5z" fill="#0d0f14"/></svg>
       <span id="h-pom-txt">▶ Empezar Pomodoro</span>
       <span style="font-size:13px;font-weight:700;background:rgba(0,0,0,.15);padding:4px 10px;border-radius:999px" id="h-pom-timer">25:00</span>
@@ -560,15 +561,15 @@ button:active{transform:scale(.97)}
 
   <!-- Exámenes -->
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Exámenes próximos 📅</div>
-  <div id="exams-list" style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection('mas');setTimeout(()=>goTo('planificador'),50)">Añadir →</span></div></div>
+  <div id="exams-list" style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)">Añadir →</span></div></div>
 
   <!-- Quick grid -->
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Acceso rápido</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
-    <div onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)" style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">🃏</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Flashcards</div><div style="font-size:11px;color:var(--teal);margin-top:2px" id="h-fc">49 tarjetas</div></div>
+    <div onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)" style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">🃏</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Flashcards</div><div style="font-size:11px;color:var(--teal);margin-top:2px" id="h-fc">0 tarjetas</div></div>
     <div onclick="startQuickRep()" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">⚡</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Repaso rápido<span class="quick-rep-badge">5 min</span></div><div style="font-size:11px;color:var(--y);margin-top:2px">10 tarjetas débiles</div></div>
-    <div onclick="navSection('estudiar');setTimeout(()=>goTo('resumenia'),50)" style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📄</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Resumen IA</div><div style="font-size:11px;color:var(--blue);margin-top:2px">Bullet points</div></div>
-    <div onclick="navSection('stats')" style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📊</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Estadísticas</div><div style="font-size:11px;color:var(--purple);margin-top:2px">Progreso detallado</div></div>
+    <div onclick="navSection('agenda');setTimeout(()=>goTo('agenda'),50)" style="background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📋</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Deberes</div><div style="font-size:11px;color:var(--orange);margin-top:2px" id="h-deberes-count">Ver pendientes</div></div>
+    <div onclick="navSection('perfil');setTimeout(()=>goTo('stats'),50)" style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📊</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Estadísticas</div><div style="font-size:11px;color:var(--purple);margin-top:2px">Tu progreso</div></div>
   </div>
 </div>
 </div>
@@ -684,26 +685,72 @@ button:active{transform:scale(.97)}
 </div>
 </div>
 
+<!-- ══ APUNTES (pantalla propia en Estudiar) ══ -->
+<div class="screen" id="s-apuntes">
+<div class="pw">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div>
+      <div class="pt">Mis <em>apuntes</em></div>
+      <div class="ps" style="margin-bottom:0">Escribe, edita y exporta por materia</div>
+    </div>
+    <button class="gbtn" onclick="exportApuntePDF()" style="font-size:11px;padding:7px 12px">🖨️ Exportar</button>
+  </div>
+  <!-- Selector de materia en chips horizontales -->
+  <div class="chip-row" id="apuntes-screen-chips" style="margin-bottom:12px"></div>
+  <!-- Contenido del editor -->
+  <div id="apuntes-screen-content"></div>
+</div>
+</div>
+
 <!-- ══ FLASHCARDS ══ -->
 <div class="screen" id="s-flashcards">
+  <!-- VISTA LISTA -->
   <div id="fc-lv"><div class="pw">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-      <div><div class="pt">Flash<em>cards</em></div><div class="ps" id="fc-s">49 tarjetas</div></div>
-      <button style="background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer" onclick="stRep()">▶ Repasar</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div class="pt" style="margin-bottom:2px">Flash<em>cards</em></div>
+        <div class="ps" style="margin-bottom:0" id="fc-s">0 tarjetas</div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button style="background:var(--bg1);border:1px solid var(--bd2);color:var(--t2);border-radius:10px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="showGenFC()">✨ IA</button>
+        <button style="background:var(--y);color:#0d0f14;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="showAddCard()">+ Nueva</button>
+      </div>
     </div>
-    <div class="chip-row" id="fc-ch"></div>
-    <div style="display:flex;gap:5px;margin-bottom:12px" id="fc-lvl"></div>
-    <div class="sl">Tarjetas</div>
-    <div id="fc-lst"></div>
+
+    <!-- Empty state -->
+    <div id="fc-empty" style="display:none;text-align:center;padding:44px 20px">
+      <div style="font-size:56px;margin-bottom:12px">🃏</div>
+      <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px">Sin tarjetas todavía</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px">Crea tus propias flashcards<br>o déjale a la IA que las genere por ti</div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto">
+        <button class="mbtn" onclick="showAddCard()">+ Crear flashcard</button>
+        <button class="gbtn" onclick="showGenFC()">✨ Generar con IA</button>
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div id="fc-filters" style="display:none">
+      <input class="inp" id="fc-search" placeholder="🔍 Buscar tarjeta..." oninput="bFC()" style="margin-bottom:10px">
+      <div class="chip-row" id="fc-ch"></div>
+      <div style="display:flex;gap:5px;margin-bottom:12px" id="fc-lvl"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Mis tarjetas</div>
+        <button style="background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="stRep()">▶ Repasar todo</button>
+      </div>
+      <div id="fc-lst"></div>
+    </div>
   </div></div>
+
+  <!-- VISTA REPASO -->
   <div id="fc-rv" style="display:none;height:100%;overflow-y:auto">
     <div style="height:100%;display:flex;flex-direction:column;padding:18px 16px;gap:12px">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <button class="gbtn" style="padding:7px 13px;font-size:12px" onclick="exRep()">← Salir</button>
-        <div style="font-size:12px;font-weight:700;color:var(--t1)" id="rp-p">1/8</div>
-        <span id="rp-m" style="font-size:10px;font-weight:700;color:var(--y);background:var(--yd);border:1px solid var(--yb);padding:3px 9px;border-radius:999px">Bio</span>
+        <div style="font-size:12px;font-weight:700;color:var(--t1)" id="rp-p">1/1</div>
+        <span id="rp-m" style="font-size:10px;font-weight:700;color:var(--y);background:var(--yd);border:1px solid var(--yb);padding:3px 9px;border-radius:999px">—</span>
       </div>
       <div style="height:3px;background:var(--bg1);border-radius:2px;overflow:hidden"><div style="height:100%;background:var(--y);border-radius:2px;transition:width .3s" id="rp-f"></div></div>
+      <div style="font-size:11px;color:var(--t3);text-align:center">← desliza izquierda: no lo sabía · derecha: lo sabía →</div>
       <div style="flex:1;perspective:1200px;min-height:200px;cursor:pointer;position:relative" id="fc-card-wrap" onclick="doFlip()">
         <div class="fc-swipe-overlay fc-swipe-ok" id="fc-swipe-ok">✓</div>
         <div class="fc-swipe-overlay fc-swipe-ko" id="fc-swipe-ko">✗</div>
@@ -711,7 +758,7 @@ button:active{transform:scale(.97)}
           <div style="position:absolute;inset:0;backface-visibility:hidden;background:var(--bg1);border:1px solid var(--bd);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:10px">
             <div style="font-size:9px;font-weight:800;color:var(--y);letter-spacing:.12em;text-transform:uppercase">Pregunta</div>
             <div style="font-size:18px;font-weight:700;color:var(--t1);line-height:1.4" id="fc-q"></div>
-            <div style="font-size:11px;color:var(--t3);font-style:italic">Toca para ver la respuesta</div>
+            <div style="font-size:11px;color:var(--t3);font-style:italic;margin-top:4px">Toca para ver la respuesta</div>
           </div>
           <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);background:#0e1d1a;border:1px solid rgba(45,212,191,.2);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:10px">
             <div style="font-size:9px;font-weight:800;color:var(--teal);letter-spacing:.12em;text-transform:uppercase">Respuesta</div>
@@ -725,9 +772,12 @@ button:active{transform:scale(.97)}
       </div>
     </div>
   </div>
-  <div id="fc-dv" style="display:none;padding:60px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px">
-    <div style="font-size:56px">🎉</div><div class="pt">¡Completado!</div>
-    <div style="color:var(--t2);font-size:13px">Has repasado todas las tarjetas</div>
+
+  <!-- VISTA COMPLETADO -->
+  <div id="fc-dv" style="display:none;padding:60px 20px;text-align:center;flex-direction:column;align-items:center;gap:14px">
+    <div style="font-size:56px">🎉</div>
+    <div class="pt">¡Completado!</div>
+    <div style="color:var(--t2);font-size:13px" id="fc-dv-stats">Has repasado todas las tarjetas</div>
     <button class="mbtn" style="max-width:200px;margin-top:8px" onclick="exRep()">← Volver</button>
   </div>
 </div>
@@ -1049,11 +1099,9 @@ button:active{transform:scale(.97)}
 <div class="pw">
   <div class="pt">Invitar <em>amigos</em> 👥</div>
   <div class="ps">Comparte Lumio con tus compañeros del cole</div>
-  <!-- QR Code visual -->
   <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px">
     <div style="width:140px;height:140px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center" id="qr-wrap">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
-        <!-- QR pattern visual (decorative) -->
         <rect width="100" height="100" fill="white"/>
         <rect x="5" y="5" width="35" height="35" rx="3" fill="none" stroke="#0d0f14" stroke-width="4"/>
         <rect x="12" y="12" width="21" height="21" rx="1" fill="#0d0f14"/>
@@ -1087,54 +1135,88 @@ button:active{transform:scale(.97)}
     <button class="mbtn" onclick="toast('🔗 ¡Enlace copiado al portapapeles!')">📋 Copiar enlace</button>
     <button class="gbtn" style="width:100%" onclick="if(navigator.share)navigator.share({title:'Lumio',text:'¡Mira esta app de estudio!',url:'https://lumio.app/raul'}).catch(()=>{})">📤 Compartir</button>
   </div>
-
-  <!-- Acerca de -->
-  <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:10px;margin-top:4px">Acerca de Lumio</div>
-  <div class="about-section">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <div style="width:52px;height:52px;background:var(--y);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:10px">
+  <div class="card" style="margin-top:4px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:44px;height:44px;background:var(--y);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:8px">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%"><circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="32"/><path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="30" stroke-linecap="round"/><rect x="216" y="364" width="80" height="26" rx="13" fill="#0d0f14"/><rect x="226" y="402" width="60" height="22" rx="11" fill="#0d0f14"/><line x1="256" y1="82" x2="256" y2="52" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="76" y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/></svg>
       </div>
       <div>
-        <div style="font-size:17px;font-weight:900;color:var(--t1)">Lumio</div>
-        <div style="font-size:11px;color:var(--t2)">Versión <span id="about-version">3.0.0</span> · 2025</div>
+        <div style="font-size:16px;font-weight:900;color:var(--t1)">Lumio</div>
+        <div style="font-size:11px;color:var(--t2)">Versión <span id="about-version">3.1.0</span> · 2025</div>
       </div>
     </div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:12px">
-      App de estudio inteligente diseñada para estudiantes de 2º ESO. Combina el método Pomodoro, flashcards con spaced repetition, IA generativa y herramientas de estudio en un solo lugar.
-    </div>
-    <div style="height:1px;background:var(--bd);margin-bottom:12px"></div>
-    <div style="font-size:12px;color:var(--t2);line-height:1.7">
+    <div style="height:1px;background:var(--bd);margin:12px 0"></div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.8">
       <div><span style="color:var(--t3)">Creado por</span> <span style="font-weight:700;color:var(--t1)" id="about-creator">Raúl</span></div>
       <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)">2º ESO · 2024–2025</span></div>
       <div><span style="color:var(--t3)">Tecnología</span> <span style="font-weight:700;color:var(--t1)">HTML · CSS · JS · Claude AI</span></div>
     </div>
   </div>
+</div>
+</div>
 
-  <!-- Ajustes -->
-  <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:10px">Ajustes</div>
-  <div class="about-section" style="display:flex;flex-direction:column;gap:12px">
+<!-- ══ AJUSTES ══ -->
+<div class="screen" id="s-ajustes">
+<div class="pw">
+  <div class="pt">Ajus<em>tes</em> ⚙️</div>
+  <div class="ps">Personaliza tu experiencia en Lumio</div>
+
+  <!-- Apariencia -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Apariencia</div>
+  <div class="card" style="margin-bottom:14px">
     <div style="display:flex;align-items:center;justify-content:space-between">
-      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Modo claro</div><div style="font-size:11px;color:var(--t2)">Para proyector o luz solar</div></div>
-      <button onclick="toggleTheme()" id="theme-toggle-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer">🌙 Oscuro</button>
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Tema</div><div style="font-size:11px;color:var(--t2)">Modo claro para proyector o luz solar</div></div>
+      <button onclick="toggleTheme()" id="theme-toggle-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">🌙 Oscuro</button>
     </div>
-    <div style="height:1px;background:var(--bd)"></div>
+  </div>
+
+  <!-- Actualizar -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Actualizaciones</div>
+  <div class="card" style="margin-bottom:14px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--t1)">Actualizar app</div>
-        <div style="font-size:11px;color:var(--t2)" id="update-status">Versión <span id="update-version-lbl">3.0.0</span></div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">Actualizar Lumio</div>
+        <div style="font-size:11px;color:var(--t2)" id="update-status">Versión <span id="update-version-lbl">3.1.0</span></div>
       </div>
-      <button onclick="checkUpdate()" id="update-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">Buscar</button>
+      <button onclick="checkUpdate()" id="update-btn" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">🔍 Buscar</button>
     </div>
-    <div style="height:1px;background:var(--bd)"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Tutorial</div><div style="font-size:11px;color:var(--t2)">Volver a ver el tutorial</div></div>
-      <button onclick="goTo('home');setTimeout(startTutorial,400)" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer">Ver tutorial</button>
+    <div style="font-size:11px;color:var(--t3);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);line-height:1.5">💡 La app se actualiza automáticamente al abrirla si hay conexión. Tus datos siempre se conservan.</div>
+  </div>
+
+  <!-- Objetivo diario -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Objetivo de estudio</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Minutos de estudio diarios que quieres alcanzar</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap" id="aj-obj-chips"></div>
+    <div style="font-size:11px;color:var(--teal);margin-top:8px;font-weight:600" id="aj-obj-status"></div>
+  </div>
+
+  <!-- Pomodoro -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Temporizador Pomodoro</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;gap:10px;align-items:center">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:5px">Trabajo (min)</div>
+        <input class="inp" type="number" id="pom-work-inp" min="5" max="60" value="25" oninput="updatePomSettings()">
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:5px">Descanso (min)</div>
+        <input class="inp" type="number" id="pom-break-inp" min="1" max="30" value="5" oninput="updatePomSettings()">
+      </div>
     </div>
-    <div style="height:1px;background:var(--bd)"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Borrar todos los datos</div><div style="font-size:11px;color:var(--t2)">Reinicia la app completamente</div></div>
-      <button onclick="if(confirm('¿Seguro? Se borrará todo.'))resetApp()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:#f87171;cursor:pointer">Reiniciar</button>
+  </div>
+
+  <!-- Tutorial y datos -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Más opciones</div>
+  <div class="card" style="display:flex;flex-direction:column;gap:0;margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Tutorial</div><div style="font-size:11px;color:var(--t2)">Volver a ver el recorrido de la app</div></div>
+      <button onclick="navSection('home');setTimeout(forceShowTutorial,300)" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">▶ Ver</button>
+    </div>
+    <div style="height:1px;background:var(--bd);margin:10px 0"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Borrar todos los datos</div><div style="font-size:11px;color:var(--t2)">Reinicia la app por completo</div></div>
+      <button onclick="if(confirm('¿Seguro? Se borrará TODO: apuntes, flashcards, progreso…'))resetApp()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:#f87171;cursor:pointer;font-family:var(--font)">🗑 Borrar</button>
     </div>
   </div>
 </div>
@@ -1162,15 +1244,13 @@ button:active{transform:scale(.97)}
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px" id="obj-chips"></div>
     <div style="font-size:12px;color:var(--t2)" id="obj-status">Sin objetivo activo</div>
   </div>
-  <!-- Timer personalizable -->
-  <div class="card" style="margin-bottom:12px">
-    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⏱ Personalizar Pomodoro</div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <div style="flex:1"><div style="font-size:10px;color:var(--t3);margin-bottom:4px">Trabajo (min)</div>
-        <input class="inp" type="number" id="pom-work-inp" min="5" max="60" value="25" oninput="updatePomSettings()"></div>
-      <div style="flex:1"><div style="font-size:10px;color:var(--t3);margin-bottom:4px">Descanso (min)</div>
-        <input class="inp" type="number" id="pom-break-inp" min="1" max="30" value="5" oninput="updatePomSettings()"></div>
+  <!-- Link a Ajustes para timer -->
+  <div class="card" style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1)">⏱ Personalizar Pomodoro</div>
+      <div style="font-size:11px;color:var(--t2);margin-top:2px">Cambia duración en Ajustes</div>
     </div>
+    <button onclick="navSection('perfil');setTimeout(()=>goTo('ajustes'),80)" style="background:var(--yd);border:1px solid var(--yb);border-radius:9px;padding:7px 13px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">Ir →</button>
   </div>
   <div class="sl">Ambiente sonoro</div>
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="sound-btns"></div>
@@ -1453,31 +1533,27 @@ button:active{transform:scale(.97)}
 
 </div><!-- end screens -->
 
-<!-- NAV 6 tabs -->
+<!-- NAV — 5 tabs, lógica y clara -->
 <nav id="nav">
   <button class="nb active" data-section="home" onclick="navSection('home')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
     <span>Inicio</span>
   </button>
-  <button class="nb" data-section="pomodoro" onclick="navSection('pomodoro')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-    <span>Pomodoro</span>
-  </button>
   <button class="nb" data-section="estudiar" onclick="navSection('estudiar')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
     <span>Estudiar</span>
   </button>
+  <button class="nb" data-section="agenda" onclick="navSection('agenda')">
+    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Agenda</span>
+  </button>
   <button class="nb" data-section="herramientas" onclick="navSection('herramientas')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 010 1.4l-8 8a1 1 0 01-.4.2l-3 1 1-3a1 1 0 01.2-.4l8-8a1 1 0 011.4 0z"/><path d="M13 8l3 3"/></svg>
+    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     <span>Herram.</span>
   </button>
-  <button class="nb" data-section="logros" onclick="navSection('logros')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
-    <span>Logros</span>
-  </button>
-  <button class="nb" data-section="mas" onclick="navSection('mas')">
-    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    <span>Más</span>
+  <button class="nb" data-section="perfil" onclick="navSection('perfil')">
+    <svg class="ni" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Perfil</span>
   </button>
 </nav>
 </div>
@@ -1485,7 +1561,59 @@ button:active{transform:scale(.97)}
 <!-- MODALS -->
 <!-- API key not needed - built into Lumio -->
 
-<!-- MODAL DEBERES -->
+<!-- MODAL CREAR / EDITAR FLASHCARD -->
+<div class="mo" id="fc-add-mo" style="display:none"><div class="mobox">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div style="font-size:18px;font-weight:800;color:var(--t1)" id="fc-mo-title">🃏 Nueva tarjeta</div>
+    <button onclick="clsMo('fc-add')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;font-family:var(--font)">✕</button>
+  </div>
+  <div><div class="sl">Materia</div>
+    <select class="inp" id="fc-mo-mat" style="margin-bottom:4px"></select>
+  </div>
+  <div><div class="sl">Pregunta</div>
+    <textarea class="inp ta" id="fc-mo-q" style="min-height:70px" placeholder="Ej: ¿Qué es la fotosíntesis?"></textarea>
+  </div>
+  <div><div class="sl">Respuesta</div>
+    <textarea class="inp ta" id="fc-mo-a" style="min-height:90px" placeholder="Ej: Proceso por el que las plantas convierten luz en glucosa..."></textarea>
+  </div>
+  <input type="hidden" id="fc-mo-id">
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="gbtn" style="flex:1" onclick="clsMo('fc-add')">Cancelar</button>
+    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="saveCard()">Guardar tarjeta</button>
+  </div>
+</div></div>
+
+<!-- MODAL GENERAR FLASHCARDS CON IA -->
+<div class="mo" id="fc-gen-mo" style="display:none"><div class="mobox">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div style="font-size:18px;font-weight:800;color:var(--t1)">✨ Generar con IA</div>
+    <button onclick="clsMo('fc-gen')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
+  </div>
+  <div><div class="sl">Materia</div>
+    <select class="inp" id="fc-gen-mat"></select>
+  </div>
+  <div><div class="sl">Cuántas tarjetas</div>
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <div class="chip on" data-n="5" onclick="fcGenPickN(this)">5</div>
+      <div class="chip" data-n="10" onclick="fcGenPickN(this)">10</div>
+      <div class="chip" data-n="15" onclick="fcGenPickN(this)">15</div>
+    </div>
+  </div>
+  <div><div class="sl">Texto o tema (opcional)</div>
+    <textarea class="inp ta" id="fc-gen-txt" style="min-height:80px" placeholder="Pega tus apuntes o escribe el tema: 'La célula y sus partes'..."></textarea>
+  </div>
+  <div id="fc-gen-loading" style="display:none;padding:12px 0;text-align:center">
+    <div class="sk-line med skeleton" style="margin:0 auto 8px"></div>
+    <div class="sk-line full skeleton" style="margin-bottom:8px"></div>
+    <div style="font-size:12px;color:var(--t3)">Generando tarjetas...</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="gbtn" style="flex:1" onclick="clsMo('fc-gen')">Cancelar</button>
+    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" id="fc-gen-btn" onclick="genFlashcardsIA()">✨ Generar</button>
+  </div>
+</div></div>
+
+
 <div class="mo" id="deb-mo" style="display:none"><div class="mobox">
   <div style="font-size:18px;font-weight:800;color:var(--t1)">📋 Nueva tarea</div>
   <div><div class="sl">Materia</div><select class="inp" id="deb-mat"></select></div>
@@ -1598,7 +1726,7 @@ button:active{transform:scale(.97)}
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
-const APP_VERSION='3.0.0';
+const APP_VERSION='3.1.0';
 // Cambia esta URL por la raw de tu archivo en GitHub:
 // https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/index.html
 const GITHUB_RAW_URL='';
@@ -1615,49 +1743,7 @@ const D={
     {id:'m7',n:'Tecnología',       c:'#2dd4bf',e:'🔧',p:0,h:0,t:7, ok:0},
     {id:'m8',n:'Ed. Plástica',     c:'#e879f9',e:'🎨',p:0,h:0,t:6, ok:0},
   ],
-  cards:[
-    {id:'c1', m:'Matemáticas',     q:'¿Qué es un número entero?',              a:'Conjunto que incluye naturales, cero y negativos: {...,-2,-1,0,1,2,...}',lv:1},
-    {id:'c2', m:'Matemáticas',     q:'Regla de signos en multiplicación',       a:'(+)·(+)=+ | (-)·(-)=+ | (+)·(-)=- | (-)·(+)=-',lv:1},
-    {id:'c3', m:'Matemáticas',     q:'Área del triángulo',                      a:'A = (base × altura) / 2',lv:1},
-    {id:'c4', m:'Matemáticas',     q:'Área del círculo',                        a:'A = π · r²',lv:1},
-    {id:'c5', m:'Matemáticas',     q:'Ecuación de 1º grado: forma y solución',  a:'ax + b = 0 → x = -b/a',lv:1},
-    {id:'c6', m:'Matemáticas',     q:'¿Qué es el tanto por ciento?',            a:'Razón que compara con 100. El 25% = 25/100 = 0,25.',lv:1},
-    {id:'c7', m:'Biología y Geo.', q:'¿Qué es la célula?',                      a:'Unidad estructural y funcional de todos los seres vivos.',lv:1},
-    {id:'c8', m:'Biología y Geo.', q:'Diferencia célula animal / vegetal',      a:'Vegetal: pared celular + cloroplastos + vacuola grande. Animal: no.',lv:1},
-    {id:'c9', m:'Biología y Geo.', q:'¿Qué es la fotosíntesis?',                a:'Plantas: luz + CO₂ + H₂O → glucosa + O₂. Ocurre en cloroplastos.',lv:1},
-    {id:'c10',m:'Biología y Geo.', q:'Fases de la mitosis',                     a:'Profase → Metafase → Anafase → Telofase. Resultado: 2 células idénticas.',lv:1},
-    {id:'c11',m:'Biología y Geo.', q:'¿Qué es el ADN?',                         a:'Molécula con información genética. Forma doble hélice.',lv:1},
-    {id:'c12',m:'Biología y Geo.', q:'Tipos de rocas',                          a:'Ígneas (magma), sedimentarias (sedimentos), metamórficas (calor/presión).',lv:1},
-    {id:'c13',m:'Física y Química',q:'¿Qué es el átomo?',                       a:'Partícula mínima de un elemento. Núcleo (p⁺+n⁰) + electrones (e⁻).',lv:1},
-    {id:'c14',m:'Física y Química',q:'Número atómico Z',                        a:'Número de protones en el núcleo. Define el elemento. Ej: C tiene Z=6.',lv:1},
-    {id:'c15',m:'Física y Química',q:'Mezcla homogénea vs heterogénea',         a:'Homogénea: no se distinguen partes. Heterogénea: sí se distinguen.',lv:1},
-    {id:'c16',m:'Física y Química',q:'Primera Ley de Newton (Inercia)',         a:'Un cuerpo permanece en reposo o m.r.u. si no actúa fuerza neta.',lv:1},
-    {id:'c17',m:'Física y Química',q:'Segunda Ley de Newton',                   a:'F = m·a. La fuerza es masa × aceleración.',lv:1},
-    {id:'c18',m:'Física y Química',q:'Velocidad media',                         a:'v = espacio / tiempo = e/t. Unidades: m/s o km/h.',lv:1},
-    {id:'c19',m:'Física y Química',q:'Densidad',                                a:'d = masa / volumen = m/V. Unidades: g/cm³ o kg/m³.',lv:1},
-    {id:'c20',m:'Geografía e Hist.',q:'Revolución Francesa',                    a:'1789. Derroca la monarquía absoluta. Lema: Libertad, Igualdad, Fraternidad.',lv:1},
-    {id:'c21',m:'Geografía e Hist.',q:'Antiguo Régimen',                        a:'Sistema basado en monarquía absoluta y sociedad estamental (Nobleza+Clero+Pueblo).',lv:1},
-    {id:'c22',m:'Geografía e Hist.',q:'Revolución Industrial',                  a:'S.XVIII-XIX en Gran Bretaña. Trabajo manual → máquinas y fábricas.',lv:1},
-    {id:'c23',m:'Geografía e Hist.',q:'Inicio 1ª Guerra Mundial',               a:'1914. Detonante: asesinato del archiduque Francisco Fernando en Sarajevo.',lv:1},
-    {id:'c24',m:'Geografía e Hist.',q:'Clima mediterráneo',                     a:'Veranos secos y calurosos, inviernos suaves y lluviosos. Sur de Europa.',lv:1},
-    {id:'c25',m:'Lengua',          q:'Sintagma nominal (SN)',                   a:'Grupo con sustantivo como núcleo. Ej: "el perro grande".',lv:1},
-    {id:'c26',m:'Lengua',          q:'Complemento Directo (CD)',                a:'Complemento que completa al verbo. Se sustituye por lo/la/los/las.',lv:1},
-    {id:'c27',m:'Lengua',          q:'Tipos de narrador',                       a:'Omnisciente, protagonista (1ª persona), testigo (3ª persona externa).',lv:1},
-    {id:'c28',m:'Lengua',          q:'Oración simple vs compuesta',             a:'Simple: 1 verbo conjugado. Compuesta: 2 o más verbos conjugados.',lv:1},
-    {id:'c29',m:'Lengua',          q:'Texto argumentativo',                     a:'Defiende una tesis con argumentos. Estructura: intro + argumentos + conclusión.',lv:1},
-    {id:'c30',m:'Inglés',          q:'Past Simple: ¿cuándo se usa?',            a:'Acciones completadas en pasado con tiempo definido. Regulares: verbo + -ed.',lv:1},
-    {id:'c31',m:'Inglés',          q:'Past Continuous: forma y uso',            a:'was/were + verbo-ing. Acción en curso en un momento pasado.',lv:1},
-    {id:'c32',m:'Inglés',          q:'Present Perfect: forma y uso',            a:'have/has + participio. Pasado con relevancia en el presente.',lv:1},
-    {id:'c33',m:'Inglés',          q:'Condicional tipo 1 (real)',                a:'If + Present Simple → will + infinitivo. Situaciones posibles.',lv:1},
-    {id:'c34',m:'Inglés',          q:'Condicional tipo 2 (hipotético)',          a:'If + Past Simple → would + infinitivo. Situaciones imaginarias.',lv:1},
-    {id:'c35',m:'Inglés',          q:'Voz pasiva en inglés',                    a:'Sujeto + to be + participio. Ej: "The book was written by Tolkien."',lv:1},
-    {id:'c36',m:'Tecnología',      q:'Ley de Ohm',                              a:'V = I · R. Tensión (V) = Intensidad (A) × Resistencia (Ω).',lv:1},
-    {id:'c37',m:'Tecnología',      q:'Serie vs paralelo',                       a:'Serie: misma I, V se reparte. Paralelo: misma V, I se reparte.',lv:1},
-    {id:'c38',m:'Tecnología',      q:'¿Qué es un algoritmo?',                   a:'Secuencia ordenada y finita de pasos para resolver un problema.',lv:1},
-    {id:'c39',m:'Ed. Plástica',    q:'Colores primarios de la luz',             a:'Rojo, verde y azul (RGB). Al combinarlos: blanco.',lv:1},
-    {id:'c40',m:'Ed. Plástica',    q:'Colores primarios de la pintura',         a:'Amarillo, cian y magenta. Al combinarlos: negro.',lv:1},
-    {id:'c41',m:'Ed. Plástica',    q:'Perspectiva cónica',                      a:'Representación 3D en plano. Líneas de fuga convergen en punto del horizonte.',lv:1},
-  ],
+  cards:[],
   week:[{d:'L',m:0},{d:'M',m:0},{d:'X',m:0},{d:'J',m:0},{d:'V',m:0},{d:'S',m:0},{d:'D',m:0}],
   exams:[],
   amigos:[{nm:'Raúl (tú)',av:'RA',c:'#f5c518',hrs:0,yo:true}],
@@ -1675,13 +1761,27 @@ function saveState(){
     exams:D.exams,historial:D.historial,horario:D.horario,objetivoDiario:D.objetivoDiario
   }));}catch(e){}
 }
+// IDs de las tarjetas predefinidas originales — nunca se restauran
+const DEFAULT_CARD_IDS=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10',
+  'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20','c21','c22','c23','c24','c25',
+  'c26','c27','c28','c29','c30','c31','c32','c33','c34','c35','c36','c37','c38','c39','c40','c41']);
+
+function cleanDefaultCards(cards){
+  // Remove old default cards; keep only user-created ones (ids start with 'fc' or 'err')
+  return (cards||[]).filter(c=>!DEFAULT_CARD_IDS.has(c.id));
+}
+
 function loadState(){
   try{
     const saved=JSON.parse(localStorage.getItem('lumio_state')||'null');
     if(!saved)return;
     if(saved.user)Object.assign(D.user,saved.user);
     if(saved.mats&&saved.mats.length)D.mats=saved.mats;
-    if(saved.cards&&saved.cards.length)D.cards=saved.cards;
+    // Strip old default cards — user starts fresh, only keeps cards they created
+    if(saved.cards){
+      const userCards=cleanDefaultCards(saved.cards);
+      D.cards=userCards;
+    }
     if(saved.week&&saved.week.length)D.week=saved.week;
     if(saved.exams)D.exams=saved.exams;
     if(saved.historial)D.historial=saved.historial;
@@ -1789,20 +1889,26 @@ const RETOS=[
 
 
 // ════════════════════════════════════════════════════════
-// NAVIGATION — 5 sections + sub-nav
+// NAVIGATION — 5 secciones principales
 // ════════════════════════════════════════════════════════
 const SECTIONS={
-  home:{screens:['home'],labels:[]},
-  pomodoro:{screens:['pom-screen'],labels:[]},
-  stats:{screens:['stats'],labels:[]},
-  estudiar:{screens:['flashcards','testia','examen','resumenia','mapa','chat','esquemas','dictado','corrector'],
-    labels:['🃏 Tarjetas','🧠 Test IA','📈 Examen','📄 Resumen','🗺️ Mapa','💬 Chat IA','🗂️ Esquemas','🎙️ Dictado','✍️ Corrector']},
-  herramientas:{screens:['calc','conversor','tabla','timeline','vocab','horario','formulas','conjugador','calcnotas','ppt'],
-    labels:['🔢 Calc','⚖️ Conversor','⚗️ Tabla P.','📜 Historia','🌐 Vocab','📋 Horario','📐 Fórmulas','🔤 Verbos','🎓 Notas','📊 PPT']},
-  logros:{screens:['logros','recordatorios','calendario','sonidos','bienestar'],
-    labels:['🏆 Logros','🔔 Avisos','📅 Calendario','🎵 Sonidos','🧘 Bienestar']},
-  mas:{screens:['materias','planificador','agenda','vacaciones','ranking','anaya','amigos'],
-    labels:['📚 Materias','🗓️ Planificador','📋 Agenda','🗓️ Vacaciones','🏅 Ranking','📘 Anaya','👥 Invitar']},
+  home:{screens:['home'],labels:[],single:true},
+  estudiar:{
+    screens:['apuntes','flashcards','pom-screen','testia','examen','resumenia','chat','corrector','dictado','esquemas','mapa'],
+    labels:['📝 Apuntes','🃏 Flashcards','⏱️ Pomodoro','🧠 Test IA','📈 Examen','📄 Resumen IA','💬 Chat IA','✍️ Corrector','🎙️ Dictado','🗂️ Esquemas','🗺️ Mapa mental'],
+  },
+  agenda:{
+    screens:['agenda','planificador','horario','vacaciones'],
+    labels:['📋 Deberes','🗓️ Exámenes','📅 Horario','🏖️ Vacaciones'],
+  },
+  herramientas:{
+    screens:['calc','formulas','conjugador','conversor','tabla','vocab','calcnotas','ppt','timeline'],
+    labels:['🔢 Calculadora','📐 Fórmulas','🔤 Conjugador','⚖️ Conversor','⚗️ Tabla P.','🌐 Vocabulario','🎓 Calc. notas','📊 Presentación','📜 Historia'],
+  },
+  perfil:{
+    screens:['stats','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','ajustes'],
+    labels:['📊 Estadísticas','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','⚙️ Ajustes'],
+  },
 };
 let currentSection='home';let currentScreen='home';
 
@@ -1811,7 +1917,7 @@ function navSection(sec){
   document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.section===sec));
   const s=SECTIONS[sec];
   const subNav=document.getElementById('sub-nav');
-  if(sec==='home'||sec==='pomodoro'||sec==='stats'){
+  if(s.single){
     subNav.classList.remove('show');subNav.innerHTML='';
     goTo(s.screens[0]);
   }else{
@@ -1827,7 +1933,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya};
+  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes};
   if(bldrs[id])bldrs[id]();
   document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
   const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
@@ -1851,7 +1957,7 @@ function bHome(){
   const pct=Math.round(D.mats.reduce((a,m)=>a+m.p,0)/D.mats.length);
   document.getElementById('pc-p').textContent=pct+'%';
   setTimeout(()=>{const el=document.getElementById('pc-f');if(el)el.style.width=pct+'%';},350);
-  document.getElementById('h-fc').textContent=D.cards.length+' tarjetas';
+  document.getElementById('h-fc').textContent=D.cards.length?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
   const strkEl=document.getElementById('h-streak');if(strkEl)strkEl.textContent=D.user.streak||0;
   // Week grid
   const wg=document.getElementById('h-week-grid');
@@ -1868,7 +1974,7 @@ function bHome(){
     document.getElementById('exams-list').innerHTML=upcoming.map(ex=>{
       const d=Math.ceil((new Date(ex.fecha)-Date.now())/864e5);
       const urg=d<=3;const warn=d<=7&&!urg;
-      return `<div onclick="navSection('mas');setTimeout(()=>goTo('planificador'),50)" style="background:var(--bg1);border:1px solid ${urg?'var(--danger)':warn?'rgba(245,197,24,.4)':'var(--bd)'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer${urg?' animation:dangerPulse 2s infinite':''}" class="${urg?'exam-danger':''}">
+      return `<div onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)" style="background:var(--bg1);border:1px solid ${urg?'var(--danger)':warn?'rgba(245,197,24,.4)':'var(--bd)'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer${urg?' animation:dangerPulse 2s infinite':''}" class="${urg?'exam-danger':''}">
         <div style="width:36px;height:36px;border-radius:9px;background:${ex.c}18;display:flex;align-items:center;justify-content:center;font-size:17px">${ex.e}</div>
         <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${ex.mat}</div>
         <div style="font-size:10px;color:var(--t2);margin-top:1px">${new Date(ex.fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div></div>
@@ -1876,8 +1982,13 @@ function bHome(){
       </div>`;
     }).join('');
   }else{
-    document.getElementById('exams-list').innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection(\'mas\');setTimeout(()=>goTo(\'planificador\'),50)">Añadir →</span></div>';
+    document.getElementById('exams-list').innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection(\'agenda\');setTimeout(()=>goTo(\'planificador\'),50)">Añadir →</span></div>';
   }
+  // Deberes pendientes
+  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  const pendientes=debs.filter(d=>!d.hecha).length;
+  const debEl=document.getElementById('h-deberes-count');
+  if(debEl)debEl.textContent=pendientes?pendientes+' pendiente'+(pendientes>1?'s':''):'Todo al día ✓';
   updateXP();updateObjStatus();renderStudyToday();
   upPom();
   saveState();
@@ -1889,7 +2000,7 @@ function renderStudyToday(){
   const due=D.cards.filter(c=>c.lv===1).length;
   if(due>0)recs.push({ico:'🃏',color:'var(--teal)',title:`Repasar ${due} flashcards pendientes`,sub:'Nivel Nuevo — mejor empezar aquí',action:"navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)"});
   const nextExam=D.exams.filter(e=>new Date(e.fecha)>new Date()).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha))[0];
-  if(nextExam){const d=Math.ceil((new Date(nextExam.fecha)-Date.now())/864e5);recs.push({ico:nextExam.e,color:nextExam.c,title:`Preparar ${nextExam.mat}`,sub:`Examen en ${d} días · Ver plan`,action:"navSection('mas');setTimeout(()=>goTo('planificador'),50)"});}
+  if(nextExam){const d=Math.ceil((new Date(nextExam.fecha)-Date.now())/864e5);recs.push({ico:nextExam.e,color:nextExam.c,title:`Preparar ${nextExam.mat}`,sub:`Examen en ${d} días · Ver plan`,action:"navSection('agenda');setTimeout(()=>goTo('planificador'),50)"});}
   const worst=[...D.mats].sort((a,b)=>a.p-b.p)[0];
   if(worst)recs.push({ico:worst.e,color:worst.c,title:`Subir progreso en ${worst.n.split(' ')[0]}`,sub:`Solo ${worst.p}% de progreso`,action:"navSection('estudiar');setTimeout(()=>goTo('testia'),50)"});
   if(D.week[getCurrentDayIdx()].m===0)recs.push({ico:'⏱',color:'var(--y)',title:'Empieza el primer Pomodoro',sub:'25 minutos de estudio enfocado',action:"showPomPre()"});
@@ -2150,11 +2261,16 @@ function exitFocus(){
   document.getElementById('focus-mode').classList.remove('show');
 }
 function updatePomSettings(){
-  const w=parseInt(document.getElementById('pom-work-inp').value)||25;
-  const b=parseInt(document.getElementById('pom-break-inp').value)||5;
+  // Read from whichever input is currently visible
+  const wEl=document.getElementById('pom-work-inp');
+  const bEl=document.getElementById('pom-break-inp');
+  const w=parseInt(wEl?.value)||25;
+  const b=parseInt(bEl?.value)||5;
+  if(w<1||b<1)return;
   pomSettings={W:w*60,B:b*60};
   if(!po.run){po.s=pomSettings.W;upPom();}
   toast('⏱ Timer actualizado: '+w+'min / '+b+'min');
+  saveState();
 }
 function addHistorial(mins){
   const now=new Date();
@@ -2400,29 +2516,307 @@ function renderGrafica(){
 }
 
 // ════════════════════════════════════════════════════════
-// FLASHCARDS
+// APUNTES — pantalla propia en Estudiar
 // ════════════════════════════════════════════════════════
-const LVL=['Nuevo','Aprend.','Repaso','Maduro','Dom.'];
+function bApuntesScreen(){
+  // Chips de materia
+  const chips=document.getElementById('apuntes-screen-chips');
+  if(chips){
+    chips.innerHTML=D.mats.map(m=>`
+      <div class="chip${m.n===apuMat?' on':''}" onclick="setApuMatScreen('${m.n}',this)">${m.e} ${m.n.split(' ')[0]}</div>
+    `).join('');
+  }
+  renderApuntesScreen();
+}
+function setApuMatScreen(mat,el){
+  // Auto-save current before switching
+  const ta=document.getElementById('apuntes-screen-ta');
+  if(ta){apuntesDB[apuMat]=ta.value;localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));}
+  apuMat=mat;
+  document.querySelectorAll('#apuntes-screen-chips .chip').forEach(c=>c.classList.remove('on'));
+  if(el)el.classList.add('on');
+  renderApuntesScreen();
+}
+let apuAutoSaveTimer=null;
+function renderApuntesScreen(){
+  const m=D.mats.find(x=>x.n===apuMat);
+  const saved=apuntesDB[apuMat]||'';
+  const content=document.getElementById('apuntes-screen-content');
+  if(!content)return;
+  content.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="font-size:22px">${m?m.e:'📝'}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--t1)">${apuMat}</div>
+        <div style="font-size:10px;color:var(--teal);font-weight:600;margin-top:1px" id="apuntes-screen-autosave"></div>
+      </div>
+      <div style="font-size:10px;color:var(--t3)" id="apuntes-screen-meta">${saved.length} car.</div>
+    </div>
+    <div class="md-toolbar" style="margin-bottom:8px">
+      <button class="md-btn" onclick="asMdInsert('**','**')"><b>N</b></button>
+      <button class="md-btn" onclick="asMdInsert('*','*')"><em>C</em></button>
+      <button class="md-btn" onclick="asMdInsert('# ','')">H1</button>
+      <button class="md-btn" onclick="asMdInsert('## ','')">H2</button>
+      <button class="md-btn" onclick="asMdInsert('- ','')">• Lista</button>
+      <button class="md-btn" onclick="asMdInsert('> ','')">❝</button>
+      <button class="md-btn" style="margin-left:auto" onclick="toggleAsPreview()" id="as-toggle-btn">👁 Vista</button>
+    </div>
+    <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap">
+      <button class="gbtn" style="font-size:10px;padding:5px 10px" onclick="asTemplate('clase')">📋 Clase</button>
+      <button class="gbtn" style="font-size:10px;padding:5px 10px" onclick="asTemplate('resumen')">📄 Resumen</button>
+      <button class="gbtn" style="font-size:10px;padding:5px 10px" onclick="asTemplate('formulas')">🔢 Fórmulas</button>
+      <button class="gbtn" style="font-size:10px;padding:5px 10px" onclick="sendApunteToResumenScreen()">📄→ IA</button>
+    </div>
+    <textarea class="inp ta" id="apuntes-screen-ta" spellcheck="true"
+      style="min-height:260px;font-size:13px;line-height:1.7;font-family:monospace"
+      placeholder="Escribe tus apuntes aquí...
+Usa **negrita**, *cursiva*, # Título, - lista">${saved}</textarea>
+    <div class="md-preview" id="as-md-preview" style="display:none"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px">
+      <button class="mbtn" onclick="saveApuntesScreen()">💾 Guardar</button>
+      <button class="gbtn" onclick="spellCheckNote('apuntes-screen-ta')">✅ Corregir</button>
+    </div>
+    <div id="as-spell-status" style="display:none;margin-top:8px;padding:10px;background:var(--bg2);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.6"></div>
+  `;
+  // Wire up auto-save and char counter
+  const ta=document.getElementById('apuntes-screen-ta');
+  if(ta){
+    ta.addEventListener('input',function(){
+      document.getElementById('apuntes-screen-meta').textContent=this.value.length+' car.';
+      clearTimeout(apuAutoSaveTimer);
+      apuAutoSaveTimer=setTimeout(()=>{
+        apuntesDB[apuMat]=this.value;
+        localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
+        const ind=document.getElementById('apuntes-screen-autosave');
+        if(ind){ind.textContent='✓ Guardado automáticamente';setTimeout(()=>{if(ind)ind.textContent='';},3000);}
+      },30000);
+    });
+  }
+}
+function asMdInsert(before,after){
+  const ta=document.getElementById('apuntes-screen-ta');if(!ta)return;
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  const sel=ta.value.slice(s,e);
+  ta.value=ta.value.slice(0,s)+before+sel+after+ta.value.slice(e);
+  ta.selectionStart=s+before.length;ta.selectionEnd=s+before.length+sel.length;
+  ta.focus();
+}
+function toggleAsPreview(){
+  const ta=document.getElementById('apuntes-screen-ta');
+  const pre=document.getElementById('as-md-preview');
+  const btn=document.getElementById('as-toggle-btn');
+  if(!ta||!pre||!btn)return;
+  const show=pre.style.display==='none'||pre.style.display==='';
+  pre.style.display=show?'block':'none';
+  ta.style.display=show?'none':'block';
+  btn.textContent=show?'✏️ Editar':'👁 Vista';
+  if(show)pre.innerHTML=mdToHtml(ta.value);
+}
+function asTemplate(type){
+  const ta=document.getElementById('apuntes-screen-ta');if(!ta)return;
+  apuTemplate(type); // reuse existing function from renderApunte
+  // But apuTemplate uses nota-ta — override for screen version
+  const templates={
+    clase:`# Apuntes de clase — ${apuMat}\n## Fecha: ${new Date().toLocaleDateString('es-ES')}\n\n## Conceptos clave\n- \n- \n\n## Definiciones\n**Término:** definición\n\n## Preguntas pendientes\n- \n`,
+    resumen:`# Resumen — ${apuMat}\n\n## Ideas principales\n1. \n2. \n3. \n\n## Puntos importantes\n- \n- \n\n## Conclusión\n\n`,
+    formulas:`# Fórmulas — ${apuMat}\n\n## Fórmulas principales\n\n| Nombre | Fórmula |\n|--------|--------|\n| | |\n\n## Unidades\n- \n\n## Ejemplos resueltos\n**Ejemplo 1:**\n`
+  };
+  if(ta.value.trim()&&!confirm('¿Reemplazar el contenido con la plantilla?'))return;
+  ta.value=templates[type]||'';
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+}
+function saveApuntesScreen(){
+  const val=document.getElementById('apuntes-screen-ta')?.value||'';
+  apuntesDB[apuMat]=val;
+  localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
+  gainXP(2);toast('💾 Apuntes de '+apuMat.split(' ')[0]+' guardados');
+  const ind=document.getElementById('apuntes-screen-autosave');
+  if(ind){ind.textContent='✓ Guardado';setTimeout(()=>{if(ind)ind.textContent='';},2000);}
+}
+function sendApunteToResumenScreen(){
+  const val=document.getElementById('apuntes-screen-ta')?.value||'';
+  if(!val.trim()){toast('⚠️ No hay apuntes que resumir');return;}
+  navSection('estudiar');
+  setTimeout(()=>{
+    goTo('resumenia');
+    setTimeout(()=>{
+      const rt=document.getElementById('res-txt');
+      if(rt){rt.value=val;rt.dispatchEvent(new Event('input'));}
+    },100);
+  },50);
+}
+
+const LVL=['Nuevo','Aprendiendo','Repaso','Maduro','Dominado'];
 const LVC=['#f87171','#f5c518','#60a5fa','#2dd4bf','#4ade80'];
 let fFlt='Todas',rC=[],rI=0,isF=false;
+
 function bFC(){
+  const empty=document.getElementById('fc-empty');
+  const filters=document.getElementById('fc-filters');
+  if(!D.cards.length){
+    if(empty)empty.style.display='block';
+    if(filters)filters.style.display='none';
+    document.getElementById('fc-s').textContent='0 tarjetas — ¡crea la primera!';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  if(filters)filters.style.display='block';
+
   const ms=['Todas',...new Set(D.cards.map(c=>c.m))];
   document.getElementById('fc-ch').innerHTML=ms.map(m=>`<div class="chip${m===fFlt?' on':''}" onclick="fFl('${m}',this)">${m}</div>`).join('');
-  const fd=fFlt==='Todas'?D.cards:D.cards.filter(c=>c.m===fFlt);
-  document.getElementById('fc-s').textContent=fd.length+' tarjetas';
-  document.getElementById('fc-lvl').innerHTML=LVL.map((n,i)=>{const ct=D.cards.filter(c=>c.lv===i+1).length;return`<div style="flex:1;background:var(--bg1);border:1px solid var(--bd);border-radius:8px;padding:6px 4px;text-align:center"><div style="font-size:14px;font-weight:900;color:var(--t1)">${ct}</div><div style="width:6px;height:6px;border-radius:50%;background:${LVC[i]};margin:2px auto"></div><div style="font-size:8px;color:var(--t3);margin-top:1px">${n}</div></div>`;}).join('');
-  document.getElementById('fc-lst').innerHTML=fd.map(c=>`<div class="card fade-in" style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:${LVC[c.lv-1]};background:${LVC[c.lv-1]}22;border:1px solid ${LVC[c.lv-1]}44">${LVL[c.lv-1]}</span><span style="font-size:9px;color:var(--t3)">${c.m}</span></div><div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">${c.q}</div><div style="font-size:12px;color:var(--t2);line-height:1.5">${c.a}</div></div>`).join('');
+  const searchQ=(document.getElementById('fc-search')?.value||'').toLowerCase().trim();
+  let fd=fFlt==='Todas'?D.cards:D.cards.filter(c=>c.m===fFlt);
+  if(searchQ)fd=fd.filter(c=>c.q.toLowerCase().includes(searchQ)||c.a.toLowerCase().includes(searchQ));
+  document.getElementById('fc-s').textContent=fd.length+' tarjeta'+(fd.length!==1?'s':'');
+  document.getElementById('fc-lvl').innerHTML=LVL.map((n,i)=>{
+    const ct=D.cards.filter(c=>c.lv===i+1).length;
+    return`<div style="flex:1;background:var(--bg1);border:1px solid var(--bd);border-radius:8px;padding:6px 4px;text-align:center">
+      <div style="font-size:14px;font-weight:900;color:var(--t1)">${ct}</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${LVC[i]};margin:2px auto"></div>
+      <div style="font-size:8px;color:var(--t3);margin-top:1px">${n}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('fc-lst').innerHTML=fd.map(c=>`
+    <div class="card fade-in" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:${LVC[c.lv-1]};background:${LVC[c.lv-1]}22;border:1px solid ${LVC[c.lv-1]}44">${LVL[c.lv-1]}</span>
+          <span style="font-size:9px;color:var(--t3)">${c.m}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="editCard('${c.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:2px">✏️</button>
+          <button onclick="deleteCard('${c.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px">🗑</button>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:5px">${c.q}</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.5">${c.a}</div>
+    </div>`).join('');
+
+  // Update h-fc count
+  const hfc=document.getElementById('h-fc');
+  if(hfc)hfc.textContent=D.cards.length+' tarjeta'+(D.cards.length!==1?'s':'');
 }
+
 function fFl(m,el){fFlt=m;document.querySelectorAll('#fc-ch .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');bFC();}
+
+// ── CREAR / EDITAR ──
+function showAddCard(matPreset){
+  const sel=document.getElementById('fc-mo-mat');
+  sel.innerHTML=D.mats.map(m=>`<option value="${m.n}">${m.e} ${m.n}</option>`).join('');
+  if(matPreset){const opt=[...sel.options].find(o=>o.value===matPreset);if(opt)opt.selected=true;}
+  document.getElementById('fc-mo-q').value='';
+  document.getElementById('fc-mo-a').value='';
+  document.getElementById('fc-mo-id').value='';
+  document.getElementById('fc-mo-title').textContent='🃏 Nueva tarjeta';
+  document.getElementById('fc-add-mo').style.display='flex';
+  setTimeout(()=>document.getElementById('fc-mo-q').focus(),150);
+}
+
+function editCard(id){
+  const c=D.cards.find(x=>x.id===id);if(!c)return;
+  const sel=document.getElementById('fc-mo-mat');
+  sel.innerHTML=D.mats.map(m=>`<option value="${m.n}">${m.e} ${m.n}</option>`).join('');
+  const opt=[...sel.options].find(o=>o.value===c.m);if(opt)opt.selected=true;
+  document.getElementById('fc-mo-q').value=c.q;
+  document.getElementById('fc-mo-a').value=c.a;
+  document.getElementById('fc-mo-id').value=id;
+  document.getElementById('fc-mo-title').textContent='✏️ Editar tarjeta';
+  document.getElementById('fc-add-mo').style.display='flex';
+}
+
+function saveCard(){
+  const mat=document.getElementById('fc-mo-mat').value;
+  const q=document.getElementById('fc-mo-q').value.trim();
+  const a=document.getElementById('fc-mo-a').value.trim();
+  const id=document.getElementById('fc-mo-id').value;
+  if(!q||!a){toast('⚠️ Rellena la pregunta y la respuesta');return;}
+  if(id){
+    const i=D.cards.findIndex(c=>c.id===id);
+    if(i>=0){D.cards[i].m=mat;D.cards[i].q=q;D.cards[i].a=a;}
+    toast('✅ Tarjeta actualizada');
+  }else{
+    D.cards.push({id:'fc'+Date.now(),m:mat,q,a,lv:1});
+    toast('🃏 Tarjeta creada +2 XP');gainXP(2);
+  }
+  clsMo('fc-add');bFC();saveState();
+}
+
+function deleteCard(id){
+  if(!confirm('¿Eliminar esta tarjeta?'))return;
+  D.cards=D.cards.filter(c=>c.id!==id);
+  bFC();saveState();toast('🗑 Tarjeta eliminada');
+}
+
+// ── GENERAR CON IA ──
+let fcGenN=5;
+function showGenFC(){
+  const sel=document.getElementById('fc-gen-mat');
+  sel.innerHTML=D.mats.map(m=>`<option value="${m.n}">${m.e} ${m.n}</option>`).join('');
+  document.getElementById('fc-gen-txt').value='';
+  document.getElementById('fc-gen-loading').style.display='none';
+  document.getElementById('fc-gen-btn').disabled=false;
+  document.getElementById('fc-gen-btn').textContent='✨ Generar';
+  document.getElementById('fc-gen-mo').style.display='flex';
+}
+function fcGenPickN(el){fcGenN=parseInt(el.dataset.n);document.querySelectorAll('#fc-gen-mo .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+async function genFlashcardsIA(){
+  const mat=document.getElementById('fc-gen-mat').value;
+  const txt=document.getElementById('fc-gen-txt').value.trim();
+  const btn=document.getElementById('fc-gen-btn');
+  btn.disabled=true;
+  document.getElementById('fc-gen-loading').style.display='block';
+  try{
+    const prompt=`Eres un profesor de 2º ESO experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt}"`:mat}.
+Responde SOLO con JSON sin backticks:
+{"tarjetas":[{"pregunta":"...","respuesta":"..."}]}
+Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 frases.`;
+    const res=await callClaude(prompt,1500);
+    const data=JSON.parse(res.replace(/```json|```/g,'').trim());
+    let added=0;
+    (data.tarjetas||[]).forEach(t=>{
+      if(t.pregunta&&t.respuesta){
+        D.cards.push({id:'fc'+Date.now()+Math.random().toString(36).slice(2,6),m:mat,q:t.pregunta,a:t.respuesta,lv:1});
+        added++;
+      }
+    });
+    saveState();clsMo('fc-gen');bFC();
+    toast(`🃏 ${added} tarjeta${added!==1?'s':''} creada${added!==1?'s':''} para ${mat}`);
+    gainXP(added*2);
+  }catch(e){
+    toast('❌ '+e.message.slice(0,55));
+  }finally{
+    document.getElementById('fc-gen-loading').style.display='none';
+    btn.disabled=false;btn.textContent='✨ Generar';
+  }
+}
+
+// ── REPASAR ──
 function stRep(){
   rC=fFlt==='Todas'?[...D.cards]:D.cards.filter(c=>c.m===fFlt);
+  if(!rC.length){toast('⚠️ Sin tarjetas para repasar');return;}
   rI=0;isF=false;
   document.getElementById('fc-lv').style.display='none';
   document.getElementById('fc-dv').style.display='none';
   document.getElementById('fc-rv').style.display='flex';
-  ldCard();
+  ldCard();setTimeout(initSwipe,100);
 }
-function ldCard(){
+
+function enRep(){
+  const corr=rC.filter((c,i)=>true).length; // just show done
+  document.getElementById('fc-rv').style.display='none';
+  const dv=document.getElementById('fc-dv');
+  dv.style.display='flex';
+  const stats=document.getElementById('fc-dv-stats');
+  if(stats)stats.textContent=`Has repasado ${rC.length} tarjeta${rC.length!==1?'s':''}`;
+}
+function exRep(){
+  document.getElementById('fc-rv').style.display='none';
+  document.getElementById('fc-dv').style.display='none';
+  document.getElementById('fc-lv').style.display='block';
+  bFC();
+}function ldCard(){
   if(rI>=rC.length){enRep();return;}
   const c=rC[rI];isF=false;
   const fi=document.getElementById('fc-fi');if(fi)fi.style.transform='rotateY(0deg)';
@@ -2474,14 +2868,23 @@ function initSwipe(){
 }
 // Quick rep mode
 function startQuickRep(){
-  // 10 weakest cards (level 1), random order
+  if(!D.cards.length){
+    navSection('estudiar');setTimeout(()=>goTo('flashcards'),50);
+    toast('🃏 Crea tus flashcards primero');return;
+  }
   const weak=D.cards.filter(c=>c.lv<=2).sort(()=>Math.random()-.5).slice(0,10);
   if(!weak.length){toast('🎉 ¡No hay tarjetas débiles! Bien hecho');return;}
   rC=weak;rI=0;isF=false;
-  document.getElementById('fc-lv').style.display='none';
-  document.getElementById('fc-dv').style.display='none';
-  document.getElementById('fc-rv').style.display='flex';
-  navSection('estudiar');setTimeout(()=>{goTo('flashcards');ldCard();},50);
+  navSection('estudiar');
+  setTimeout(()=>{
+    goTo('flashcards');
+    setTimeout(()=>{
+      document.getElementById('fc-lv').style.display='none';
+      document.getElementById('fc-dv').style.display='none';
+      document.getElementById('fc-rv').style.display='flex';
+      ldCard();initSwipe();
+    },100);
+  },50);
 }
 function doFlip(){
   isF=!isF;
@@ -3284,14 +3687,48 @@ function obFinish(){
 // TUTORIAL
 // ════════════════════════════════════════════════════════
 const TUT_STEPS=[
-  {ico:'💡',title:'Bienvenido a Lumio',msg:'Tu app de estudio inteligente. Te ayuda a estudiar mejor, organizarte y preparar los exámenes de forma más eficaz.'},
-  {ico:'🍅',title:'Pomodoro',msg:'Estudia en bloques de 25 minutos con descansos. Es la técnica más efectiva para concentrarse y no quemarse.'},
-  {ico:'🃏',title:'Flashcards',msg:'Repasa tarjetas con preguntas y respuestas. El sistema aprende qué tarjetas se te dan peor y te las pone más.'},
-  {ico:'🧠',title:'IA integrada',msg:'Genera tests, resúmenes y mapas mentales de tus apuntes automáticamente. También puedes preguntarle dudas.'},
-  {ico:'📅',title:'Planificador',msg:'Añade tus exámenes y Lumio crea un plan de estudio día a día para llegar preparado a cada uno.'},
-  {ico:'🏆',title:'¡Todo listo!',msg:'Gana XP, desbloquea logros y mantén tu racha diaria. Cuanto más estudies, más sube tu nivel.'},
+  {ico:'💡',title:'Bienvenido a Lumio',
+    msg:'Tu app de estudio para 2º ESO. Vamos a hacer un recorrido rápido por toda la app. ¡Solo 2 minutos!',
+    nav:null},
+  {ico:'🏠',title:'Inicio — tu dashboard',
+    msg:'Aquí ves tu progreso semanal, racha de días y exámenes próximos. El botón amarillo grande arranca el Pomodoro directamente.',
+    nav:'home'},
+  {ico:'📝',title:'Apuntes',
+    msg:'Escribe tus notas por materia con formato. Tienes plantillas de clase, auto-guardado y corrector ortográfico con IA.',
+    nav:'estudiar:apuntes'},
+  {ico:'🃏',title:'Flashcards',
+    msg:'Crea tus propias tarjetas o genéralas con IA pegando tus apuntes. Desliza a la derecha si lo sabías, izquierda si no.',
+    nav:'estudiar:flashcards'},
+  {ico:'⏱️',title:'Pomodoro',
+    msg:'25 minutos de estudio, 5 de descanso. Te pregunta cómo estás para ajustar la sesión y sugiere pausas activas al terminar.',
+    nav:'estudiar:pom-screen'},
+  {ico:'🧠',title:'IA para estudiar',
+    msg:'Test IA genera exámenes de tus apuntes. Resumen IA los convierte en bullets. Chat IA responde tus dudas. Todo sin salir de la app.',
+    nav:'estudiar:testia'},
+  {ico:'📋',title:'Agenda — deberes y exámenes',
+    msg:'Añade tus deberes con fecha de entrega y tus exámenes con temas. Lumio te avisa cuando queda menos de 24h para un examen.',
+    nav:'agenda:agenda'},
+  {ico:'🗓️',title:'Horario y vacaciones',
+    msg:'Configura tu horario semanal y Lumio te dice qué tienes mañana. En Vacaciones ves la cuenta atrás hasta el próximo descanso.',
+    nav:'agenda:horario'},
+  {ico:'🔢',title:'Herramientas',
+    msg:'Calculadora científica, fórmulas de Matemáticas y Física, conjugador de verbos, tabla periódica, calculadora de notas y más.',
+    nav:'herramientas:calc'},
+  {ico:'📊',title:'Perfil y estadísticas',
+    msg:'Ve tu progreso real: horas estudiadas, pomodoros y racha. También tus logros, ranking con compañeros y pausas activas de bienestar.',
+    nav:'perfil:stats'},
+  {ico:'⚙️',title:'Ajustes',
+    msg:'En Ajustes cambias el tema claro/oscuro, buscas actualizaciones y reinicias la app. Tus datos siempre están seguros y guardados.',
+    nav:'perfil:ajustes'},
+  {ico:'🚀',title:'¡Listo para empezar!',
+    msg:'Ya conoces Lumio. Empieza escribiendo tus apuntes de hoy o crea tus primeras flashcards. ¡Buena suerte!',
+    nav:'home'},
 ];
 let tutStep=0;
+function forceShowTutorial(){
+  localStorage.removeItem('lumio_seen_tutorial');
+  tutStep=0;showTutStep();
+}
 function startTutorial(){
   if(localStorage.getItem('lumio_seen_tutorial'))return;
   tutStep=0;showTutStep();
@@ -3301,32 +3738,42 @@ function showTutStep(){
   if(tutStep>=TUT_STEPS.length){
     ov.style.display='none';ov.innerHTML='';
     document.body.style.overflow='';
-    document.getElementById('screens').style.overflow='';
+    const sc=document.getElementById('screens');if(sc)sc.style.overflow='';
     localStorage.setItem('lumio_seen_tutorial','1');
+    navSection('home');
     return;
   }
-  // Lock scrolling completely
-  document.body.style.overflow='hidden';
-  const screens=document.getElementById('screens');
-  if(screens)screens.style.overflow='hidden';
-
   const s=TUT_STEPS[tutStep];
   const total=TUT_STEPS.length;
-  const dots=TUT_STEPS.map((_,i)=>`<div style="width:${i===tutStep?20:7}px;height:7px;border-radius:999px;background:${i===tutStep?'var(--y)':'var(--bg3)'};transition:all .3s"></div>`).join('');
-
-  ov.style.display='flex';
-  ov.style.cssText='position:fixed;inset:0;z-index:960;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);padding:24px;pointer-events:all;';
+  // Navigate to relevant screen
+  if(s.nav&&s.nav!=='home'){
+    const parts=s.nav.split(':');
+    navSection(parts[0]);
+    if(parts[1])setTimeout(()=>goTo(parts[1]),80);
+  }else if(s.nav==='home'){
+    navSection('home');
+  }
+  // Lock scroll
+  document.body.style.overflow='hidden';
+  const sc=document.getElementById('screens');if(sc)sc.style.overflow='hidden';
+  const dots=TUT_STEPS.map((_,i)=>`<div style="width:${i===tutStep?18:6}px;height:6px;border-radius:999px;background:${i===tutStep?'var(--y)':'var(--bg3)'};transition:all .3s"></div>`).join('');
+  ov.style.cssText='position:fixed;inset:0;z-index:960;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6);padding:0 0 80px;pointer-events:all;';
   ov.innerHTML=`
-    <div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
-      <div style="font-size:52px;line-height:1">${s.ico}</div>
-      <div style="font-size:19px;font-weight:900;color:var(--t1)">${s.title}</div>
-      <div style="font-size:14px;color:var(--t2);line-height:1.6">${s.msg}</div>
-      <div style="display:flex;gap:6px;align-items:center;margin:4px 0">${dots}</div>
-      <div style="display:flex;gap:10px;width:100%;margin-top:4px">
-        ${tutStep>0?`<button onclick="tutStep--;showTutStep()" style="flex:1;background:none;border:1px solid var(--bd2);border-radius:12px;padding:13px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">← Atrás</button>`:''}
-        <button onclick="tutStep++;showTutStep()" style="flex:2;background:var(--y);color:#0d0f14;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font)">${tutStep===total-1?'¡Empezar! 🚀':'Siguiente →'}</button>
+    <div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px 20px 14px 14px;padding:22px 20px 18px;width:100%;max-width:390px;display:flex;flex-direction:column;gap:13px;animation:tutCardIn .25s cubic-bezier(.34,1.56,.64,1)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:30px;line-height:1">${s.ico}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--t3)">${tutStep+1} / ${total}</div>
       </div>
-      <button onclick="tutStep=TUT_STEPS.length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:var(--font)">Saltar tutorial</button>
+      <div>
+        <div style="font-size:17px;font-weight:900;color:var(--t1);margin-bottom:5px">${s.title}</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.65">${s.msg}</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center">${dots}</div>
+      <div style="display:flex;gap:9px">
+        ${tutStep>0?`<button onclick="tutStep--;showTutStep()" style="flex:1;background:none;border:1px solid var(--bd2);border-radius:12px;padding:11px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">\u2190 Atr\u00e1s</button>`:''}
+        <button onclick="tutStep++;showTutStep()" style="flex:2;background:var(--y);color:#0d0f14;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font)">${tutStep===total-1?'\u00a1Empezar! \U0001f680':'Siguiente \u2192'}</button>
+      </div>
+      <button onclick="tutStep=TUT_STEPS.length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:var(--font);padding:0">Saltar recorrido</button>
     </div>`;
 }
 
@@ -4203,6 +4650,27 @@ function openAnaya(){
   if(saved.url)window.open(saved.url,'_blank');
   else toast('⚠️ Añade el enlace de Anaya Digital primero');
 }
+function bAjustes(){
+  // Sync theme button
+  const ttb=document.getElementById('theme-toggle-btn');
+  if(ttb)ttb.textContent=isDark?'🌙 Oscuro':'☀️ Claro';
+  // Objetivo chips
+  const chips=document.getElementById('aj-obj-chips');
+  if(chips){
+    const objs=[30,45,60,90,120];
+    chips.innerHTML=objs.map(o=>`<div class="chip${o===D.objetivoDiario?' on':''}" onclick="setObj(${o},this)">${o} min</div>`).join('');
+  }
+  const st=document.getElementById('aj-obj-status');
+  if(st)st.textContent='Objetivo actual: '+D.objetivoDiario+' min/día';
+  // Sync pom inputs
+  const pw=document.getElementById('pom-work-inp');
+  const pb=document.getElementById('pom-break-inp');
+  if(pw)pw.value=Math.round(pomSettings.W/60);
+  if(pb)pb.value=Math.round(pomSettings.B/60);
+  // Version label
+  document.querySelectorAll('#update-version-lbl,#about-version').forEach(el=>{if(el)el.textContent=APP_VERSION;});
+}
+
 function toggleAnayaPass(){
   const inp=document.getElementById('anaya-pass');
   const eye=document.getElementById('anaya-eye');
@@ -4213,154 +4681,178 @@ function toggleAnayaPass(){
 
 
 // ════════════════════════════════════════════════════════
-// SISTEMA DE ACTUALIZACIÓN
+// SISTEMA DE ACTUALIZACIÓN — auto-check al abrir la app
 // ════════════════════════════════════════════════════════
 
-// Lista completa de claves localStorage a preservar durante update
 const USER_DATA_KEYS=[
-  'lumio_state',        // estado principal (D)
-  'lumio_apuntes',      // apuntes por materia
-  'lumio_plan',         // planificador de exámenes
-  'lumio_tl',           // línea del tiempo personalizada
-  'lumio_horario',      // horario de clases
-  'lumio_theme',        // tema claro/oscuro
-  'lumio_seen_onboarding',
-  'lumio_seen_tutorial',
-  'lumio_user',         // nombre y preferencias
-  'lumio_deberes',      // agenda de deberes
-  'lumio_animos',       // historial de ánimo
-  'lumio_anaya',        // datos Anaya Digital
-  'lumio_peers',        // ranking compañeros
+  'lumio_state','lumio_apuntes','lumio_plan','lumio_tl','lumio_horario',
+  'lumio_theme','lumio_seen_onboarding','lumio_seen_tutorial','lumio_user',
+  'lumio_deberes','lumio_animos','lumio_anaya','lumio_peers','lumio_version',
 ];
 
-// Inicializar label de versión
 document.addEventListener('DOMContentLoaded',()=>{
   const v=APP_VERSION;
   document.querySelectorAll('#about-version,#update-version-lbl').forEach(el=>{if(el)el.textContent=v;});
   localStorage.setItem('lumio_version',v);
+  // Auto-check update silently 3s after load (no interrumpe el inicio)
+  if(GITHUB_RAW_URL)setTimeout(autoCheckUpdate,3000);
 });
 
-async function checkUpdate(){
-  if(!GITHUB_RAW_URL){
-    showUpdateModal('config');
-    return;
+// Auto-check silencioso: solo muestra banner si hay versión nueva
+async function autoCheckUpdate(){
+  try{
+    // Cache-busting fetch que ignora el service worker completamente
+    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{
+      cache:'no-store',          // nunca usa caché del navegador
+      headers:{'pragma':'no-cache','cache-control':'no-cache'}
+    });
+    if(!res.ok)return;
+    const html=await res.text();
+    const match=html.match(/const APP_VERSION='([^']+)'/);
+    const remoteVersion=match?match[1]:null;
+    if(!remoteVersion||remoteVersion===APP_VERSION)return;
+    // Hay versión nueva — guardar html y mostrar banner
+    window._pendingUpdate=html;
+    showUpdateBanner(remoteVersion);
+  }catch(e){
+    // Sin conexión o fallo — ignorar silenciosamente
   }
+}
+
+// Banner no intrusivo en la parte superior
+function showUpdateBanner(remoteVersion){
+  const existing=document.getElementById('update-banner');
+  if(existing)return; // ya se mostró
+  const banner=document.createElement('div');
+  banner.id='update-banner';
+  banner.style.cssText=`position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:var(--y);color:#0d0f14;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;font-family:var(--font)`;
+  banner.innerHTML=`
+    <div>
+      <div style="font-size:13px;font-weight:800">🚀 Lumio ${remoteVersion} disponible</div>
+      <div style="font-size:11px;opacity:.7">Tus datos se conservan</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="installUpdate()" style="background:#0d0f14;color:var(--y);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">Actualizar</button>
+      <button onclick="this.closest('#update-banner').remove()" style="background:rgba(0,0,0,.15);color:#0d0f14;border:none;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">✕</button>
+    </div>`;
+  document.body.appendChild(banner);
+  // Empujar contenido hacia abajo para que el banner no tape nada
+  const phone=document.getElementById('phone');
+  if(phone)phone.style.marginTop='48px';
+}
+
+// Búsqueda manual desde ajustes
+async function checkUpdate(){
+  if(!GITHUB_RAW_URL){showUpdateModal('config');return;}
   const btn=document.getElementById('update-btn');
   const status=document.getElementById('update-status');
   if(btn){btn.disabled=true;btn.textContent='Buscando...';}
   try{
-    // Fetch the raw HTML from GitHub
-    const res=await fetch(GITHUB_RAW_URL+'?nocache='+Date.now());
-    if(!res.ok)throw new Error('No se pudo conectar con GitHub ('+res.status+')');
+    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{cache:'no-store',headers:{'pragma':'no-cache','cache-control':'no-cache'}});
+    if(!res.ok)throw new Error('Error '+res.status);
     const html=await res.text();
-
-    // Extract version from fetched HTML
     const match=html.match(/const APP_VERSION='([^']+)'/);
     const remoteVersion=match?match[1]:null;
-
-    if(!remoteVersion){
-      toast('⚠️ No se encontró versión en el archivo de GitHub');
-      return;
-    }
-
+    if(!remoteVersion){toast('⚠️ No se encontró versión en GitHub');return;}
     if(remoteVersion===APP_VERSION){
       if(status)status.textContent='✅ Ya tienes la última versión ('+APP_VERSION+')';
       toast('✅ Lumio ya está actualizado');
     }else{
-      // Show update modal with the fetched HTML ready to install
-      showUpdateModal('available',{remoteVersion,html});
+      window._pendingUpdate=html;
+      showUpdateModal('available',{remoteVersion});
     }
   }catch(e){
-    toast('❌ '+e.message.slice(0,60));
-    if(status)status.textContent='Error al conectar · '+e.message.slice(0,40);
+    toast('❌ '+e.message.slice(0,55));
+    if(status)status.textContent='Error: '+e.message.slice(0,40);
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Buscar';}
   }
 }
 
 function showUpdateModal(type,data={}){
-  const existing=document.getElementById('update-modal');
-  if(existing)existing.remove();
-
+  const existing=document.getElementById('update-modal');if(existing)existing.remove();
   let content='';
   if(type==='config'){
     content=`
       <div style="font-size:48px;margin-bottom:8px">⚙️</div>
       <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:8px">Configura tu GitHub</div>
-      <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">
-        Para activar las actualizaciones, abre el archivo <code style="background:var(--bg2);padding:2px 6px;border-radius:5px;font-size:12px">index.html</code> con un editor de texto y cambia la línea:<br><br>
-        <code style="background:var(--bg2);padding:8px 10px;border-radius:8px;font-size:11px;display:block;line-height:1.8;word-break:break-all">const GITHUB_RAW_URL='https://raw.githubusercontent.com/<b>TU_USUARIO/TU_REPO</b>/main/index.html';</code>
-      </div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">Abre el archivo con un editor y cambia esta línea:<br><br>
+      <code style="background:var(--bg2);padding:8px;border-radius:8px;font-size:11px;display:block;word-break:break-all">const GITHUB_RAW_URL='https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/index.html';</code></div>
       <button class="mbtn" onclick="document.getElementById('update-modal').remove()">Entendido</button>`;
-  }else if(type==='available'){
+  }else{
     content=`
       <div style="font-size:48px;margin-bottom:8px">🚀</div>
       <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px">¡Actualización disponible!</div>
-      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px">
-        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Versión actual</div><div style="font-size:16px;font-weight:800;color:var(--t2)">${APP_VERSION}</div></div>
-        <div style="font-size:20px;color:var(--y);padding-top:8px">→</div>
-        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Nueva versión</div><div style="font-size:16px;font-weight:800;color:var(--green)">${data.remoteVersion}</div></div>
+      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:14px">
+        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Actual</div><div style="font-size:15px;font-weight:800;color:var(--t2)">${APP_VERSION}</div></div>
+        <div style="font-size:20px;color:var(--y);padding-top:6px">→</div>
+        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Nueva</div><div style="font-size:15px;font-weight:800;color:var(--green)">${data.remoteVersion}</div></div>
       </div>
-      <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:11px 13px;margin-bottom:16px;font-size:12px;color:var(--t2);line-height:1.6">
-        🔒 <b style="color:var(--t1)">Tus datos están protegidos</b><br>
-        Apuntes, flashcards, progreso, horario, planificador y configuración se preservan automáticamente.
+      <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--t2);line-height:1.6">
+        🔒 <b style="color:var(--t1)">Tus datos están protegidos.</b><br>Apuntes, flashcards, progreso y configuración se conservan automáticamente.
       </div>
       <div style="display:flex;gap:8px">
-        <button class="gbtn" style="flex:1" onclick="document.getElementById('update-modal').remove()">Cancelar</button>
-        <button class="mbtn" style="flex:2" onclick="installUpdate(${JSON.stringify(data.html).replace(/</g,'\\u003c')})">⬇️ Actualizar ahora</button>
+        <button class="gbtn" style="flex:1" onclick="document.getElementById('update-modal').remove()">Ahora no</button>
+        <button class="mbtn" style="flex:2" onclick="document.getElementById('update-modal').remove();installUpdate()">⬇️ Actualizar</button>
       </div>`;
-    // Store html separately to avoid inline script issues
-    window._pendingUpdate=data.html;
-    content=content.replace(`installUpdate(${JSON.stringify(data.html).replace(/</g,'\\u003c')})`, 'installUpdate()');
   }
-
   const modal=document.createElement('div');
   modal.id='update-modal';
   modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
-  modal.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0">${content}</div>`;
+  modal.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:26px 20px;width:100%;max-width:340px;text-align:center">${content}</div>`;
   document.body.appendChild(modal);
 }
 
 async function installUpdate(){
   const html=window._pendingUpdate;
-  if(!html){toast('❌ No hay actualización pendiente');return;}
-
-  const modal=document.getElementById('update-modal');
-  if(modal)modal.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:32px 22px;width:100%;max-width:340px;text-align:center">
-    <div style="font-size:40px;margin-bottom:12px">💾</div>
-    <div style="font-size:16px;font-weight:800;color:var(--t1);margin-bottom:8px">Guardando tus datos...</div>
-    <div style="font-size:12px;color:var(--t2)">No cierres la app</div>
-  </div>`;
-
-  try{
-    // Step 1: Backup ALL user data
-    const backup={};
-    USER_DATA_KEYS.forEach(k=>{
-      const val=localStorage.getItem(k);
-      if(val!==null)backup[k]=val;
-    });
-    // Also backup any lumio_ach_* achievement keys
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&(k.startsWith('lumio_ach_')||k.startsWith('lumio_imminent_'))){
-        backup[k]=localStorage.getItem(k);
-      }
-    }
-
-    // Step 2: Replace document content (same origin → localStorage survives)
-    document.open();
-    document.write(html);
-    document.close();
-
-    // Step 3: Restore data in new document context
-    // The new document will run its own DOMContentLoaded, but we restore
-    // data now so loadState() picks it up when it runs
-    Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
-
-  }catch(e){
-    toast('❌ Error durante la actualización: '+e.message.slice(0,50));
-    if(modal)modal.remove();
+  if(!html){toast('❌ No hay actualización descargada. Usa "Buscar" primero.');return;}
+  // Mostrar pantalla de instalación
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';
+  overlay.innerHTML=`<div style="font-size:48px">💾</div>
+    <div style="font-size:18px;font-weight:800;color:var(--t1)">Instalando actualización...</div>
+    <div style="font-size:13px;color:var(--t2)">Guardando tus datos · No cierres la app</div>
+    <div style="width:200px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+      <div id="install-bar" style="height:100%;background:var(--y);border-radius:2px;width:0;transition:width .3s"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const bar=document.getElementById('install-bar');
+  // Paso 1: Backup datos
+  if(bar)bar.style.width='30%';
+  const backup={};
+  USER_DATA_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)backup[k]=v;});
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&(k.startsWith('lumio_ach_')||k.startsWith('lumio_imminent_')))backup[k]=localStorage.getItem(k);
   }
+  if(bar)bar.style.width='60%';
+  // Paso 2: Desregistrar SW para que no sirva versión antigua en el futuro
+  if('serviceWorker' in navigator){
+    const regs=await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r=>r.unregister()));
+  }
+  if(bar)bar.style.width='80%';
+  // Pequeña pausa visual
+  await new Promise(r=>setTimeout(r,300));
+  if(bar)bar.style.width='100%';
+  await new Promise(r=>setTimeout(r,200));
+  // Paso 3: Restaurar datos ANTES de reemplazar documento
+  Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
+  // Paso 4: Limpiar tarjetas predefinidas del backup antes de restaurar
+  try{
+    const stateKey='lumio_state';
+    const st=JSON.parse(backup[stateKey]||'null');
+    if(st&&st.cards){
+      const DEFAULT_IDS=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10',
+        'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20','c21','c22','c23','c24','c25',
+        'c26','c27','c28','c29','c30','c31','c32','c33','c34','c35','c36','c37','c38','c39','c40','c41']);
+      st.cards=st.cards.filter(card=>!DEFAULT_IDS.has(card.id));
+      backup[stateKey]=JSON.stringify(st);
+    }
+  }catch(e){}
+  Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
+  // Paso 5: Reemplazar el documento
+  document.open();document.write(html);document.close();
 }
 
 function resetApp(){
