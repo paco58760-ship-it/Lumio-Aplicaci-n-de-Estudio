@@ -1097,7 +1097,7 @@ button:active{transform:scale(.97)}
       </div>
       <div>
         <div style="font-size:17px;font-weight:900;color:var(--t1)">Lumio</div>
-        <div style="font-size:11px;color:var(--t2)">Versión 2.0 · 2025</div>
+        <div style="font-size:11px;color:var(--t2)">Versión <span id="about-version">3.0.0</span> · 2025</div>
       </div>
     </div>
     <div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:12px">
@@ -1117,6 +1117,14 @@ button:active{transform:scale(.97)}
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Modo claro</div><div style="font-size:11px;color:var(--t2)">Para proyector o luz solar</div></div>
       <button onclick="toggleTheme()" id="theme-toggle-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer">🌙 Oscuro</button>
+    </div>
+    <div style="height:1px;background:var(--bd)"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">Actualizar app</div>
+        <div style="font-size:11px;color:var(--t2)" id="update-status">Versión <span id="update-version-lbl">3.0.0</span></div>
+      </div>
+      <button onclick="checkUpdate()" id="update-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">Buscar</button>
     </div>
     <div style="height:1px;background:var(--bd)"></div>
     <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1173,6 +1181,276 @@ button:active{transform:scale(.97)}
 </div>
 </div>
 
+<!-- ══ AGENDA DE DEBERES ══ -->
+<div class="screen" id="s-agenda">
+<div class="pw">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+    <div><div class="pt">Agenda <em>deberes</em> 📋</div><div class="ps" style="margin-bottom:0">Tareas pendientes por materia</div></div>
+    <button class="gbtn" onclick="showAddDeberes()">+ Añadir</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px">
+    <button class="tabb on" data-f="todas" onclick="agendaFilter(this)">Todas</button>
+    <button class="tabb" data-f="hoy" onclick="agendaFilter(this)">Hoy</button>
+    <button class="tabb" data-f="pendiente" onclick="agendaFilter(this)">Pendiente</button>
+    <button class="tabb" data-f="hecha" onclick="agendaFilter(this)">Hecha</button>
+  </div>
+  <div id="agenda-mañana" style="margin-bottom:12px"></div>
+  <div id="agenda-list"></div>
+</div>
+</div>
+
+<!-- ══ VACACIONES Y CALENDARIO ESCOLAR ══ -->
+<div class="screen" id="s-vacaciones">
+<div class="pw">
+  <div class="pt">Calen<em>dario escolar</em> 🗓️</div>
+  <div class="ps">Curso 2024–2025</div>
+  <div id="vac-countdown" style="margin-bottom:14px"></div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Próximas fechas</div>
+  <div id="vac-list"></div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:14px;margin-bottom:8px">Trimestres</div>
+  <div id="trim-list"></div>
+</div>
+</div>
+
+<!-- ══ FÓRMULAS ══ -->
+<div class="screen" id="s-formulas">
+<div class="pw">
+  <div class="pt">Fórmu<em>las</em> 📐</div>
+  <div class="ps">Matemáticas y Física · 2º ESO</div>
+  <input class="inp" id="form-search" placeholder="Buscar fórmula..." oninput="filterFormulas()" style="margin-bottom:10px">
+  <div class="chip-row" id="form-cats"></div>
+  <div id="form-list"></div>
+</div>
+</div>
+
+<!-- ══ CONJUGADOR ══ -->
+<div class="screen" id="s-conjugador">
+<div class="pw">
+  <div class="pt">Conju<em>gador</em> 🔤</div>
+  <div class="ps">Español e Inglés</div>
+  <div style="display:flex;gap:7px;margin-bottom:12px">
+    <button class="tabb on" data-l="es" onclick="conjLang(this)">Español</button>
+    <button class="tabb" data-l="en" onclick="conjLang(this)">English</button>
+  </div>
+  <input class="inp" id="conj-verb" placeholder="Escribe un verbo..." style="margin-bottom:10px" oninput="conjSearch()">
+  <div id="conj-result"></div>
+</div>
+</div>
+
+<!-- ══ CALCULADORA DE NOTAS ══ -->
+<div class="screen" id="s-calcnotas">
+<div class="pw">
+  <div class="pt">Calcula<em>dora notas</em> 🎓</div>
+  <div class="ps">¿Cuánto necesito para aprobar?</div>
+  <div style="display:flex;gap:7px;margin-bottom:14px">
+    <button class="tabb on" data-m="necesito" onclick="calcNotasTab(this)">¿Qué necesito?</button>
+    <button class="tabb" data-m="media" onclick="calcNotasTab(this)">Media ponderada</button>
+    <button class="tabb" data-m="reglaTres" onclick="calcNotasTab(this)">Regla de 3</button>
+  </div>
+  <div id="cn-necesito">
+    <div class="card" style="margin-bottom:10px">
+      <div class="sl">Notas parciales ya obtenidas</div>
+      <div id="cn-notas-list" style="margin-bottom:8px"></div>
+      <button class="gbtn" style="width:100%;font-size:12px" onclick="addCNNota()">+ Añadir nota</button>
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="sl">Peso del examen final (%)</div>
+      <input class="inp" type="number" id="cn-peso-final" value="30" min="1" max="100" oninput="calcNecesito()">
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="sl">Nota mínima para aprobar</div>
+      <input class="inp" type="number" id="cn-minima" value="5" min="0" max="10" step="0.1" oninput="calcNecesito()">
+    </div>
+    <div id="cn-resultado" style="display:none"></div>
+  </div>
+  <div id="cn-media" style="display:none">
+    <div class="card" style="margin-bottom:10px">
+      <div class="sl">Asignaturas y notas</div>
+      <div id="cn-media-list" style="margin-bottom:8px"></div>
+      <button class="gbtn" style="width:100%;font-size:12px" onclick="addMediaNota()">+ Añadir asignatura</button>
+    </div>
+    <div id="cn-media-resultado" style="display:none"></div>
+  </div>
+  <div id="cn-reglaTres" style="display:none">
+    <div class="card" style="margin-bottom:10px">
+      <div class="sl">Si A es a B, entonces C es a…</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">A</div><input class="inp" type="number" id="r3-a" oninput="calcR3()" placeholder="ej: 100"></div>
+        <div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">B</div><input class="inp" type="number" id="r3-b" oninput="calcR3()" placeholder="ej: 10"></div>
+        <div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">C</div><input class="inp" type="number" id="r3-c" oninput="calcR3()" placeholder="ej: 75"></div>
+        <div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">X = ?</div><div style="font-size:28px;font-weight:900;color:var(--y);padding-top:8px" id="r3-x">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ GENERADOR PPT ══ -->
+<div class="screen" id="s-ppt">
+<div class="pw">
+  <div class="pt">Presen<em>tación</em> 📊</div>
+  <div class="ps">Esquema para trabajos orales con IA</div>
+  <div style="margin-bottom:10px"><div class="sl">Tema del trabajo</div>
+    <input class="inp" id="ppt-tema" placeholder="Ej: La Revolución Industrial, El ecosistema...">
+  </div>
+  <div style="margin-bottom:10px"><div class="sl">Número de diapositivas</div>
+    <div style="display:flex;gap:6px">
+      <div class="chip on" data-n="5" onclick="pptPickN(this)">5</div>
+      <div class="chip" data-n="8" onclick="pptPickN(this)">8</div>
+      <div class="chip" data-n="10" onclick="pptPickN(this)">10</div>
+    </div>
+  </div>
+  <div style="margin-bottom:10px"><div class="sl">Contexto adicional (opcional)</div>
+    <textarea class="inp ta" style="min-height:70px" id="ppt-info" placeholder="Puntos clave que debe incluir..."></textarea>
+  </div>
+  <button class="mbtn" style="margin-bottom:14px" onclick="genPPT()">✨ Generar esquema</button>
+  <div id="ppt-result" style="display:none"></div>
+</div>
+</div>
+
+<!-- ══ GENERADOR DE ESQUEMAS ══ -->
+<div class="screen" id="s-esquemas">
+<div class="pw">
+  <div class="pt">Esque<em>mas</em> 🗂️</div>
+  <div class="ps">Texto → esquema visual jerárquico</div>
+  <div style="margin-bottom:10px"><div class="sl">Texto o apuntes</div>
+    <textarea class="inp ta" style="min-height:120px" id="esq-texto" placeholder="Pega tu texto aquí..."></textarea>
+  </div>
+  <button class="mbtn" style="margin-bottom:14px" onclick="genEsquema()">🗂️ Generar esquema</button>
+  <div id="esq-result" style="display:none">
+    <div class="sl">Esquema visual</div>
+    <div id="esq-content" style="background:var(--bg1);border:1px solid var(--bd);border-radius:13px;padding:14px;font-size:12px;color:var(--t1);line-height:1.8"></div>
+    <button class="gbtn" style="width:100%;margin-top:8px" onclick="esqToApunte()">💾 Guardar en apuntes</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODO DICTADO ══ -->
+<div class="screen" id="s-dictado">
+<div class="pw">
+  <div class="pt">Modo <em>dictado</em> 🎙️</div>
+  <div class="ps">La IA te pregunta, tú respondes en voz alta</div>
+  <div style="margin-bottom:12px"><div class="sl">Materia</div>
+    <div class="chip-row" id="dict-chips"></div>
+  </div>
+  <div id="dict-setup">
+    <div class="card card-y" style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px">¿Cómo funciona?</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        1. La IA te lee una pregunta en voz alta<br>
+        2. Tú respondes oralmente<br>
+        3. La IA evalúa tu respuesta<br>
+        4. Ideal para repasar de camino al cole 🎧
+      </div>
+    </div>
+    <button class="mbtn" onclick="startDictado()">🎙️ Empezar dictado</button>
+  </div>
+  <div id="dict-active" style="display:none">
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:12px" id="dict-ico">🤔</div>
+      <div style="font-size:15px;font-weight:700;color:var(--t1);line-height:1.5;margin-bottom:16px" id="dict-pregunta">Cargando pregunta...</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:20px" id="dict-estado">Escuchando respuesta...</div>
+      <button onclick="dictNext()" style="background:var(--y);color:#0d0f14;border:none;border-radius:12px;padding:14px 32px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font)" id="dict-next-btn">Siguiente →</button>
+      <div style="margin-top:12px"><button onclick="stopDictado()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:var(--font)">Parar dictado</button></div>
+    </div>
+    <div class="card" id="dict-feedback" style="display:none"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ CORRECTOR DE REDACCIONES ══ -->
+<div class="screen" id="s-corrector">
+<div class="pw">
+  <div class="pt">Correc<em>tor</em> ✍️</div>
+  <div class="ps">La IA corrige tu redacción con sugerencias</div>
+  <div style="margin-bottom:10px"><div class="sl">Tu redacción</div>
+    <textarea class="inp ta" style="min-height:160px" id="cor-texto" placeholder="Pega o escribe tu redacción aquí..."></textarea>
+    <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:3px" id="cor-cc">0 caracteres</div>
+  </div>
+  <div style="margin-bottom:10px"><div class="sl">Tipo de corrección</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <div class="chip on" data-t="completa" onclick="corTipo(this)">Completa</div>
+      <div class="chip" data-t="ortografia" onclick="corTipo(this)">Solo ortografía</div>
+      <div class="chip" data-t="estilo" onclick="corTipo(this)">Estilo y cohesión</div>
+    </div>
+  </div>
+  <button class="mbtn" style="margin-bottom:14px" onclick="corregir()">✍️ Corregir con IA</button>
+  <div id="cor-loading" style="display:none;padding:20px 0">
+    <div class="sk-line med skeleton"></div>
+    <div class="sk-line full skeleton"></div>
+    <div class="sk-line short skeleton"></div>
+    <div class="sk-block skeleton"></div>
+    <div class="sk-line full skeleton"></div>
+  </div>
+  <div id="cor-result" style="display:none"></div>
+</div>
+</div>
+
+<!-- ══ RANKING ══ -->
+<div class="screen" id="s-ranking">
+<div class="pw">
+  <div class="pt">Ran<em>king</em> 🏅</div>
+  <div class="ps">Comparte tu progreso con amigos</div>
+  <div id="rank-mi-tarjeta" style="margin-bottom:14px"></div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Añadir compañero</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sl">Pega el código de tu compañero</div>
+    <input class="inp" id="rank-code-inp" placeholder="Código de Lumio..." style="margin-bottom:8px">
+    <button class="mbtn" onclick="importRankCode()">Añadir al ranking</button>
+  </div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Clasificación</div>
+  <div id="rank-lista"></div>
+</div>
+</div>
+
+<!-- ══ BIENESTAR ══ -->
+<div class="screen" id="s-bienestar">
+<div class="pw">
+  <div class="pt">Bien<em>estar</em> 🧘</div>
+  <div class="ps">Cuídate mientras estudias</div>
+  <div id="bienestar-burnout" style="margin-bottom:12px"></div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Pausa activa ahora</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">2 minutos para recargar</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Elige un ejercicio rápido</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="pausas-grid"></div>
+  </div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Historial de ánimo</div>
+  <div class="card" id="animo-historial"></div>
+</div>
+</div>
+
+<!-- ══ AJUSTES ANAYA ══ -->
+<div class="screen" id="s-anaya">
+<div class="pw">
+  <div class="pt">Mi cuenta <em>Anaya</em> 📘</div>
+  <div class="ps">Acceso rápido a tus libros digitales</div>
+  <div class="card card-y" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">¿Por qué guardar tus datos aquí?</div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.6">Para acceder rápidamente a tus libros digitales Anaya sin tener que buscarlos. Todo queda guardado en tu dispositivo, nadie más lo ve.</div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="sl">Usuario Anaya Digital</div>
+    <input class="inp" id="anaya-user" placeholder="tu@correo.es o usuario" style="margin-bottom:8px">
+    <div class="sl">Contraseña</div>
+    <div style="position:relative">
+      <input class="inp" id="anaya-pass" type="password" placeholder="Contraseña" style="padding-right:44px">
+      <button onclick="toggleAnayaPass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px" id="anaya-eye">👁</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="sl">Enlace directo a tus libros (opcional)</div>
+    <input class="inp" id="anaya-url" placeholder="https://www.anayaeducacion.es/...">
+    <div style="font-size:10px;color:var(--t3);margin-top:5px">Copia la URL después de iniciar sesión para acceder directamente</div>
+  </div>
+  <button class="mbtn" style="margin-bottom:8px" onclick="saveAnaya()">💾 Guardar datos</button>
+  <button class="gbtn" style="width:100%;margin-bottom:14px" id="anaya-open-btn" onclick="openAnaya()" style="display:none">📘 Abrir Anaya Digital</button>
+  <div class="card" style="opacity:.6">
+    <div style="font-size:11px;color:var(--t3);line-height:1.7">🔒 Tus datos se guardan únicamente en este dispositivo. Lumio no los envía a ningún servidor.</div>
+  </div>
+</div>
+</div>
+
 </div><!-- end screens -->
 
 <!-- NAV 6 tabs -->
@@ -1206,6 +1484,45 @@ button:active{transform:scale(.97)}
 
 <!-- MODALS -->
 <!-- API key not needed - built into Lumio -->
+
+<!-- MODAL DEBERES -->
+<div class="mo" id="deb-mo" style="display:none"><div class="mobox">
+  <div style="font-size:18px;font-weight:800;color:var(--t1)">📋 Nueva tarea</div>
+  <div><div class="sl">Materia</div><select class="inp" id="deb-mat"></select></div>
+  <div><div class="sl">Descripción</div><input class="inp" id="deb-desc" placeholder="Ej: Ejercicios 1-5 pág. 48"></div>
+  <div><div class="sl">Entregar</div><input class="inp" type="date" id="deb-fecha"></div>
+  <div style="display:flex;gap:8px">
+    <button class="gbtn" style="flex:1" onclick="clsMo('deb')">Cancelar</button>
+    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="saveDeberes()">Añadir tarea</button>
+  </div>
+</div></div>
+
+<!-- MODAL CHECK-IN ÁNIMO -->
+<div class="mo" id="checkin-mo" style="display:none"><div class="mobox" style="text-align:center">
+  <div style="font-size:28px;font-weight:800;color:var(--t1);margin-bottom:4px">¿Cómo estás hoy?</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Cuéntame antes de empezar</div>
+  <div style="display:flex;justify-content:space-around;margin-bottom:14px">
+    <div onclick="selAnimo(this,'😴',20)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="cansado"><div style="font-size:28px">😴</div><div style="font-size:10px;color:var(--t2);font-weight:700">Cansado</div></div>
+    <div onclick="selAnimo(this,'😐',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="normal"><div style="font-size:28px">😐</div><div style="font-size:10px;color:var(--t2);font-weight:700">Normal</div></div>
+    <div onclick="selAnimo(this,'😊',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="bien"><div style="font-size:28px">😊</div><div style="font-size:10px;color:var(--t2);font-weight:700">Bien</div></div>
+    <div onclick="selAnimo(this,'🔥',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="motivado"><div style="font-size:28px">🔥</div><div style="font-size:10px;color:var(--t2);font-weight:700">Motivado</div></div>
+  </div>
+  <div id="checkin-sugerencia" style="font-size:12px;color:var(--teal);min-height:18px;margin-bottom:12px"></div>
+  <div style="display:flex;gap:8px">
+    <button class="gbtn" style="flex:1" onclick="clsMo('checkin');confirmPomStart()">Saltar</button>
+    <button class="mbtn" style="flex:2" id="checkin-ok-btn" onclick="confirmCheckinAndStart()" disabled>▶ Empezar</button>
+  </div>
+</div></div>
+
+<!-- MODAL PAUSA ACTIVA -->
+<div class="mo" id="pausa-mo" style="display:none"><div class="mobox" style="text-align:center">
+  <div style="font-size:48px;margin-bottom:8px" id="pausa-ico">🧘</div>
+  <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px" id="pausa-titulo">Pausa activa</div>
+  <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px" id="pausa-desc">Tómate 2 minutos</div>
+  <div style="font-size:36px;font-weight:900;color:var(--y);margin-bottom:16px" id="pausa-timer">2:00</div>
+  <button class="mbtn" onclick="endPausa()">Listo ✓</button>
+</div></div>
+
 
 <div class="mo" id="plan-mo" style="display:none"><div class="mobox">
   <div style="font-size:18px;font-weight:800;color:var(--t1)">➕ Nuevo examen</div>
@@ -1281,6 +1598,11 @@ button:active{transform:scale(.97)}
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
+const APP_VERSION='3.0.0';
+// Cambia esta URL por la raw de tu archivo en GitHub:
+// https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/index.html
+const GITHUB_RAW_URL='';
+
 const D={
   user:{name:'Raúl',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
   mats:[
@@ -1473,14 +1795,14 @@ const SECTIONS={
   home:{screens:['home'],labels:[]},
   pomodoro:{screens:['pom-screen'],labels:[]},
   stats:{screens:['stats'],labels:[]},
-  estudiar:{screens:['flashcards','testia','examen','resumenia','mapa','chat'],
-    labels:['🃏 Tarjetas','🧠 Test IA','📈 Examen','📄 Resumen','🗺️ Mapa','💬 Chat IA']},
-  herramientas:{screens:['calc','conversor','tabla','timeline','vocab','horario'],
-    labels:['🔢 Calc','⚖️ Conversor','⚗️ Tabla P.','📜 Historia','🌐 Vocab','📋 Horario']},
-  logros:{screens:['logros','recordatorios','calendario','sonidos'],
-    labels:['🏆 Logros','🔔 Avisos','📅 Calendario','🎵 Sonidos']},
-  mas:{screens:['materias','planificador','amigos'],
-    labels:['📚 Materias','🗓️ Planificador','👥 Invitar']},
+  estudiar:{screens:['flashcards','testia','examen','resumenia','mapa','chat','esquemas','dictado','corrector'],
+    labels:['🃏 Tarjetas','🧠 Test IA','📈 Examen','📄 Resumen','🗺️ Mapa','💬 Chat IA','🗂️ Esquemas','🎙️ Dictado','✍️ Corrector']},
+  herramientas:{screens:['calc','conversor','tabla','timeline','vocab','horario','formulas','conjugador','calcnotas','ppt'],
+    labels:['🔢 Calc','⚖️ Conversor','⚗️ Tabla P.','📜 Historia','🌐 Vocab','📋 Horario','📐 Fórmulas','🔤 Verbos','🎓 Notas','📊 PPT']},
+  logros:{screens:['logros','recordatorios','calendario','sonidos','bienestar'],
+    labels:['🏆 Logros','🔔 Avisos','📅 Calendario','🎵 Sonidos','🧘 Bienestar']},
+  mas:{screens:['materias','planificador','agenda','vacaciones','ranking','anaya','amigos'],
+    labels:['📚 Materias','🗓️ Planificador','📋 Agenda','🗓️ Vacaciones','🏅 Ranking','📘 Anaya','👥 Invitar']},
 };
 let currentSection='home';let currentScreen='home';
 
@@ -1505,7 +1827,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos};
+  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya};
   if(bldrs[id])bldrs[id]();
   document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
   const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
@@ -1639,6 +1961,19 @@ function showPomPre(){
 }
 function confirmPomStart(){
   document.getElementById('pom-pre-mo').classList.remove('show');
+  // Show check-in if not done today
+  const animos=JSON.parse(localStorage.getItem('lumio_animos')||'[]');
+  const hoyStr=new Date().toLocaleDateString('es-ES',{weekday:'short',day:'numeric'});
+  const yaHoyCheckin=animos.length&&animos[animos.length-1].fecha===hoyStr;
+  if(!yaHoyCheckin){
+    animoSel=null;
+    document.querySelectorAll('.animo-opt').forEach(e=>{e.style.background='';e.style.borderColor='var(--bd)';});
+    document.getElementById('checkin-sugerencia').textContent='';
+    document.getElementById('checkin-ok-btn').disabled=true;
+    document.getElementById('checkin-mo').style.display='flex';
+    return;
+  }
+  // No check-in needed, start directly
   const btn=document.getElementById('pom-b');if(btn)btn.textContent='⏸ Pausar';
   if(!po.run)tgPom();
 }
@@ -1668,8 +2003,12 @@ function tgPom(){
           gainXP(10);launchConfetti();
           po.brk=true;po.s=pomSettings.B;
           toast('🍅 ¡Pomodoro completado! +10 XP');
-          // vibration
           if(navigator.vibrate)navigator.vibrate([200,100,200]);
+          // Suggest active break
+          setTimeout(()=>{
+            const rnd=Math.floor(Math.random()*PAUSAS.length);
+            startPausa(rnd);
+          },600);
         }else{po.brk=false;po.s=pomSettings.W;toast('☕ ¡A estudiar!');}
         upPom();renderStudyToday();saveState();
       }
@@ -3056,10 +3395,978 @@ function exportApuntePDF(){
 }
 
 // ════════════════════════════════════════════════════════
-// RESET APP
+// FÓRMULAS
 // ════════════════════════════════════════════════════════
+const FORMULAS=[
+  {cat:'Geometría',n:'Área triángulo',f:'A = (b · h) / 2',desc:'Base por altura entre dos'},
+  {cat:'Geometría',n:'Área círculo',f:'A = π · r²',desc:'Pi por radio al cuadrado'},
+  {cat:'Geometría',n:'Circunferencia',f:'C = 2 · π · r',desc:'Dos por pi por radio'},
+  {cat:'Geometría',n:'Área rectángulo',f:'A = b · h',desc:'Base por altura'},
+  {cat:'Geometría',n:'Área trapecio',f:'A = (B + b) · h / 2',desc:'Suma bases por altura entre dos'},
+  {cat:'Geometría',n:'Volumen cubo',f:'V = a³',desc:'Arista al cubo'},
+  {cat:'Geometría',n:'Volumen cilindro',f:'V = π · r² · h',desc:'Pi por radio cuadrado por altura'},
+  {cat:'Geometría',n:'Pitágoras',f:'a² + b² = c²',desc:'Suma de catetos al cuadrado igual a hipotenusa al cuadrado'},
+  {cat:'Álgebra',n:'Ecuación 1º grado',f:'ax + b = 0 → x = -b/a',desc:'Despejar la incógnita'},
+  {cat:'Álgebra',n:'Ecuación 2º grado',f:'x = (-b ± √(b²-4ac)) / 2a',desc:'Fórmula cuadrática'},
+  {cat:'Álgebra',n:'Producto notable (a+b)²',f:'a² + 2ab + b²',desc:'Cuadrado de la suma'},
+  {cat:'Álgebra',n:'Producto notable (a-b)²',f:'a² - 2ab + b²',desc:'Cuadrado de la diferencia'},
+  {cat:'Álgebra',n:'Diferencia de cuadrados',f:'(a+b)(a-b) = a² - b²',desc:'Producto de conjugados'},
+  {cat:'Números',n:'Tanto por ciento',f:'% = (parte / total) · 100',desc:'Parte entre total por cien'},
+  {cat:'Números',n:'Interés simple',f:'I = C · r · t',desc:'Capital por tasa por tiempo'},
+  {cat:'Números',n:'Media aritmética',f:'x̄ = (x₁+x₂+...+xₙ) / n',desc:'Suma de datos entre número de datos'},
+  {cat:'Física',n:'Velocidad media',f:'v = e / t',desc:'Espacio entre tiempo (m/s)'},
+  {cat:'Física',n:'MRU (espacio)',f:'e = v · t',desc:'Velocidad por tiempo'},
+  {cat:'Física',n:'2ª Ley Newton',f:'F = m · a',desc:'Fuerza = masa × aceleración (N)'},
+  {cat:'Física',n:'Densidad',f:'d = m / V',desc:'Masa entre volumen (g/cm³)'},
+  {cat:'Física',n:'Peso',f:'P = m · g',desc:'Masa por gravedad (g = 9.8 m/s²)'},
+  {cat:'Física',n:'Presión',f:'P = F / A',desc:'Fuerza entre área (Pa)'},
+  {cat:'Física',n:'Ley de Ohm',f:'V = I · R',desc:'Tensión = Intensidad × Resistencia'},
+  {cat:'Física',n:'Energía cinética',f:'Ec = ½ · m · v²',desc:'Medio masa por velocidad al cuadrado'},
+  {cat:'Física',n:'Energía potencial',f:'Ep = m · g · h',desc:'Masa por gravedad por altura'},
+  {cat:'Química',n:'Mol',f:'n = m / M',desc:'Moles = masa / masa molar (g/mol)'},
+  {cat:'Química',n:'Concentración molar',f:'C = n / V',desc:'Moles entre volumen en litros (mol/L)'},
+  {cat:'Química',n:'Gas ideal',f:'PV = nRT',desc:'Presión×Volumen = moles×R×Temperatura'},
+];
+let formCat='Todas',formSearch='';
+function bFormulas(){
+  const cats=['Todas',...new Set(FORMULAS.map(f=>f.cat))];
+  document.getElementById('form-cats').innerHTML=cats.map(c=>`<div class="chip${c===formCat?' on':''}" onclick="setFormCat('${c}',this)">${c}</div>`).join('');
+  renderFormulas();
+}
+function setFormCat(c,el){formCat=c;document.querySelectorAll('#form-cats .chip').forEach(x=>x.classList.remove('on'));el.classList.add('on');renderFormulas();}
+function filterFormulas(){formSearch=document.getElementById('form-search').value.toLowerCase();renderFormulas();}
+function renderFormulas(){
+  let list=FORMULAS;
+  if(formCat!=='Todas')list=list.filter(f=>f.cat===formCat);
+  if(formSearch)list=list.filter(f=>f.n.toLowerCase().includes(formSearch)||f.f.toLowerCase().includes(formSearch));
+  document.getElementById('form-list').innerHTML=list.map(f=>`
+    <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="this.querySelector('.form-desc').style.display=this.querySelector('.form-desc').style.display==='block'?'none':'block'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em">${f.cat}</div>
+        <div style="font-size:10px;color:var(--t3)">▼</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px">${f.n}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--y);letter-spacing:.02em;background:var(--bg2);padding:8px 12px;border-radius:8px;font-family:monospace">${f.f}</div>
+      <div class="form-desc" style="display:none;font-size:12px;color:var(--t2);margin-top:8px;line-height:1.5">${f.desc}</div>
+    </div>`).join('')||'<div style="color:var(--t3);text-align:center;padding:20px">Sin resultados</div>';
+}
+
+// ════════════════════════════════════════════════════════
+// CONJUGADOR
+// ════════════════════════════════════════════════════════
+let conjLangSel='es';
+const VERBOS_ES={
+  'hablar':{tipo:'regular -ar',tiempos:{
+    'Presente':['hablo','hablas','habla','hablamos','habláis','hablan'],
+    'Pretérito Indefinido':['hablé','hablaste','habló','hablamos','hablasteis','hablaron'],
+    'Pretérito Imperfecto':['hablaba','hablabas','hablaba','hablábamos','hablabais','hablaban'],
+    'Futuro':['hablaré','hablarás','hablará','hablaremos','hablaréis','hablarán'],
+    'Condicional':['hablaría','hablarías','hablaría','hablaríamos','hablaríais','hablarían'],
+    'Subjuntivo Presente':['hable','hables','hable','hablemos','habléis','hablen'],
+    'Imperativo':['—','habla','hable','hablemos','hablad','hablen'],
+  }},
+  'comer':{tipo:'regular -er',tiempos:{
+    'Presente':['como','comes','come','comemos','coméis','comen'],
+    'Pretérito Indefinido':['comí','comiste','comió','comimos','comisteis','comieron'],
+    'Pretérito Imperfecto':['comía','comías','comía','comíamos','comíais','comían'],
+    'Futuro':['comeré','comerás','comerá','comeremos','comeréis','comerán'],
+    'Condicional':['comería','comerías','comería','comeríamos','comeríais','comerían'],
+    'Subjuntivo Presente':['coma','comas','coma','comamos','comáis','coman'],
+    'Imperativo':['—','come','coma','comamos','comed','coman'],
+  }},
+  'vivir':{tipo:'regular -ir',tiempos:{
+    'Presente':['vivo','vives','vive','vivimos','vivís','viven'],
+    'Pretérito Indefinido':['viví','viviste','vivió','vivimos','vivisteis','vivieron'],
+    'Pretérito Imperfecto':['vivía','vivías','vivía','vivíamos','vivíais','vivían'],
+    'Futuro':['viviré','vivirás','vivirá','viviremos','viviréis','vivirán'],
+    'Condicional':['viviría','vivirías','viviría','viviríamos','viviríais','vivirían'],
+    'Subjuntivo Presente':['viva','vivas','viva','vivamos','viváis','vivan'],
+    'Imperativo':['—','vive','viva','vivamos','vivid','vivan'],
+  }},
+  'ser':{tipo:'irregular',tiempos:{
+    'Presente':['soy','eres','es','somos','sois','son'],
+    'Pretérito Indefinido':['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+    'Pretérito Imperfecto':['era','eras','era','éramos','erais','eran'],
+    'Futuro':['seré','serás','será','seremos','seréis','serán'],
+    'Condicional':['sería','serías','sería','seríamos','seríais','serían'],
+    'Subjuntivo Presente':['sea','seas','sea','seamos','seáis','sean'],
+    'Imperativo':['—','sé','sea','seamos','sed','sean'],
+  }},
+  'estar':{tipo:'irregular',tiempos:{
+    'Presente':['estoy','estás','está','estamos','estáis','están'],
+    'Pretérito Indefinido':['estuve','estuviste','estuvo','estuvimos','estuvisteis','estuvieron'],
+    'Pretérito Imperfecto':['estaba','estabas','estaba','estábamos','estabais','estaban'],
+    'Futuro':['estaré','estarás','estará','estaremos','estaréis','estarán'],
+    'Condicional':['estaría','estarías','estaría','estaríamos','estaríais','estarían'],
+    'Subjuntivo Presente':['esté','estés','esté','estemos','estéis','estén'],
+    'Imperativo':['—','está','esté','estemos','estad','estén'],
+  }},
+  'tener':{tipo:'irregular',tiempos:{
+    'Presente':['tengo','tienes','tiene','tenemos','tenéis','tienen'],
+    'Pretérito Indefinido':['tuve','tuviste','tuvo','tuvimos','tuvisteis','tuvieron'],
+    'Pretérito Imperfecto':['tenía','tenías','tenía','teníamos','teníais','tenían'],
+    'Futuro':['tendré','tendrás','tendrá','tendremos','tendréis','tendrán'],
+    'Condicional':['tendría','tendrías','tendría','tendríamos','tendríais','tendrían'],
+    'Subjuntivo Presente':['tenga','tengas','tenga','tengamos','tengáis','tengan'],
+    'Imperativo':['—','ten','tenga','tengamos','tened','tengan'],
+  }},
+  'ir':{tipo:'irregular',tiempos:{
+    'Presente':['voy','vas','va','vamos','vais','van'],
+    'Pretérito Indefinido':['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+    'Pretérito Imperfecto':['iba','ibas','iba','íbamos','ibais','iban'],
+    'Futuro':['iré','irás','irá','iremos','iréis','irán'],
+    'Condicional':['iría','irías','iría','iríamos','iríais','irían'],
+    'Subjuntivo Presente':['vaya','vayas','vaya','vayamos','vayáis','vayan'],
+    'Imperativo':['—','ve','vaya','vayamos','id','vayan'],
+  }},
+  'hacer':{tipo:'irregular',tiempos:{
+    'Presente':['hago','haces','hace','hacemos','hacéis','hacen'],
+    'Pretérito Indefinido':['hice','hiciste','hizo','hicimos','hicisteis','hicieron'],
+    'Pretérito Imperfecto':['hacía','hacías','hacía','hacíamos','hacíais','hacían'],
+    'Futuro':['haré','harás','hará','haremos','haréis','harán'],
+    'Condicional':['haría','harías','haría','haríamos','haríais','harían'],
+    'Subjuntivo Presente':['haga','hagas','haga','hagamos','hagáis','hagan'],
+    'Imperativo':['—','haz','haga','hagamos','haced','hagan'],
+  }},
+  'poder':{tipo:'irregular e→ue',tiempos:{
+    'Presente':['puedo','puedes','puede','podemos','podéis','pueden'],
+    'Pretérito Indefinido':['pude','pudiste','pudo','pudimos','pudisteis','pudieron'],
+    'Pretérito Imperfecto':['podía','podías','podía','podíamos','podíais','podían'],
+    'Futuro':['podré','podrás','podrá','podremos','podréis','podrán'],
+    'Condicional':['podría','podrías','podría','podríamos','podríais','podrían'],
+    'Subjuntivo Presente':['pueda','puedas','pueda','podamos','podáis','puedan'],
+    'Imperativo':['—','puede','pueda','podamos','poded','puedan'],
+  }},
+  'decir':{tipo:'irregular',tiempos:{
+    'Presente':['digo','dices','dice','decimos','decís','dicen'],
+    'Pretérito Indefinido':['dije','dijiste','dijo','dijimos','dijisteis','dijeron'],
+    'Pretérito Imperfecto':['decía','decías','decía','decíamos','decíais','decían'],
+    'Futuro':['diré','dirás','dirá','diremos','diréis','dirán'],
+    'Condicional':['diría','dirías','diría','diríamos','diríais','dirían'],
+    'Subjuntivo Presente':['diga','digas','diga','digamos','digáis','digan'],
+    'Imperativo':['—','di','diga','digamos','decid','digan'],
+  }},
+};
+const VERBOS_EN={
+  'be':{tipo:'irregular',tiempos:{
+    'Simple Present':['am','are (you)','is','are (we)','are (you all)','are'],
+    'Simple Past':['was','were','was','were','were','were'],
+    'Present Perfect':['have been','have been','has been','have been','have been','have been'],
+    'Past Continuous':['was being','were being','was being','were being','were being','were being'],
+    'Future (will)':['will be','will be','will be','will be','will be','will be'],
+    'Conditional':['would be','would be','would be','would be','would be','would be'],
+  }},
+  'have':{tipo:'irregular',tiempos:{
+    'Simple Present':['have','have','has','have','have','have'],
+    'Simple Past':['had','had','had','had','had','had'],
+    'Present Perfect':['have had','have had','has had','have had','have had','have had'],
+    'Future (will)':['will have','will have','will have','will have','will have','will have'],
+    'Conditional':['would have','would have','would have','would have','would have','would have'],
+  }},
+  'go':{tipo:'irregular',tiempos:{
+    'Simple Present':['go','go','goes','go','go','go'],
+    'Simple Past':['went','went','went','went','went','went'],
+    'Present Perfect':['have gone','have gone','has gone','have gone','have gone','have gone'],
+    'Present Continuous':['am going','are going','is going','are going','are going','are going'],
+    'Future (will)':['will go','will go','will go','will go','will go','will go'],
+    'Conditional':['would go','would go','would go','would go','would go','would go'],
+  }},
+  'do':{tipo:'irregular',tiempos:{
+    'Simple Present':['do','do','does','do','do','do'],
+    'Simple Past':['did','did','did','did','did','did'],
+    'Present Perfect':['have done','have done','has done','have done','have done','have done'],
+    'Future (will)':['will do','will do','will do','will do','will do','will do'],
+    'Conditional':['would do','would do','would do','would do','would do','would do'],
+  }},
+  'study':{tipo:'regular (-y→-ied)',tiempos:{
+    'Simple Present':['study','study','studies','study','study','study'],
+    'Simple Past':['studied','studied','studied','studied','studied','studied'],
+    'Present Perfect':['have studied','have studied','has studied','have studied','have studied','have studied'],
+    'Present Continuous':['am studying','are studying','is studying','are studying','are studying','are studying'],
+    'Future (will)':['will study','will study','will study','will study','will study','will study'],
+    'Conditional':['would study','would study','would study','would study','would study','would study'],
+  }},
+  'speak':{tipo:'irregular',tiempos:{
+    'Simple Present':['speak','speak','speaks','speak','speak','speak'],
+    'Simple Past':['spoke','spoke','spoke','spoke','spoke','spoke'],
+    'Present Perfect':['have spoken','have spoken','has spoken','have spoken','have spoken','have spoken'],
+    'Present Continuous':['am speaking','are speaking','is speaking','are speaking','are speaking','are speaking'],
+    'Future (will)':['will speak','will speak','will speak','will speak','will speak','will speak'],
+  }},
+  'work':{tipo:'regular',tiempos:{
+    'Simple Present':['work','work','works','work','work','work'],
+    'Simple Past':['worked','worked','worked','worked','worked','worked'],
+    'Present Perfect':['have worked','have worked','has worked','have worked','have worked','have worked'],
+    'Present Continuous':['am working','are working','is working','are working','are working','are working'],
+    'Future (will)':['will work','will work','will work','will work','will work','will work'],
+    'Conditional':['would work','would work','would work','would work','would work','would work'],
+  }},
+};
+function bConjugador(){renderConj();}
+function conjLang(btn){conjLangSel=btn.dataset.l;document.querySelectorAll('#s-conjugador .tabb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('conj-verb').value='';document.getElementById('conj-result').innerHTML='';renderConjSuggestions();}
+function renderConjSuggestions(){
+  const db=conjLangSel==='es'?VERBOS_ES:VERBOS_EN;
+  document.getElementById('conj-result').innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Verbos disponibles</div><div class="chip-row">${Object.keys(db).map(v=>`<div class="chip" onclick="document.getElementById('conj-verb').value='${v}';conjSearch()">${v}</div>`).join('')}</div>`;
+}
+function conjSearch(){
+  const q=document.getElementById('conj-verb').value.trim().toLowerCase();
+  if(!q){renderConjSuggestions();return;}
+  const db=conjLangSel==='es'?VERBOS_ES:VERBOS_EN;
+  const verbo=db[q];
+  if(!verbo){
+    document.getElementById('conj-result').innerHTML=`<div style="color:var(--t3);text-align:center;padding:20px;font-size:13px">Verbo no encontrado. Prueba: ${Object.keys(db).filter(v=>v.startsWith(q[0])).slice(0,4).join(', ')}</div>`;
+    return;
+  }
+  const pronEs=['yo','tú','él/ella','nosotros','vosotros','ellos'];
+  const pronEn=['I','you','he/she','we','you all','they'];
+  const pron=conjLangSel==='es'?pronEs:pronEn;
+  document.getElementById('conj-result').innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="font-size:20px;font-weight:900;color:var(--t1)">${q}</div>
+      <div style="font-size:11px;color:var(--teal);font-weight:700;margin-top:2px">${verbo.tipo}</div>
+    </div>
+    ${Object.entries(verbo.tiempos).map(([tiempo,formas])=>`
+      <div class="card" style="margin-bottom:8px">
+        <div style="font-size:10px;font-weight:800;color:var(--y);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">${tiempo}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          ${formas.map((f,i)=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--t3);font-size:10px">${pron[i]}</span><br><span style="color:var(--t1);font-weight:600">${f}</span></div>`).join('')}
+        </div>
+      </div>`).join('')}`;
+}
+function renderConj(){renderConjSuggestions();}
+
+// ════════════════════════════════════════════════════════
+// CALCULADORA DE NOTAS
+// ════════════════════════════════════════════════════════
+let cnMode='necesito';let cnNotas=[];let cnMediaNotas=[];
+function bCalcNotas(){cnNotas=[];cnMediaNotas=[];renderCNNotas();renderMediaNotas();calcNecesito();}
+function calcNotasTab(btn){
+  cnMode=btn.dataset.m;
+  document.querySelectorAll('#s-calcnotas .tabb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  ['necesito','media','reglaTres'].forEach(m=>document.getElementById('cn-'+m).style.display=m===cnMode?'block':'none');
+}
+function addCNNota(){cnNotas.push({n:0,p:20});renderCNNotas();}
+function renderCNNotas(){
+  document.getElementById('cn-notas-list').innerHTML=cnNotas.map((n,i)=>`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input class="inp" type="number" min="0" max="10" step="0.1" value="${n.n}" placeholder="Nota" style="flex:2" oninput="cnNotas[${i}].n=parseFloat(this.value)||0;calcNecesito()">
+      <input class="inp" type="number" min="1" max="100" value="${n.p}" placeholder="%" style="flex:1" oninput="cnNotas[${i}].p=parseInt(this.value)||0;calcNecesito()">
+      <button onclick="cnNotas.splice(${i},1);renderCNNotas();calcNecesito()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;flex-shrink:0">×</button>
+    </div>`).join('');
+  calcNecesito();
+}
+function calcNecesito(){
+  const el=document.getElementById('cn-resultado');if(!el)return;
+  if(!cnNotas.length){el.style.display='none';return;}
+  const pesoFinal=parseFloat(document.getElementById('cn-peso-final')?.value)||30;
+  const minima=parseFloat(document.getElementById('cn-minima')?.value)||5;
+  const pesoActual=cnNotas.reduce((a,n)=>a+n.p,0);
+  const notaActual=cnNotas.reduce((a,n)=>a+(n.n*n.p),0)/Math.max(pesoActual,1);
+  const pesoRestante=100-pesoActual;
+  // nota_necesaria = (minima*100 - notaActual*pesoActual) / pesoFinal
+  const necesaria=(minima*100-notaActual*pesoActual)/Math.max(pesoFinal,1);
+  const c=necesaria<=5?'var(--green)':necesaria<=7?'var(--y)':necesaria<=10?'var(--orange)':'var(--red)';
+  el.style.display='block';
+  el.innerHTML=`<div class="card card-y">
+    <div style="display:flex;justify-content:space-around;text-align:center">
+      <div><div style="font-size:26px;font-weight:900;color:var(--teal)">${notaActual.toFixed(2)}</div><div style="font-size:10px;color:var(--t2)">media actual</div></div>
+      <div><div style="font-size:26px;font-weight:900;color:${c}">${necesaria<=0?'✓ Aprobado':necesaria>10?'Imposible ❌':necesaria.toFixed(2)}</div><div style="font-size:10px;color:var(--t2)">necesitas en el final</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--t2);margin-top:10px;text-align:center">${necesaria<=0?'¡Ya tienes el aprobado! 🎉':necesaria>10?'No es posible con las notas actuales. Habla con el profesor.':'Con un '+necesaria.toFixed(1)+' en el examen final ('+pesoFinal+'%) apruebas.'}</div>
+  </div>`;
+}
+function addMediaNota(){cnMediaNotas.push({n:'',nota:0,p:1});renderMediaNotas();}
+function renderMediaNotas(){
+  document.getElementById('cn-media-list').innerHTML=cnMediaNotas.map((n,i)=>`
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+      <input class="inp" value="${n.n}" placeholder="Asignatura" style="flex:3;font-size:12px" oninput="cnMediaNotas[${i}].n=this.value;calcMedia()">
+      <input class="inp" type="number" min="0" max="10" step="0.1" value="${n.nota}" placeholder="Nota" style="flex:2" oninput="cnMediaNotas[${i}].nota=parseFloat(this.value)||0;calcMedia()">
+      <button onclick="cnMediaNotas.splice(${i},1);renderMediaNotas();calcMedia()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">×</button>
+    </div>`).join('');
+  calcMedia();
+}
+function calcMedia(){
+  const el=document.getElementById('cn-media-resultado');if(!el)return;
+  if(!cnMediaNotas.length){el.style.display='none';return;}
+  const media=cnMediaNotas.reduce((a,n)=>a+n.nota,0)/cnMediaNotas.length;
+  const c=media>=9?'var(--green)':media>=7?'var(--teal)':media>=5?'var(--y)':'var(--red)';
+  const nota=media>=9?'Sobresaliente':media>=7?'Notable':media>=6?'Bien':media>=5?'Suficiente':'Suspenso';
+  el.style.display='block';
+  el.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:36px;font-weight:900;color:${c}">${media.toFixed(2)}</div><div style="font-size:14px;font-weight:700;color:${c}">${nota}</div><div style="font-size:11px;color:var(--t2);margin-top:4px">sobre ${cnMediaNotas.length} asignaturas</div></div>`;
+}
+function calcR3(){
+  const a=parseFloat(document.getElementById('r3-a')?.value),b=parseFloat(document.getElementById('r3-b')?.value),c=parseFloat(document.getElementById('r3-c')?.value);
+  const el=document.getElementById('r3-x');if(!el)return;
+  if(isNaN(a)||isNaN(b)||isNaN(c)||a===0){el.textContent='—';return;}
+  el.textContent=(b*c/a).toFixed(4).replace(/\.?0+$/,'');
+}
+
+// ════════════════════════════════════════════════════════
+// GENERADOR PPT
+// ════════════════════════════════════════════════════════
+let pptN=5;
+function pptPickN(el){pptN=parseInt(el.dataset.n);document.querySelectorAll('#s-ppt .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+async function genPPT(){
+  const tema=document.getElementById('ppt-tema').value.trim();
+  if(!tema){toast('⚠️ Escribe el tema del trabajo');return;}
+  const info=document.getElementById('ppt-info').value.trim();
+  const btn=document.querySelector('#s-ppt .mbtn');
+  if(btn){btn.disabled=true;btn.textContent='Generando...';}
+  document.getElementById('ppt-result').style.display='none';
+  try{
+    const prompt=`Eres un experto en presentaciones escolares para 2º ESO. Genera un esquema detallado de presentación de ${pptN} diapositivas sobre "${tema}". ${info?'Puntos clave: '+info:''}
+
+Responde SOLO en JSON sin backticks:
+{"titulo":"${tema}","diapositivas":[{"num":1,"titulo":"Título de la diapositiva","tipo":"portada|contenido|conclusión","puntos":["punto 1","punto 2","punto 3"],"nota":"Consejo para hablar esta diapositiva"}]}`;
+    const res=await callClaude(prompt,1500);
+    const data=JSON.parse(res.replace(/```json|```/g,'').trim());
+    renderPPT(data);
+    gainXP(8);
+  }catch(e){toast('❌ '+e.message.slice(0,55));}
+  if(btn){btn.disabled=false;btn.textContent='✨ Generar esquema';}
+}
+function renderPPT(data){
+  const colores=['var(--y)','var(--teal)','var(--blue)','var(--coral)','var(--purple)','var(--orange)','var(--green)'];
+  document.getElementById('ppt-result').style.display='block';
+  document.getElementById('ppt-result').innerHTML=`
+    <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">${data.diapositivas.length} diapositivas · ${data.titulo}</div>
+    ${data.diapositivas.map((d,i)=>`
+      <div class="card" style="margin-bottom:8px;border-left:3px solid ${colores[i%colores.length]}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:26px;height:26px;border-radius:7px;background:${colores[i%colores.length]};color:#0d0f14;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0">${d.num}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${d.titulo}</div>
+          <div style="font-size:9px;color:var(--t3);margin-left:auto;text-transform:uppercase">${d.tipo}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">${(d.puntos||[]).map(p=>`<div style="display:flex;gap:7px;font-size:12px;color:var(--t2)"><span style="color:${colores[i%colores.length]};flex-shrink:0">•</span>${p}</div>`).join('')}</div>
+        ${d.nota?`<div style="font-size:11px;color:var(--teal);background:rgba(45,212,191,.08);border-radius:7px;padding:7px 9px">💬 ${d.nota}</div>`:''}
+      </div>`).join('')}
+    <button class="gbtn" style="width:100%;margin-top:4px" onclick="copyPPT()">📋 Copiar esquema</button>`;
+}
+function copyPPT(){
+  const txt=document.getElementById('ppt-result')?.innerText||'';
+  navigator.clipboard?.writeText(txt).then(()=>toast('📋 Esquema copiado')).catch(()=>toast('Selecciona el texto manualmente'));
+}
+
+// ════════════════════════════════════════════════════════
+// GENERADOR DE ESQUEMAS
+// ════════════════════════════════════════════════════════
+let lastEsquema='';
+function bEsquemas(){}
+function bPPT(){}
+async function genEsquema(){
+  const txt=document.getElementById('esq-texto').value.trim();
+  if(!txt){toast('⚠️ Pega el texto primero');return;}
+  const btn=document.querySelector('#s-esquemas .mbtn');
+  if(btn){btn.disabled=true;btn.textContent='Generando...';}
+  try{
+    const prompt=`Eres un experto en técnicas de estudio para 2º ESO. Convierte el siguiente texto en un esquema visual jerárquico con emojis, usando sangría y símbolos para mostrar la jerarquía. Máximo 4 niveles. Usa este formato:
+📌 TEMA PRINCIPAL
+  ├── 🔷 Subtema 1
+  │   ├── • Detalle 1.1
+  │   └── • Detalle 1.2
+  └── 🔷 Subtema 2
+      └── • Detalle 2.1
+
+Responde SOLO con el esquema, sin explicaciones.\n\nTEXTO:\n${txt}`;
+    const res=await callClaude(prompt,1000);
+    lastEsquema=res;
+    document.getElementById('esq-content').innerHTML=res.split('\n').map(l=>`<div style="white-space:pre;font-family:monospace;font-size:12px">${l}</div>`).join('');
+    document.getElementById('esq-result').style.display='block';
+    gainXP(5);
+  }catch(e){toast('❌ '+e.message.slice(0,55));}
+  if(btn){btn.disabled=false;btn.textContent='🗂️ Generar esquema';}
+}
+function esqToApunte(){
+  apuntesDB[apuMat]=(apuntesDB[apuMat]||'')+'\n\n--- ESQUEMA IA ---\n'+lastEsquema;
+  localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
+  toast('💾 Esquema guardado en apuntes de '+apuMat);gainXP(2);
+}
+
+// ════════════════════════════════════════════════════════
+// MODO DICTADO
+// ════════════════════════════════════════════════════════
+let dictMat=null,dictCartas=[],dictIdx=0,dictRec=null;
+function bDictado(){
+  document.getElementById('dict-chips').innerHTML=D.mats.map(m=>`<div class="chip${m.n===dictMat?' on':''}" onclick="dictMat='${m.n}';document.querySelectorAll('#dict-chips .chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${m.e} ${m.n.split(' ')[0]}</div>`).join('');
+}
+async function startDictado(){
+  if(!dictMat){toast('⚠️ Elige una materia');return;}
+  const cartas=D.cards.filter(c=>c.m===dictMat);
+  if(!cartas.length){toast('⚠️ No hay tarjetas para esta materia');return;}
+  dictCartas=cartas.sort(()=>Math.random()-.5).slice(0,10);
+  dictIdx=0;
+  document.getElementById('dict-setup').style.display='none';
+  document.getElementById('dict-active').style.display='block';
+  dictNextCard();
+}
+function dictNextCard(){
+  if(dictIdx>=dictCartas.length){
+    document.getElementById('dict-ico').textContent='🎉';
+    document.getElementById('dict-pregunta').textContent='¡Dictado completado! Has repasado '+dictCartas.length+' preguntas.';
+    document.getElementById('dict-estado').textContent='';
+    document.getElementById('dict-next-btn').textContent='Reiniciar';
+    document.getElementById('dict-next-btn').onclick=()=>{dictIdx=0;dictNextCard();};
+    document.getElementById('dict-feedback').style.display='none';
+    gainXP(10);return;
+  }
+  const c=dictCartas[dictIdx];
+  document.getElementById('dict-ico').textContent='🤔';
+  document.getElementById('dict-pregunta').textContent=c.q;
+  document.getElementById('dict-estado').textContent='🔊 Leyendo pregunta...';
+  document.getElementById('dict-feedback').style.display='none';
+  document.getElementById('dict-next-btn').textContent='Ver respuesta →';
+  document.getElementById('dict-next-btn').onclick=()=>showDictAnswer();
+  // Text-to-speech
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(c.q);
+    u.lang='es-ES';u.rate=0.85;u.pitch=1;
+    u.onend=()=>{document.getElementById('dict-estado').textContent='💬 Responde en voz alta cuando estés listo';};
+    window.speechSynthesis.speak(u);
+  }else{
+    document.getElementById('dict-estado').textContent='💬 Responde mentalmente cuando estés listo';
+  }
+}
+function showDictAnswer(){
+  const c=dictCartas[dictIdx];
+  const fb=document.getElementById('dict-feedback');
+  fb.style.display='block';
+  fb.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin-bottom:5px">Respuesta correcta</div><div style="font-size:13px;color:var(--t1);line-height:1.5">${c.a}</div>`;
+  if('speechSynthesis' in window){
+    const u=new SpeechSynthesisUtterance(c.a);
+    u.lang='es-ES';u.rate=0.85;
+    window.speechSynthesis.speak(u);
+  }
+  document.getElementById('dict-estado').textContent='¿Lo sabías?';
+  document.getElementById('dict-next-btn').textContent='Siguiente →';
+  document.getElementById('dict-next-btn').onclick=()=>{dictIdx++;dictNextCard();};
+}
+function dictNext(){dictIdx++;dictNextCard();}
+function stopDictado(){
+  if('speechSynthesis' in window)window.speechSynthesis.cancel();
+  document.getElementById('dict-setup').style.display='block';
+  document.getElementById('dict-active').style.display='none';
+}
+
+// ════════════════════════════════════════════════════════
+// CORRECTOR DE REDACCIONES
+// ════════════════════════════════════════════════════════
+let corTipoSel='completa';
+function bCorrector(){
+  const ta=document.getElementById('cor-texto');
+  if(ta)ta.addEventListener('input',function(){document.getElementById('cor-cc').textContent=this.value.length+' caracteres';});
+}
+function corTipo(el){corTipoSel=el.dataset.t;document.querySelectorAll('#s-corrector .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+async function corregir(){
+  const txt=document.getElementById('cor-texto').value.trim();
+  if(txt.length<50){toast('⚠️ La redacción es demasiado corta');return;}
+  const btn=document.querySelector('#s-corrector .mbtn');
+  if(btn){btn.disabled=true;btn.textContent='Corrigiendo...';}
+  document.getElementById('cor-result').style.display='none';
+  document.getElementById('cor-loading').style.display='block';
+  const prompts={
+    completa:`Eres un profesor de Lengua de 2º ESO. Corrige esta redacción de forma completa y constructiva. Analiza: ortografía, gramática, puntuación, cohesión, coherencia y estructura. Da una nota del 1-10 y sugerencias concretas de mejora. Sé amable y alentador. Usa este formato exacto:
+📝 NOTA: X/10
+✅ LO QUE ESTÁ BIEN: (puntos positivos)
+❌ ERRORES ENCONTRADOS: (lista de errores con corrección)
+💡 SUGERENCIAS DE MEJORA: (consejos concretos)
+📖 REDACCIÓN CORREGIDA: (texto completo corregido)`,
+    ortografia:`Eres un corrector ortográfico de español. Corrige SOLO los errores ortográficos, tildes y puntuación de esta redacción. Lista cada error y su corrección, luego muestra el texto corregido.`,
+    estilo:`Eres un experto en escritura para 2º ESO. Analiza SOLO el estilo y cohesión de esta redacción: conectores, variedad de vocabulario, fluidez, estructura. No corrijas ortografía. Da sugerencias concretas para mejorar el estilo.`,
+  };
+  try{
+    const res=await callClaude(prompts[corTipoSel]+'\n\nREDACCIÓN:\n'+txt,1500);
+    document.getElementById('cor-loading').style.display='none';
+    document.getElementById('cor-result').style.display='block';
+    document.getElementById('cor-result').innerHTML=`<div class="card">${res.split('\n').map(l=>l.trim()?`<div style="font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:4px">${l}</div>`:''  ).join('')}</div>
+    <button class="gbtn" style="width:100%;margin-top:4px" onclick="saveCorreccion()">💾 Guardar corrección</button>`;
+    gainXP(5);
+  }catch(e){
+    document.getElementById('cor-loading').style.display='none';
+    toast('❌ '+e.message.slice(0,55));
+  }
+  if(btn){btn.disabled=false;btn.textContent='✍️ Corregir con IA';}
+}
+function saveCorreccion(){
+  const txt=document.getElementById('cor-result')?.innerText||'';
+  apuntesDB['Lengua']=(apuntesDB['Lengua']||'')+'\n\n--- CORRECCIÓN IA ---\n'+txt;
+  localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
+  toast('💾 Corrección guardada en apuntes de Lengua');
+}
+
+// ════════════════════════════════════════════════════════
+// AGENDA DE DEBERES
+// ════════════════════════════════════════════════════════
+let agendaFiltro='todas';
+function bAgenda(){
+  const sel=document.getElementById('deb-mat');
+  if(sel&&!sel.children.length){
+    const opt=document.createElement('option');opt.value='';opt.textContent='— Elige materia —';sel.appendChild(opt);
+    D.mats.forEach(m=>{const o=document.createElement('option');o.value=m.n;o.textContent=m.e+' '+m.n;sel.appendChild(o);});
+  }
+  const fd=document.getElementById('deb-fecha');if(fd&&!fd.min)fd.min=new Date().toISOString().split('T')[0];
+  // Mañana card
+  const mañana=new Date();mañana.setDate(mañana.getDate()+1);
+  const mañStr=mañana.toISOString().split('T')[0];
+  const horDB=JSON.parse(localStorage.getItem('lumio_horario')||'{}');
+  const diaMañana=mañana.getDay();
+  const diasIdx=diaMañana===0||diaMañana===6?-1:diaMañana-1;
+  let matsMañana=[];
+  if(diasIdx>=0){
+    for(let h=0;h<7;h++){const mat=horDB[h+'-'+diasIdx];if(mat&&mat&&!matsMañana.includes(mat)&&mat!=='Recreo'&&mat!=='Libre')matsMañana.push(mat);}
+  }
+  const mañCard=document.getElementById('agenda-mañana');
+  if(mañCard){
+    if(matsMañana.length){
+      mañCard.innerHTML=`<div class="card card-y"><div style="font-size:10px;font-weight:800;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📅 Mañana tienes</div>${matsMañana.map(m=>{const mat=D.mats.find(x=>x.n===m);return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)"><div style="font-size:15px">${mat?mat.e:'📚'}</div><div style="font-size:12px;font-weight:700;color:var(--t1)">${m}</div></div>`;}).join('')}<div style="font-size:11px;color:var(--t2);margin-top:6px">Repasa los deberes pendientes de estas materias</div></div>`;
+    }else{
+      mañCard.innerHTML='';
+    }
+  }
+  renderAgenda();
+}
+function agendaFilter(btn){agendaFiltro=btn.dataset.f;document.querySelectorAll('#s-agenda .tabb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderAgenda();}
+function renderAgenda(){
+  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  const hoy=new Date().toISOString().split('T')[0];
+  let lista=debs;
+  if(agendaFiltro==='hoy')lista=debs.filter(d=>d.fecha===hoy);
+  else if(agendaFiltro==='pendiente')lista=debs.filter(d=>!d.hecha);
+  else if(agendaFiltro==='hecha')lista=debs.filter(d=>d.hecha);
+  lista.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const el=document.getElementById('agenda-list');
+  if(!lista.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--t3);font-size:13px">Sin tareas '+agendaFiltro+' ✓</div>';return;}
+  el.innerHTML=lista.map(d=>{
+    const mat=D.mats.find(m=>m.n===d.mat);
+    const dias=Math.ceil((new Date(d.fecha)-new Date(hoy))/864e5);
+    const urg=dias<=1&&!d.hecha;
+    return `<div class="card" style="margin-bottom:8px;border-left:3px solid ${d.hecha?'var(--t3)':mat?mat.c:'var(--y)'}">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div onclick="toggleDeber('${d.id}')" style="width:22px;height:22px;border-radius:6px;border:2px solid ${d.hecha?'var(--green)':'var(--bd2)'};background:${d.hecha?'var(--green)':'transparent'};flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s">${d.hecha?'<span style="color:#0d0f14;font-size:11px;font-weight:900">✓</span>':''}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:${d.hecha?'var(--t3)':'var(--t1)'};${d.hecha?'text-decoration:line-through':''}">${d.desc}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px">${mat?mat.e:''} ${d.mat}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;font-weight:700;color:${urg?'var(--red)':dias<=3?'var(--orange)':'var(--t2)'}">${dias===0?'¡Hoy!':dias===1?'Mañana':dias<0?'Vencido':'En '+dias+'d'}</div>
+          <button onclick="deleteDeber('${d.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:11px;margin-top:2px">Borrar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function showAddDeberes(){document.getElementById('deb-mo').style.display='flex';}
+function saveDeberes(){
+  const mat=document.getElementById('deb-mat').value,desc=document.getElementById('deb-desc').value.trim(),fecha=document.getElementById('deb-fecha').value;
+  if(!mat||!desc||!fecha){toast('⚠️ Rellena todos los campos');return;}
+  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  debs.push({id:'d'+Date.now(),mat,desc,fecha,hecha:false});
+  localStorage.setItem('lumio_deberes',JSON.stringify(debs));
+  clsMo('deb');document.getElementById('deb-desc').value='';bAgenda();toast('📋 Tarea añadida');gainXP(2);
+}
+function toggleDeber(id){
+  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  const i=debs.findIndex(d=>d.id===id);if(i<0)return;
+  debs[i].hecha=!debs[i].hecha;
+  localStorage.setItem('lumio_deberes',JSON.stringify(debs));
+  if(debs[i].hecha){gainXP(3);toast('✅ Tarea completada +3 XP');}
+  renderAgenda();
+}
+function deleteDeber(id){
+  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]').filter(d=>d.id!==id);
+  localStorage.setItem('lumio_deberes',JSON.stringify(debs));renderAgenda();
+}
+
+// ════════════════════════════════════════════════════════
+// VACACIONES Y CALENDARIO ESCOLAR
+// ════════════════════════════════════════════════════════
+const CALENDARIO_ESCOLAR=[
+  {n:'Inicio curso',fecha:'2024-09-09',ico:'🏫',tipo:'inicio'},
+  {n:'Fiestas Nacionales (12 oct)',fecha:'2024-10-12',ico:'🇪🇸',tipo:'festivo'},
+  {n:'Vacaciones de Navidad',fecha:'2024-12-21',fechaFin:'2025-01-07',ico:'🎄',tipo:'vacaciones'},
+  {n:'Vuelta de Navidad',fecha:'2025-01-08',ico:'📚',tipo:'inicio'},
+  {n:'Semana Santa',fecha:'2025-04-12',fechaFin:'2025-04-20',ico:'🐣',tipo:'vacaciones'},
+  {n:'Vuelta de Semana Santa',fecha:'2025-04-22',ico:'📚',tipo:'inicio'},
+  {n:'Festivo 1 de Mayo',fecha:'2025-05-01',ico:'🌹',tipo:'festivo'},
+  {n:'Fin de curso ESO',fecha:'2025-06-20',ico:'🎓',tipo:'fin'},
+];
+const TRIMESTRES=[
+  {n:'1er Trimestre',inicio:'2024-09-09',fin:'2024-12-20',ico:'🍂'},
+  {n:'2º Trimestre',inicio:'2025-01-08',fin:'2025-04-11',ico:'❄️'},
+  {n:'3er Trimestre',inicio:'2025-04-22',fin:'2025-06-20',ico:'🌸'},
+];
+function bVacaciones(){
+  const now=new Date();const hoy=now.toISOString().split('T')[0];
+  // Next vacation countdown
+  const proxVac=CALENDARIO_ESCOLAR.filter(e=>e.tipo==='vacaciones'&&e.fecha>hoy).sort((a,b)=>a.fecha.localeCompare(b.fecha))[0];
+  const vcEl=document.getElementById('vac-countdown');
+  if(proxVac&&vcEl){
+    const dias=Math.ceil((new Date(proxVac.fecha)-now)/864e5);
+    vcEl.innerHTML=`<div class="card card-y" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:6px">${proxVac.ico}</div>
+      <div style="font-size:28px;font-weight:900;color:var(--y)">${dias} días</div>
+      <div style="font-size:14px;color:var(--t2)">para ${proxVac.n.toLowerCase()}</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px">${new Date(proxVac.fecha).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>`;
+  }
+  // Dates list
+  document.getElementById('vac-list').innerHTML=CALENDARIO_ESCOLAR.filter(e=>e.fecha>=hoy).slice(0,8).map(e=>{
+    const dias=Math.ceil((new Date(e.fecha)-now)/864e5);
+    const c={'vacaciones':'var(--teal)','festivo':'var(--orange)','inicio':'var(--green)','fin':'var(--y)'}[e.tipo]||'var(--t2)';
+    return`<div class="card" style="margin-bottom:6px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:24px;width:32px;text-align:center">${e.ico}</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${e.n}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:1px">${new Date(e.fecha).toLocaleDateString('es-ES',{day:'numeric',month:'long'})}${e.fechaFin?' – '+new Date(e.fechaFin).toLocaleDateString('es-ES',{day:'numeric',month:'long'})  :''}</div>
+      </div>
+      <div style="font-size:14px;font-weight:800;color:${c}">${dias===0?'¡Hoy!':dias+'d'}</div>
+    </div>`;
+  }).join('');
+  // Trimestres
+  document.getElementById('trim-list').innerHTML=TRIMESTRES.map(t=>{
+    const ini=new Date(t.inicio),fin=new Date(t.fin),tot=Math.ceil((fin-ini)/864e5);
+    const transcurrido=Math.max(0,Math.min(tot,Math.ceil((now-ini)/864e5)));
+    const pct=Math.round(transcurrido/tot*100);
+    const activo=now>=ini&&now<=fin;
+    return`<div class="card" style="margin-bottom:8px${activo?';border-color:var(--yb)':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">${t.ico} ${t.n}${activo?' <span style="font-size:9px;background:var(--yd);color:var(--y);border:1px solid var(--yb);padding:1px 7px;border-radius:999px;font-weight:700">EN CURSO</span>':''}</div>
+        <div style="font-size:12px;color:var(--t2)">${pct}%</div>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:var(--y)"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px">${new Date(t.inicio).toLocaleDateString('es-ES',{day:'numeric',month:'short'})} – ${new Date(t.fin).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// RANKING
+// ════════════════════════════════════════════════════════
+function bRanking(){
+  const myCode=btoa(JSON.stringify({n:D.user.name,h:+(D.user.hours||0).toFixed(1),p:D.user.pomodorosDone||0,xp:D.user.xp||0,s:D.user.streak||0})).slice(0,24);
+  document.getElementById('rank-mi-tarjeta').innerHTML=`
+    <div class="card card-y">
+      <div style="font-size:10px;font-weight:800;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tu código Lumio</div>
+      <div style="font-size:14px;font-weight:800;color:var(--t1);letter-spacing:.05em;margin-bottom:8px;font-family:monospace">${myCode}</div>
+      <button class="gbtn" style="font-size:12px;width:100%" onclick="navigator.clipboard?.writeText('${myCode}').then(()=>toast('📋 Código copiado'))">📋 Copiar mi código</button>
+      <div style="margin-top:10px;display:flex;justify-content:space-around;text-align:center">
+        <div><div style="font-size:20px;font-weight:900;color:var(--y)">${+(D.user.hours||0).toFixed(1)}h</div><div style="font-size:10px;color:var(--t2)">estudiadas</div></div>
+        <div><div style="font-size:20px;font-weight:900;color:var(--teal)">${D.user.pomodorosDone||0}</div><div style="font-size:10px;color:var(--t2)">pomodoros</div></div>
+        <div><div style="font-size:20px;font-weight:900;color:var(--orange)">${D.user.streak||0}🔥</div><div style="font-size:10px;color:var(--t2)">racha</div></div>
+      </div>
+    </div>`;
+  renderRanking();
+}
+function importRankCode(){
+  const code=document.getElementById('rank-code-inp').value.trim();
+  if(!code){toast('⚠️ Pega el código de tu compañero');return;}
+  try{
+    const data=JSON.parse(atob(code.padEnd(code.length+((4-code.length%4)%4),'=')));
+    if(!data.n){throw new Error('Código inválido');}
+    const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]');
+    if(peers.find(p=>p.n===data.n)){toast('⚠️ '+data.n+' ya está en tu ranking');return;}
+    peers.push({...data,code,fecha:new Date().toLocaleDateString('es-ES')});
+    localStorage.setItem('lumio_peers',JSON.stringify(peers));
+    document.getElementById('rank-code-inp').value='';
+    renderRanking();toast('🏅 '+data.n+' añadido al ranking');gainXP(5);
+  }catch(e){toast('❌ Código inválido');}
+}
+function renderRanking(){
+  const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]');
+  const todos=[{n:D.user.name,h:+(D.user.hours||0).toFixed(1),p:D.user.pomodorosDone||0,xp:D.user.xp||0,s:D.user.streak||0,yo:true},...peers];
+  todos.sort((a,b)=>b.h-a.h);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('rank-lista').innerHTML=todos.map((u,i)=>`
+    <div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px${u.yo?';border-color:var(--yb)':''}">
+      <div style="font-size:22px;width:28px;text-align:center">${medals[i]||i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">${u.n}${u.yo?' (tú)':''}</div>
+        <div style="font-size:10px;color:var(--t2);margin-top:1px">${u.p} pomodoros · ${u.s}🔥 racha · ${u.xp} XP</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:18px;font-weight:900;color:var(--y)">${u.h}h</div>
+        <div style="font-size:9px;color:var(--t3)">esta semana</div>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// BIENESTAR
+// ════════════════════════════════════════════════════════
+const PAUSAS=[
+  {ico:'🧘',n:'Respiración 4-7-8',desc:'Inhala 4s → aguanta 7s → exhala 8s. Repite 3 veces. Reduce el estrés al instante.'},
+  {ico:'🤸',n:'Estiramiento de cuello',desc:'Gira despacio la cabeza: derecha, atrás, izquierda, adelante. 2 veces. Alivia la tensión.'},
+  {ico:'👀',n:'Descanso visual 20-20-20',desc:'Mira a algo a 6 metros de distancia durante 20 segundos. Reduce fatiga ocular.'},
+  {ico:'🚶',n:'Levántate y camina',desc:'Da 20 pasos por la habitación. Activa la circulación y mejora la concentración.'},
+  {ico:'💪',n:'Estiramiento de espalda',desc:'Junta las manos detrás de la espalda y estira el pecho durante 15 segundos.'},
+  {ico:'🧠',n:'Respiración de caja',desc:'Inhala 4s → aguanta 4s → exhala 4s → aguanta 4s. 4 veces. Calma la mente.'},
+];
+let pausaTimer=null;
+function bBienestar(){
+  // Burnout check
+  const burnEl=document.getElementById('bienestar-burnout');
+  const horasSemana=D.week.reduce((a,b)=>a+b.m,0)/60;
+  const diasActivos=D.week.filter(d=>d.m>0).length;
+  if(burnEl){
+    if(diasActivos>=6&&horasSemana>10){
+      burnEl.innerHTML=`<div class="card" style="border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.05)"><div style="display:flex;gap:10px;align-items:flex-start"><div style="font-size:24px">⚠️</div><div><div style="font-size:13px;font-weight:700;color:#f87171">Señal de agotamiento</div><div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5">Llevas ${diasActivos} días seguidos estudiando más de ${horasSemana.toFixed(0)}h semanales. Descansa el fin de semana, lo necesitas y el cerebro consolida mejor así.</div></div></div></div>`;
+    }else{
+      burnEl.innerHTML=`<div class="card" style="border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.05)"><div style="font-size:12px;color:var(--green)">✅ Ritmo de estudio saludable esta semana</div></div>`;
+    }
+  }
+  // Pausas grid
+  document.getElementById('pausas-grid').innerHTML=PAUSAS.map((p,i)=>`
+    <div onclick="startPausa(${i})" style="background:var(--bg1);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s" ontouchstart="this.style.background='var(--bg2)'" ontouchend="this.style.background='var(--bg1)'">
+      <div style="font-size:26px;margin-bottom:5px">${p.ico}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--t1);line-height:1.3">${p.n}</div>
+    </div>`).join('');
+  // Historial animo
+  const animos=JSON.parse(localStorage.getItem('lumio_animos')||'[]').slice(-7);
+  const animoEl=document.getElementById('animo-historial');
+  if(animoEl){
+    if(!animos.length){animoEl.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Haz check-in de ánimo antes del Pomodoro para ver tu historial</div>';}
+    else{animoEl.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Últimos días</div><div style="display:flex;gap:8px;flex-wrap:wrap">${animos.map(a=>`<div style="text-align:center"><div style="font-size:20px">${a.ico}</div><div style="font-size:9px;color:var(--t3)">${a.fecha}</div></div>`).join('')}</div>`;}
+  }
+}
+function startPausa(i){
+  const p=PAUSAS[i];
+  document.getElementById('pausa-ico').textContent=p.ico;
+  document.getElementById('pausa-titulo').textContent=p.n;
+  document.getElementById('pausa-desc').textContent=p.desc;
+  let secs=120;
+  document.getElementById('pausa-timer').textContent='2:00';
+  document.getElementById('pausa-mo').style.display='flex';
+  if(pausaTimer)clearInterval(pausaTimer);
+  pausaTimer=setInterval(()=>{
+    secs--;
+    document.getElementById('pausa-timer').textContent=Math.floor(secs/60)+':'+(secs%60).toString().padStart(2,'0');
+    if(secs<=0){clearInterval(pausaTimer);pausaTimer=null;endPausa();}
+  },1000);
+}
+function endPausa(){
+  if(pausaTimer){clearInterval(pausaTimer);pausaTimer=null;}
+  document.getElementById('pausa-mo').style.display='none';
+  toast('🧘 Pausa activa completada +5 XP');gainXP(5);
+}
+
+// ════════════════════════════════════════════════════════
+// CHECK-IN ÁNIMO (antes del pomodoro)
+// ════════════════════════════════════════════════════════
+let animoSel=null,pomMinutos=25;
+const SUGERENCIAS_ANIMO={
+  '😴':'Cansado/a → Pomodoro de 20 min. Empieza con la tarea más fácil.',
+  '😐':'Normal → Pomodoro estándar de 25 min. ¡Tú puedes!',
+  '😊':'Bien → Pomodoro de 25 min. Aprovecha la energía.',
+  '🔥':'Motivado/a → Pomodoro de 30 min. ¡Es tu momento!',
+};
+function selAnimo(el,ico,mins){
+  animoSel=ico;pomMinutos=mins;
+  document.querySelectorAll('.animo-opt').forEach(e=>{e.style.background='var(--bg2)';e.style.borderColor='var(--bd)';});
+  el.style.background='var(--yd)';el.style.borderColor='var(--yb)';
+  document.getElementById('checkin-sugerencia').textContent=SUGERENCIAS_ANIMO[ico]||'';
+  document.getElementById('checkin-ok-btn').disabled=false;
+  // Update pomSettings temporarily
+  pomSettings.W=mins*60;
+  if(!po.run){po.s=pomSettings.W;upPom();}
+}
+function confirmCheckinAndStart(){
+  // Save mood
+  if(animoSel){
+    const animos=JSON.parse(localStorage.getItem('lumio_animos')||'[]');
+    animos.push({ico:animoSel,fecha:new Date().toLocaleDateString('es-ES',{weekday:'short',day:'numeric'}),mins:pomMinutos});
+    if(animos.length>30)animos.splice(0,animos.length-30);
+    localStorage.setItem('lumio_animos',JSON.stringify(animos));
+  }
+  clsMo('checkin');
+  confirmPomStart();
+}
+
+// ════════════════════════════════════════════════════════
+// ANAYA
+// ════════════════════════════════════════════════════════
+function bAnaya(){
+  const saved=JSON.parse(localStorage.getItem('lumio_anaya')||'{}');
+  if(saved.user)document.getElementById('anaya-user').value=saved.user;
+  if(saved.pass)document.getElementById('anaya-pass').value=saved.pass;
+  if(saved.url)document.getElementById('anaya-url').value=saved.url;
+  const btn=document.getElementById('anaya-open-btn');
+  if(btn)btn.style.display=saved.url?'block':'none';
+}
+function saveAnaya(){
+  const data={user:document.getElementById('anaya-user').value.trim(),pass:document.getElementById('anaya-pass').value,url:document.getElementById('anaya-url').value.trim()};
+  localStorage.setItem('lumio_anaya',JSON.stringify(data));
+  const btn=document.getElementById('anaya-open-btn');
+  if(btn)btn.style.display=data.url?'block':'none';
+  toast('💾 Datos Anaya guardados');
+}
+function openAnaya(){
+  const saved=JSON.parse(localStorage.getItem('lumio_anaya')||'{}');
+  if(saved.url)window.open(saved.url,'_blank');
+  else toast('⚠️ Añade el enlace de Anaya Digital primero');
+}
+function toggleAnayaPass(){
+  const inp=document.getElementById('anaya-pass');
+  const eye=document.getElementById('anaya-eye');
+  if(!inp||!eye)return;
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁';}
+}
+
+
+// ════════════════════════════════════════════════════════
+// SISTEMA DE ACTUALIZACIÓN
+// ════════════════════════════════════════════════════════
+
+// Lista completa de claves localStorage a preservar durante update
+const USER_DATA_KEYS=[
+  'lumio_state',        // estado principal (D)
+  'lumio_apuntes',      // apuntes por materia
+  'lumio_plan',         // planificador de exámenes
+  'lumio_tl',           // línea del tiempo personalizada
+  'lumio_horario',      // horario de clases
+  'lumio_theme',        // tema claro/oscuro
+  'lumio_seen_onboarding',
+  'lumio_seen_tutorial',
+  'lumio_user',         // nombre y preferencias
+  'lumio_deberes',      // agenda de deberes
+  'lumio_animos',       // historial de ánimo
+  'lumio_anaya',        // datos Anaya Digital
+  'lumio_peers',        // ranking compañeros
+];
+
+// Inicializar label de versión
+document.addEventListener('DOMContentLoaded',()=>{
+  const v=APP_VERSION;
+  document.querySelectorAll('#about-version,#update-version-lbl').forEach(el=>{if(el)el.textContent=v;});
+  localStorage.setItem('lumio_version',v);
+});
+
+async function checkUpdate(){
+  if(!GITHUB_RAW_URL){
+    showUpdateModal('config');
+    return;
+  }
+  const btn=document.getElementById('update-btn');
+  const status=document.getElementById('update-status');
+  if(btn){btn.disabled=true;btn.textContent='Buscando...';}
+  try{
+    // Fetch the raw HTML from GitHub
+    const res=await fetch(GITHUB_RAW_URL+'?nocache='+Date.now());
+    if(!res.ok)throw new Error('No se pudo conectar con GitHub ('+res.status+')');
+    const html=await res.text();
+
+    // Extract version from fetched HTML
+    const match=html.match(/const APP_VERSION='([^']+)'/);
+    const remoteVersion=match?match[1]:null;
+
+    if(!remoteVersion){
+      toast('⚠️ No se encontró versión en el archivo de GitHub');
+      return;
+    }
+
+    if(remoteVersion===APP_VERSION){
+      if(status)status.textContent='✅ Ya tienes la última versión ('+APP_VERSION+')';
+      toast('✅ Lumio ya está actualizado');
+    }else{
+      // Show update modal with the fetched HTML ready to install
+      showUpdateModal('available',{remoteVersion,html});
+    }
+  }catch(e){
+    toast('❌ '+e.message.slice(0,60));
+    if(status)status.textContent='Error al conectar · '+e.message.slice(0,40);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Buscar';}
+  }
+}
+
+function showUpdateModal(type,data={}){
+  const existing=document.getElementById('update-modal');
+  if(existing)existing.remove();
+
+  let content='';
+  if(type==='config'){
+    content=`
+      <div style="font-size:48px;margin-bottom:8px">⚙️</div>
+      <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:8px">Configura tu GitHub</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px">
+        Para activar las actualizaciones, abre el archivo <code style="background:var(--bg2);padding:2px 6px;border-radius:5px;font-size:12px">index.html</code> con un editor de texto y cambia la línea:<br><br>
+        <code style="background:var(--bg2);padding:8px 10px;border-radius:8px;font-size:11px;display:block;line-height:1.8;word-break:break-all">const GITHUB_RAW_URL='https://raw.githubusercontent.com/<b>TU_USUARIO/TU_REPO</b>/main/index.html';</code>
+      </div>
+      <button class="mbtn" onclick="document.getElementById('update-modal').remove()">Entendido</button>`;
+  }else if(type==='available'){
+    content=`
+      <div style="font-size:48px;margin-bottom:8px">🚀</div>
+      <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px">¡Actualización disponible!</div>
+      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px">
+        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Versión actual</div><div style="font-size:16px;font-weight:800;color:var(--t2)">${APP_VERSION}</div></div>
+        <div style="font-size:20px;color:var(--y);padding-top:8px">→</div>
+        <div style="text-align:center"><div style="font-size:11px;color:var(--t3)">Nueva versión</div><div style="font-size:16px;font-weight:800;color:var(--green)">${data.remoteVersion}</div></div>
+      </div>
+      <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:11px 13px;margin-bottom:16px;font-size:12px;color:var(--t2);line-height:1.6">
+        🔒 <b style="color:var(--t1)">Tus datos están protegidos</b><br>
+        Apuntes, flashcards, progreso, horario, planificador y configuración se preservan automáticamente.
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="gbtn" style="flex:1" onclick="document.getElementById('update-modal').remove()">Cancelar</button>
+        <button class="mbtn" style="flex:2" onclick="installUpdate(${JSON.stringify(data.html).replace(/</g,'\\u003c')})">⬇️ Actualizar ahora</button>
+      </div>`;
+    // Store html separately to avoid inline script issues
+    window._pendingUpdate=data.html;
+    content=content.replace(`installUpdate(${JSON.stringify(data.html).replace(/</g,'\\u003c')})`, 'installUpdate()');
+  }
+
+  const modal=document.createElement('div');
+  modal.id='update-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0">${content}</div>`;
+  document.body.appendChild(modal);
+}
+
+async function installUpdate(){
+  const html=window._pendingUpdate;
+  if(!html){toast('❌ No hay actualización pendiente');return;}
+
+  const modal=document.getElementById('update-modal');
+  if(modal)modal.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:32px 22px;width:100%;max-width:340px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">💾</div>
+    <div style="font-size:16px;font-weight:800;color:var(--t1);margin-bottom:8px">Guardando tus datos...</div>
+    <div style="font-size:12px;color:var(--t2)">No cierres la app</div>
+  </div>`;
+
+  try{
+    // Step 1: Backup ALL user data
+    const backup={};
+    USER_DATA_KEYS.forEach(k=>{
+      const val=localStorage.getItem(k);
+      if(val!==null)backup[k]=val;
+    });
+    // Also backup any lumio_ach_* achievement keys
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&(k.startsWith('lumio_ach_')||k.startsWith('lumio_imminent_'))){
+        backup[k]=localStorage.getItem(k);
+      }
+    }
+
+    // Step 2: Replace document content (same origin → localStorage survives)
+    document.open();
+    document.write(html);
+    document.close();
+
+    // Step 3: Restore data in new document context
+    // The new document will run its own DOMContentLoaded, but we restore
+    // data now so loadState() picks it up when it runs
+    Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
+
+  }catch(e){
+    toast('❌ Error durante la actualización: '+e.message.slice(0,50));
+    if(modal)modal.remove();
+  }
+}
+
 function resetApp(){
-  ['lumio_apuntes','lumio_plan','lumio_tl','lumio_horario','lumio_theme','lumio_seen_onboarding','lumio_seen_tutorial','lumio_user'].forEach(k=>localStorage.removeItem(k));
+  ['lumio_apuntes','lumio_plan','lumio_tl','lumio_horario','lumio_theme',
+   'lumio_seen_onboarding','lumio_seen_tutorial','lumio_user','lumio_state',
+   'lumio_deberes','lumio_animos','lumio_anaya','lumio_peers'].forEach(k=>localStorage.removeItem(k));
   location.reload();
 }
 
