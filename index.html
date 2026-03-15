@@ -1626,7 +1626,7 @@ button:active{transform:scale(.97)}
     <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
     <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
   </div>
-  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a6d6c7c5c9939e919096e6c1cbc7cfca88c5c9cb">[email&#160;protected]</a></span></div>
   <div><div class="sl">Tipo</div>
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
       <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
@@ -1809,11 +1809,36 @@ button:active{transform:scale(.97)}
 
 <div id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ════════════════════════════════════════════════════════
+// UPDATE INTERCEPTOR — se ejecuta ANTES que cualquier cosa
+// Funciona en PWA (pantalla de inicio), iOS Safari y Android
+// ════════════════════════════════════════════════════════
+(function(){
+  try{
+    const pending=localStorage.getItem('lumio_pending_html');
+    if(!pending)return;
+    // Hay una actualización esperando — aplicarla ahora
+    localStorage.removeItem('lumio_pending_html');
+    // Restaurar datos del usuario
+    const backup=JSON.parse(localStorage.getItem('lumio_update_backup')||'null');
+    if(backup){
+      localStorage.removeItem('lumio_update_backup');
+      Object.entries(backup).forEach(function(e){
+        try{localStorage.setItem(e[0],e[1]);}catch(err){}
+      });
+    }
+    // Reemplazar el documento completo — funciona en arranque limpio (no en PWA standalone sin reload)
+    document.open('text/html','replace');
+    document.write(pending);
+    document.close();
+  }catch(e){}
+})();
+
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
-const APP_VERSION='3.1.0';
+const APP_VERSION='3.2.0';
 // Cambia esta URL por la raw de tu archivo en GitHub:
 const GITHUB_RAW_URL='';
 
@@ -5133,6 +5158,7 @@ function showUpdateModal(type,data={}){
 async function installUpdate(){
   const html=window._pendingUpdate;
   if(!html){toast('❌ No hay actualización descargada. Usa "Buscar" primero.');return;}
+
   // Mostrar pantalla de instalación
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';
@@ -5144,42 +5170,62 @@ async function installUpdate(){
     </div>`;
   document.body.appendChild(overlay);
   const bar=document.getElementById('install-bar');
-  // Paso 1: Backup datos
-  if(bar)bar.style.width='30%';
+
+  // Paso 1: Backup de todos los datos del usuario
+  if(bar)bar.style.width='25%';
   const backup={};
   USER_DATA_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)backup[k]=v;});
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k&&(k.startsWith('lumio_ach_')||k.startsWith('lumio_imminent_')))backup[k]=localStorage.getItem(k);
+    if(k&&(k.startsWith('lumio_ach_')||k.startsWith('lumio_imminent_')||k.startsWith('lumio_gas')))
+      backup[k]=localStorage.getItem(k);
   }
-  if(bar)bar.style.width='60%';
-  // Paso 2: Desregistrar SW para que no sirva versión antigua en el futuro
-  if('serviceWorker' in navigator){
-    const regs=await navigator.serviceWorker.getRegistrations();
-    await Promise.all(regs.map(r=>r.unregister()));
-  }
-  if(bar)bar.style.width='80%';
-  // Pequeña pausa visual
-  await new Promise(r=>setTimeout(r,300));
-  if(bar)bar.style.width='100%';
-  await new Promise(r=>setTimeout(r,200));
-  // Paso 3: Restaurar datos ANTES de reemplazar documento
-  Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
-  // Paso 4: Limpiar tarjetas predefinidas del backup antes de restaurar
+
+  // Paso 2: Limpiar tarjetas predefinidas del backup
   try{
-    const stateKey='lumio_state';
-    const st=JSON.parse(backup[stateKey]||'null');
+    const st=JSON.parse(backup['lumio_state']||'null');
     if(st&&st.cards){
-      const DEFAULT_IDS=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10',
-        'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20','c21','c22','c23','c24','c25',
-        'c26','c27','c28','c29','c30','c31','c32','c33','c34','c35','c36','c37','c38','c39','c40','c41']);
-      st.cards=st.cards.filter(card=>!DEFAULT_IDS.has(card.id));
-      backup[stateKey]=JSON.stringify(st);
+      const DEF=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11','c12','c13','c14','c15',
+        'c16','c17','c18','c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30',
+        'c31','c32','c33','c34','c35','c36','c37','c38','c39','c40','c41']);
+      st.cards=st.cards.filter(c=>!DEF.has(c.id));
+      backup['lumio_state']=JSON.stringify(st);
     }
   }catch(e){}
-  Object.entries(backup).forEach(([k,v])=>localStorage.setItem(k,v));
-  // Paso 5: Reemplazar el documento
-  document.open();document.write(html);document.close();
+  if(bar)bar.style.width='50%';
+
+  // Paso 3: Desregistrar Service Worker (para evitar que sirva versión antigua)
+  if('serviceWorker' in navigator){
+    try{
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }catch(e){}
+  }
+  if(bar)bar.style.width='75%';
+
+  // Paso 4: Guardar HTML nuevo y backup en localStorage
+  // El interceptor al arrancar aplicará el HTML antes de que nada se renderice
+  // Este método funciona en PWA (pantalla de inicio), iOS Safari y Android Chrome
+  try{
+    localStorage.setItem('lumio_update_backup', JSON.stringify(backup));
+    localStorage.setItem('lumio_pending_html', html);
+  }catch(e){
+    // localStorage lleno — intentar liberar espacio eliminando historial
+    try{
+      localStorage.removeItem('lumio_historial');
+      localStorage.setItem('lumio_update_backup', JSON.stringify(backup));
+      localStorage.setItem('lumio_pending_html', html);
+    }catch(e2){
+      overlay.remove();
+      toast('❌ Sin espacio en el dispositivo para guardar la actualización');
+      return;
+    }
+  }
+  if(bar)bar.style.width='100%';
+  await new Promise(r=>setTimeout(r,300));
+
+  // Paso 5: Recargar — el interceptor al inicio aplicará la actualización
+  location.reload(true);
 }
 
 function resetApp(){
@@ -5271,16 +5317,4 @@ window.addEventListener('DOMContentLoaded',()=>{
 
   // Splash then onboarding or app
   setTimeout(()=>{
-    document.getElementById('splash').classList.add('out');
-    setTimeout(()=>{
-      if(!localStorage.getItem('lumio_seen_onboarding')){
-        showOnboarding();
-      }else{
-        setTimeout(startTutorial,600);
-      }
-    },600);
-  },1800);
-});
-</script>
-</body>
-</html>
+    document.getElementById('splash').classList.
