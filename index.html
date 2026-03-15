@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lumio">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23f5c518'/%3E%3Ccircle cx='256' cy='220' r='110' fill='none' stroke='%230d0f14' stroke-width='28'/%3E%3Cpath d='M210 340 Q256 380 302 340' fill='none' stroke='%230d0f14' stroke-width='26' stroke-linecap='round'/%3E%3Crect x='218' y='372' width='76' height='22' rx='11' fill='%230d0f14'/%3E%3Crect x='228' y='408' width='56' height='20' rx='10' fill='%230d0f14'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="./icon.svg">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -254,7 +254,20 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 <body>
 <!-- SPLASH -->
 <div id="splash">
-  <div class="sp-ico">💡</div>
+  <div class="sp-ico">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="48" height="48">
+      <circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="28"/>
+      <path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/>
+      <rect x="216" y="364" width="80" height="22" rx="11" fill="#0d0f14"/>
+      <rect x="226" y="400" width="60" height="20" rx="10" fill="#0d0f14"/>
+      <rect x="236" y="432" width="40" height="18" rx="9" fill="#0d0f14"/>
+      <line x1="256" y1="82"  x2="256" y2="52"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+      <line x1="366" y1="118" x2="388" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+      <line x1="146" y1="118" x2="124" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+      <line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+      <line x1="76"  y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+    </svg>
+  </div>
   <div style="font-size:38px;font-weight:900;color:var(--t1)">Lu<span style="color:var(--y)">mio</span></div>
   <div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.12em;text-transform:uppercase">Tu compañero de estudio</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
@@ -264,7 +277,9 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 <div id="onboarding" style="display:none">
   <!-- Step 1: Nombre -->
   <div class="ob-step active" id="ob-1">
-    <div class="ob-ico">💡</div>
+    <div class="ob-ico" style="width:80px;height:80px;background:var(--y);border-radius:22px;padding:14px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%"><circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="28"/><path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><rect x="216" y="364" width="80" height="22" rx="11" fill="#0d0f14"/><rect x="226" y="400" width="60" height="20" rx="10" fill="#0d0f14"/><rect x="236" y="432" width="40" height="18" rx="9" fill="#0d0f14"/><line x1="256" y1="82" x2="256" y2="52" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/><line x1="366" y1="118" x2="388" y2="96" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/><line x1="146" y1="118" x2="124" y2="96" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/><line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/><line x1="76" y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/></svg>
+    </div>
     <div class="ob-title">¡Bienvenido a Lumio!</div>
     <div class="ob-sub">Tu app de estudio inteligente. En 30 segundos la dejamos lista para ti.</div>
     <div style="width:100%">
@@ -346,7 +361,19 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
 <div class="screen active" id="s-home">
 <div class="pw">
   <div style="display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:18px;padding-top:6px">
-    <div style="width:68px;height:68px;background:var(--y);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:38px">💡</div>
+    <div style="width:72px;height:72px;background:var(--y);border-radius:18px;display:flex;align-items:center;justify-content:center;padding:12px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+        <circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="28"/>
+        <path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/>
+        <rect x="216" y="364" width="80" height="22" rx="11" fill="#0d0f14"/>
+        <rect x="226" y="400" width="60" height="20" rx="10" fill="#0d0f14"/>
+        <line x1="256" y1="82"  x2="256" y2="52"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+        <line x1="366" y1="118" x2="388" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+        <line x1="146" y1="118" x2="124" y2="96"  stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+        <line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+        <line x1="76"  y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="22" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div style="font-size:28px;font-weight:900;color:var(--t1)">Lumio</div>
     <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.12em;text-transform:uppercase">Tu compañero de estudio</div>
   </div>
@@ -361,7 +388,9 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
   </div>
   <!-- greeting -->
   <div class="card" style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
-    <div style="width:36px;height:36px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💡</div>
+    <div style="width:36px;height:36px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:6px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%"><circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="32"/><path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="30" stroke-linecap="round"/><rect x="216" y="364" width="80" height="26" rx="13" fill="#0d0f14"/><rect x="226" y="402" width="60" height="22" rx="11" fill="#0d0f14"/><line x1="256" y1="82" x2="256" y2="52" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="76" y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/></svg>
+    </div>
     <div><div style="font-size:14px;font-weight:700;color:var(--t1)" id="h-nm">Buenas tardes, Raúl</div>
     <div style="font-size:11px;color:var(--t2);margin-top:1px" id="h-obj">Sin objetivo diario definido</div></div>
   </div>
@@ -832,7 +861,9 @@ html,body{height:100%;background:#060709;font-family:Arial,sans-serif;-webkit-fo
   <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:10px;margin-top:4px">Acerca de Lumio</div>
   <div class="about-section">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <div style="width:52px;height:52px;background:var(--y);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">💡</div>
+      <div style="width:52px;height:52px;background:var(--y);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:10px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%"><circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="32"/><path d="M200 328 Q256 372 312 328" fill="none" stroke="#0d0f14" stroke-width="30" stroke-linecap="round"/><rect x="216" y="364" width="80" height="26" rx="13" fill="#0d0f14"/><rect x="226" y="402" width="60" height="22" rx="11" fill="#0d0f14"/><line x1="256" y1="82" x2="256" y2="52" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="406" y1="210" x2="436" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/><line x1="76" y1="210" x2="106" y2="210" stroke="#0d0f14" stroke-width="26" stroke-linecap="round"/></svg>
+      </div>
       <div>
         <div style="font-size:17px;font-weight:900;color:var(--t1)">Lumio</div>
         <div style="font-size:11px;color:var(--t2)">Versión 2.0 · 2025</div>
