@@ -35,8 +35,8 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .ni{font-size:18px;line-height:1}
 .nb span{font-size:8px;font-weight:700;white-space:nowrap}
 /* SPLASH */
-#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;transition:opacity .5s ease .1s,visibility .5s ease .1s}
-#splash.out{opacity:0;pointer-events:none;visibility:hidden}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s,-webkit-transform .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0)}
+#splash.out{opacity:0;pointer-events:none;visibility:hidden;-webkit-transform:translate3d(0,0,0)}
 .sp-ico{width:76px;height:76px;background:var(--y);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;animation:spul 1.6s ease-in-out infinite}
 @keyframes spul{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .sp-bar{width:50px;height:3px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:10px}
@@ -59,6 +59,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .gbtn:hover{border-color:var(--yb);color:var(--y)}
 .chip-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:11px;-webkit-overflow-scrolling:touch}
 .chip-row::-webkit-scrollbar{display:none}
+.chip-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--bd);background:var(--bg1);font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
 .chip.on{background:var(--yd);border-color:var(--yb);color:var(--y)}
 .tabb{flex:1;padding:8px;border-radius:999px;border:1px solid var(--bd);background:var(--bg1);font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .15s}
@@ -548,6 +549,9 @@ button:active{transform:scale(.97)}
 </div>
 
 <div id="phone">
+<!-- SEARCH BUTTON (fixed top-right) -->
+<button id="global-search-btn" onclick="openBusqueda()" title="Búsqueda global"
+  style="position:absolute;top:10px;right:12px;z-index:600;background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 11px;font-size:14px;cursor:pointer;font-family:var(--font)">🔍</button>
 <!-- SUB-NAV (shown for multi-screen sections) -->
 <div id="sub-nav"></div>
 <div id="screens">
@@ -729,7 +733,7 @@ button:active{transform:scale(.97)}
   </div>
   <div id="mat-editar" style="display:none">
     <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">Selecciona las materias que estudias este curso. Tus apuntes y flashcards se conservan.</div>
-    <div class="chip-row" id="mat-curso-chips" style="margin-bottom:10px"></div>
+    <div class="chip-row" id="mat-curso-chips" class="chip-wrap" style="margin-bottom:10px;display:flex;flex-wrap:wrap"></div>
     <div class="ob-mats-grid" id="mat-edit-grid" style="margin-bottom:14px"></div>
     <button class="mbtn" onclick="guardarMaterias()">✅ Guardar materias</button>
   </div>
@@ -928,7 +932,7 @@ button:active{transform:scale(.97)}
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <input class="inp" id="apu-search" placeholder="🔍 Buscar en apuntes..." oninput="apu_render()" style="flex:1;margin-bottom:0">
     </div>
-    <div class="chip-row" id="apu-mat-filter" style="margin-bottom:14px"></div>
+    <div class="chip-row" id="apu-mat-filter" class="chip-wrap" style="margin-bottom:14px;display:flex;flex-wrap:wrap"></div>
 
     <!-- Empty state -->
     <div id="apu-empty" style="display:none;text-align:center;padding:40px 20px">
@@ -954,7 +958,7 @@ button:active{transform:scale(.97)}
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
       <select id="apu-edit-mat" style="border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--t1);font-family:var(--font);font-size:11px;font-weight:700;padding:4px 8px;outline:none;cursor:pointer"></select>
-      <button onclick="apu_saveNote()" style="background:var(--y);color:#0d0f14;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)" title="Guardar">💾</button>
+      <button onclick="apu_saveNoteManual()" style="background:var(--y);color:#0d0f14;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)" title="Guardar" id="apu-save-btn">💾</button>
       <button onclick="if(apuEditId)apu_deleteNote(apuEditId)" style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;line-height:1" title="Eliminar apunte">🗑</button>
     </div>
   </div>
@@ -998,6 +1002,7 @@ button:active{transform:scale(.97)}
     <div style="display:flex;gap:6px">
       <button onclick="apu_insertTemplate('clase')" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)">📋 Plantilla</button>
       <button onclick="spellCheckNote('apu-edit-ta')" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)">✅ Corregir</button>
+      <button onclick="if(apuEditId)compartirApunte(apuEditId)" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)" title="Compartir apunte">📤</button>
     </div>
   </div>
   <div id="as-spell-status" style="display:none;padding:8px 14px;background:var(--bg2);font-size:11px;color:var(--t2);line-height:1.6;flex-shrink:0"></div>
@@ -1610,6 +1615,36 @@ button:active{transform:scale(.97)}
     </div>
   </div>
 
+  <!-- Backup / Restaurar -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Backup y restauración</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">Exporta todos tus datos a un fichero JSON. Imprescindible al cambiar de móvil.</div>
+    <div style="display:flex;gap:8px">
+      <button class="mbtn" style="flex:1;font-size:12px" onclick="exportBackup()">📤 Exportar datos</button>
+      <label style="flex:1;display:flex">
+        <input type="file" id="restore-file" accept=".json" style="display:none" onchange="importBackup(this)">
+        <button class="gbtn" style="flex:1;font-size:12px" onclick="document.getElementById('restore-file').click()">📥 Restaurar</button>
+      </label>
+    </div>
+    <div style="font-size:10px;color:var(--t3);margin-top:8px">El fichero incluye apuntes, flashcards, progreso, clases y configuración.</div>
+  </div>
+
+  <!-- Notificaciones programadas -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Recordatorio diario</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Aviso para estudiar</div><div style="font-size:11px;color:var(--t2)" id="notif-status">Sin recordatorio activo</div></div>
+      <div style="width:44px;height:26px;border-radius:999px;background:var(--bg2);border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .2s" id="notif-toggle" onclick="toggleNotifAlarm()">
+        <div style="position:absolute;width:20px;height:20px;border-radius:50%;background:var(--t3);top:2px;left:2px;transition:all .2s" id="notif-toggle-dot"></div>
+      </div>
+    </div>
+    <div id="notif-time-wrap" style="display:none">
+      <div class="sl">Hora del recordatorio</div>
+      <input type="time" class="inp" id="notif-time" value="19:00" onchange="saveNotifAlarm()" style="margin-bottom:6px">
+      <div style="font-size:11px;color:var(--t2)">Recibirás una notificación del sistema todos los días a esa hora.</div>
+    </div>
+  </div>
+
   <!-- Feedback -->
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Contacto</div>
   <div class="card" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
@@ -1619,6 +1654,25 @@ button:active{transform:scale(.97)}
     </div>
     <button onclick="navSection('perfil');setTimeout(()=>goTo('feedback'),50)" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">💬 Ir →</button>
   </div>
+</div>
+</div>
+
+<!-- ══ BÚSQUEDA GLOBAL ══ -->
+<div class="screen" id="s-busqueda">
+<div class="pw">
+  <div class="pt">Búsque<em>da</em> 🔍</div>
+  <div class="ps">Busca en apuntes, tarjetas y clases</div>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <input class="inp" id="busq-inp" placeholder="Buscar en todo..." oninput="busqSearch()" style="flex:1;margin-bottom:0" autofocus>
+    <button onclick="document.getElementById('busq-inp').value='';busqSearch()" class="gbtn" style="padding:10px 12px">✕</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+    <div class="chip on" data-bq="todo" onclick="busqFilter(this)">Todo</div>
+    <div class="chip" data-bq="apuntes" onclick="busqFilter(this)">📝 Apuntes</div>
+    <div class="chip" data-bq="cards" onclick="busqFilter(this)">🃏 Tarjetas</div>
+    <div class="chip" data-bq="clases" onclick="busqFilter(this)">🏫 Clases</div>
+  </div>
+  <div id="busq-results"></div>
 </div>
 </div>
 
@@ -1833,7 +1887,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-notas-historial"><div class="pw">
   <div class="pt">Mis <em>notas</em> 📊</div>
   <div class="ps">Registra tus notas y calcula la media</div>
-  <div class="chip-row" id="notas-mats" style="margin-bottom:12px"></div>
+  <div class="chip-row" id="notas-mats" class="chip-wrap" style="margin-bottom:12px;display:flex;flex-wrap:wrap"></div>
   <div class="card" style="margin-bottom:12px">
     <div style="display:flex;gap:8px;align-items:flex-end">
       <div style="flex:1"><div class="sl">Examen / Trabajo</div><input class="inp" id="nota-nombre" placeholder="Ej: Examen T1..."></div>
@@ -2625,7 +2679,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor};
+  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
   document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
   const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
@@ -3490,14 +3544,23 @@ function matTab(btn){
   if(t==='editar')renderMatEdit();
 }
 function openApunte(mat){
-  apuMat=mat;
-  document.querySelectorAll('#apuntes-chips .chip').forEach(c=>c.classList.remove('on'));
-  document.querySelectorAll('#apuntes-chips .chip').forEach(c=>{if(c.textContent.includes(mat.split(' ')[0]))c.classList.add('on');});
-  document.querySelectorAll('#mat-tabs .tabb').forEach(b=>b.classList.remove('on'));
-  document.querySelector('#mat-tabs .tabb[data-t="apuntes"]').classList.add('on');
-  ['info','grafica'].forEach(t=>document.getElementById('mat-'+t).style.display='none');
-  document.getElementById('mat-apuntes').style.display='block';
-  renderApunte();
+  // Open new notes system filtered by materia
+  apuFilterMat=mat;
+  navSection('estudiar');
+  setTimeout(()=>{
+    goTo('apuntes');
+    setTimeout(()=>{
+      // Try to find and open the first note for this materia
+      const notes=getNotesDB().filter(n=>n.mat===mat);
+      if(notes.length===1){
+        apu_openNote(notes[0].id);
+      }else{
+        // Just filter to this materia in the list
+        apuFilterMat=mat;
+        apu_render();
+      }
+    },100);
+  },50);
 }
 function renderApunte(){
   const m=D.mats.find(x=>x.n===apuMat);
@@ -3744,7 +3807,7 @@ function apu_openNote(id, focusTitle=false){
     clearTimeout(apuAutoSaveTimer);
     const status=document.getElementById('apu-autosave-status');
     if(status)status.textContent='';
-    apuAutoSaveTimer=setTimeout(()=>{apu_saveNote(true);},2000); // autosave after 2s idle
+    apuAutoSaveTimer=setTimeout(()=>{apu_saveNote(true);},3000); // autosave after 3s idle
   };
 
   setTimeout(()=>{
@@ -3850,7 +3913,14 @@ function sendApuToIA(){
   toast('📄 Texto enviado a Resumen IA');
 }
 
-// Legacy compat: keep setApuMatScreen for other code that calls it
+// Manual save with visual feedback
+async function apu_saveNoteManual(){
+  const btn=document.getElementById('apu-save-btn');
+  if(btn){btn.textContent='✓';btn.style.background='var(--green)';btn.style.color='#fff';}
+  apu_saveNote(false);
+  await new Promise(r=>setTimeout(r,900));
+  if(btn){btn.textContent='💾';btn.style.background='var(--y)';btn.style.color='#0d0f14';}
+}
 function setApuMatScreen(mat,el){
   apuFilterMat=mat;apu_render();
 }
@@ -3893,9 +3963,12 @@ function bFC(){
   if(filters)filters.style.display='block';
 
   const ms=['Todas',...new Set(D.cards.map(c=>c.m))];
-  document.getElementById('fc-ch').innerHTML=ms.map(m=>`<div class="chip${m===fFlt?' on':''}" onclick="fFl('${m}',this)">${m}</div>`).join('');
+  document.getElementById('fc-ch').innerHTML=[
+    ...ms.map(m=>`<div class="chip${m===fFlt?' on':''}" onclick="fFl('${m}',this)">${m}</div>`),
+    `<div class="chip${fFlt==='__fail__'?' on':''}" onclick="fFl('__fail__',this)" style="background:${fFlt==='__fail__'?'rgba(248,113,113,.2)':'var(--bg1)'};border-color:rgba(248,113,113,.4);color:${fFlt==='__fail__'?'#f87171':'var(--t2)'}">🔴 Falladas</div>`
+  ].join('');
   const searchQ=(document.getElementById('fc-search')?.value||'').toLowerCase().trim();
-  let fd=fFlt==='Todas'?D.cards:D.cards.filter(c=>c.m===fFlt);
+  let fd=fFlt==='Todas'?D.cards:fFlt==='__fail__'?D.cards.filter(c=>c.lv===1):D.cards.filter(c=>c.m===fFlt);
   if(searchQ)fd=fd.filter(c=>c.q.toLowerCase().includes(searchQ)||c.a.toLowerCase().includes(searchQ));
   document.getElementById('fc-s').textContent=fd.length+' tarjeta'+(fd.length!==1?'s':'');
   document.getElementById('fc-lvl').innerHTML=LVL.map((n,i)=>{
@@ -4375,6 +4448,12 @@ function bResumen(){
 }
 function setResMat(el,n){resMat=n;document.querySelectorAll('#res-ch .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
 function saveResumen(){
+  // Save to new notes system
+  const notes=getNotesDB();
+  const title='Resumen IA · '+resMat+' · '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  notes.unshift({id:'res_'+Date.now(),mat:resMat,title,body:'## Resumen IA\n\n'+lastResumen,created:Date.now(),updated:Date.now()});
+  saveNotesDB(notes);
+  // Legacy sync
   if(!apuntesDB[resMat])apuntesDB[resMat]='';
   apuntesDB[resMat]+='\n\n--- RESUMEN IA ---\n'+lastResumen;
   localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
@@ -4523,9 +4602,13 @@ async function sendChat(){
   typing.innerHTML='<span style="display:inline-flex;gap:4px;align-items:center"><span style="animation:dotPulse 1s infinite 0s;font-size:18px">•</span><span style="animation:dotPulse 1s infinite .2s;font-size:18px">•</span><span style="animation:dotPulse 1s infinite .4s;font-size:18px">•</span></span>';
 
   // System prompt personalizado con contexto del alumno
-  const notesContext=D.mats.slice(0,3).map(m=>{
-    const n=apuntesDB[m.n];
-    return n&&n.length>20?`\n[Apuntes de ${m.n}]: ${n.slice(0,300)}...`:'';
+  // Read from new notes system (lumio_notes_v2) with fallback to old apuntesDB
+  const _allNotes=JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]');
+  const notesContext=D.mats.slice(0,4).map(m=>{
+    const newNote=_allNotes.filter(n=>n.mat===m.n).map(n=>n.body).join(' ').trim();
+    const legacy=apuntesDB[m.n]||'';
+    const txt=(newNote||legacy).slice(0,350);
+    return txt.length>20?`\n[Apuntes de ${m.n}]: ${txt}...`:'';
   }).join('');
   const cardsContext=D.cards.length?`\n[Flashcards]: ${D.cards.slice(0,6).map(c=>`Q:${c.q}→A:${c.a}`).join(' | ')}`:'';
 
@@ -5386,14 +5469,19 @@ function setQnoteMat(mat,el){
   const ta=document.getElementById('qnote-ta');if(ta)ta.value=saved;
 }
 function saveQuickNote(){
-  const val=document.getElementById('qnote-ta')?.value||'';
-  apuntesDB[qnoteMat]=val;
+  const val=(document.getElementById('qnote-ta')?.value||'').trim();
+  if(!val){clsMo('qnote');return;}
+  // Save as a real note in new system
+  const notes=getNotesDB();
+  const title='Nota rápida · '+qnoteMat+' · '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  notes.unshift({id:'qn_'+Date.now(),mat:qnoteMat,title,body:val,created:Date.now(),updated:Date.now()});
+  saveNotesDB(notes);
+  // Legacy sync
+  apuntesDB[qnoteMat]=(apuntesDB[qnoteMat]?apuntesDB[qnoteMat]+'\n\n':'')+val;
   localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));
   clsMo('qnote');
   gainXP(2);
-  toast('💾 Apuntes de '+qnoteMat.split(' ')[0]+' guardados');
-  // Refresh apuntes view if open
-  if(apuMat===qnoteMat)renderApunte();
+  toast('💾 Nota guardada en '+qnoteMat.split(' ')[0]);
 }
 // ════════════════════════════════════════════════════════
 // CONFETTI
@@ -5784,8 +5872,20 @@ function mdToHtml(md){
 // EXPORT PDF (apuntes)
 // ════════════════════════════════════════════════════════
 function exportApuntePDF(){
-  const ta=document.getElementById('nota-ta');if(!ta||!ta.value.trim()){toast('⚠️ No hay apuntes para exportar');return;}
-  const m=D.mats.find(x=>x.n===apuMat);
+  // Export currently open note (new system) or all notes for a materia
+  let body='',title=apuMat||'Apuntes';
+  if(apuEditId){
+    const note=getNotesDB().find(n=>n.id===apuEditId);
+    if(note){body=note.body;title=note.title||note.mat;}
+  }else{
+    const notes=getNotesDB().filter(n=>apuFilterMat==='__all__'||n.mat===apuFilterMat);
+    body=notes.map(n=>`# ${n.title||n.mat}\n\n${n.body}`).join('\n\n---\n\n');
+    title=apuFilterMat==='__all__'?'Todos los apuntes':apuFilterMat;
+  }
+  if(!body.trim()){toast('⚠️ No hay apuntes para exportar');return;}
+  const m=D.mats.find(x=>x.n===apuMat)||D.mats[0];
+  const ta={value:body};  // compat shim for mdToHtml call below
+  void m;
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${apuMat} — Lumio</title>
   <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.7}
   h1{color:#0d0f14;border-bottom:2px solid #f5c518;padding-bottom:8px}
@@ -5798,12 +5898,12 @@ function exportApuntePDF(){
   .meta{font-size:13px;color:#888;margin-top:20px}
   </style></head><body>
   <div class="header"><div class="logo">💡</div><div><strong style="font-size:18px">${apuMat}</strong><div style="font-size:12px;color:#888">Apuntes de ${D.user.name} · Lumio · ${D.user.curso||"ESO"}</div></div></div>
-  ${mdToHtml(ta.value)}
+  ${mdToHtml(body)}
   <div class="meta">Exportado desde Lumio · ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}</div>
   </body></html>`;
   const blob=new Blob([html],{type:'text/html'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`Lumio_${apuMat.replace(/\s/g,'_')}_${D.user.name}.html`;
+  const a=document.createElement('a');a.href=url;a.download=`Lumio_${title.replace(/\s/g,'_')}_${D.user.name||'apuntes'}.html`;
   a.click();URL.revokeObjectURL(url);
   toast('🖨️ Apuntes exportados — ábrelos en el navegador e imprime');gainXP(3);
 }
@@ -6641,6 +6741,7 @@ function bClaseDetalle(){
       <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
         <button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="compartirClase('${clase.id}')">📤 ${clase.codigo}</button>
         ${isAdmin?`<button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="showMiembros()">👥</button>`:''}
+      <button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="startExamenClase('${clase.id}')" title="Generar examen del temario">🧠</button>
       </div>
     </div>
 
@@ -7658,25 +7759,33 @@ function semanaNav(d){
   const dayOfWeek=today.getDay()||7;
   const monday=new Date(today);monday.setDate(today.getDate()-(dayOfWeek-1)+(semanaDelta*7));
   const days=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const fmt=d=>d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
-  document.getElementById('semana-label').textContent=fmt(monday)+' – '+fmt(new Date(monday.getTime()+6*864e5));
-  const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  const fmt=dt=>dt.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  const isThisWeek=semanaDelta===0;
+  document.getElementById('semana-label').textContent=isThisWeek?'Esta semana ('+fmt(monday)+' – '+fmt(new Date(monday.getTime()+6*864e5))+')':fmt(monday)+' – '+fmt(new Date(monday.getTime()+6*864e5));
+  const allDebs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
+  // Undated pending deberes shown on today (only in current week)
+  const todayStr=today.toISOString().slice(0,10);
+  const undatedDebs=isThisWeek?allDebs.filter(d=>!d.hecha&&!d.fecha):[];
   let html='';
   for(let i=0;i<7;i++){
     const day=new Date(monday.getTime()+i*864e5);
     const dateStr=day.toISOString().slice(0,10);
-    const isToday=dateStr===today.toISOString().slice(0,10);
-    const dayDebs=debs.filter(d=>d.fecha===dateStr);
+    const isToday=dateStr===todayStr;
+    const dayDebs=allDebs.filter(d=>d.fecha===dateStr);
     const dayExams=D.exams.filter(e=>e.fecha===dateStr);
-    const isEmpty=!dayDebs.length&&!dayExams.length;
-    html+=`<div style="margin-bottom:8px">
+    const extraDebs=isToday?undatedDebs:[];
+    const isEmpty=!dayDebs.length&&!dayExams.length&&!extraDebs.length;
+    html+=`<div style="margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-        <div style="width:32px;height:32px;border-radius:9px;background:${isToday?'var(--y)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:${isToday?'#0d0f14':'var(--t2)'};">${day.getDate()}</div>
+        <div style="width:32px;height:32px;border-radius:9px;background:${isToday?'var(--y)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:${isToday?'#0d0f14':'var(--t2)'}">${day.getDate()}</div>
         <div style="font-size:12px;font-weight:700;color:${isToday?'var(--y)':'var(--t2)'}">${days[i]}</div>
       </div>
-      ${isEmpty?'<div style="font-size:11px;color:var(--t3);padding-left:40px">Libre ✓</div>':''}
-      ${dayExams.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);margin-bottom:4px;margin-left:40px"><span style="font-size:14px">${e.e}</span><div style="font-size:12px;font-weight:700;color:#f87171">Examen: ${e.mat}</div></div>`).join('')}
-      ${dayDebs.filter(d=>!d.hecha).map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);margin-bottom:4px;margin-left:40px"><span style="font-size:14px">${D.mats.find(m=>m.n===d.mat)?.e||'📋'}</span><div style="font-size:12px;color:var(--t1)">${d.txt.slice(0,40)}</div></div>`).join('')}
+      ${isEmpty?`<div style="font-size:11px;color:var(--t3);padding-left:40px">Libre ✓</div>`:''}
+      ${dayExams.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);margin-bottom:4px;margin-left:40px"><span style="font-size:14px">${e.e}</span><div style="font-size:12px;font-weight:700;color:#f87171">📈 Examen: ${e.mat}</div></div>`).join('')}
+      ${[...dayDebs,...extraDebs].filter(d=>!d.hecha).map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);margin-bottom:4px;margin-left:40px">
+        <span style="font-size:14px">${D.mats.find(m=>m.n===d.mat)?.e||'📋'}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.txt.slice(0,45)}</div>${!d.fecha?'<div style="font-size:10px;color:var(--t3)">Sin fecha</div>':''}</div>
+      </div>`).join('')}
     </div>`;
   }
   document.getElementById('semana-grid').innerHTML=html;
@@ -7951,14 +8060,14 @@ function startRep_mat(mat){
 // ════════════════════════════════════════════════════════
 function bPredictor(){
   const el=document.getElementById('predictor-content');if(!el)return;
-  const nota=getNotasDB();
+  const notasData=getNotasDB();
   if(!D.cards.length&&!Object.keys(nota).length){
     el.innerHTML='<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:36px">🎯</div><div style="font-weight:700;color:var(--t1);margin-top:8px">Sin datos suficientes</div><div style="font-size:12px;margin-top:4px">Haz tests y guarda tus notas para que podamos predecir</div></div>';return;
   }
   let html='';
   D.mats.forEach(mat=>{
     const cards=D.cards.filter(c=>c.m===mat.n);
-    const notas=nota[mat.n]||[];
+    const notas=notasData[mat.n]||[];
     if(!cards.length&&!notas.length)return;
     // Score basado en: dominio de tarjetas + historial notas
     const dominio=cards.length?cards.reduce((s,c)=>s+(c.lv||1),0)/(cards.length*5):null;
@@ -8130,6 +8239,8 @@ function bAjustes(){
     badge.textContent='✅ Envío automático activo';
     if(!gasCard.querySelector('.gas-status'))gasCard.insertBefore(badge,gasCard.firstChild);
   }
+  // Notificaciones
+  _notifRenderStatus();
 }
 // Update all hardcoded course references throughout the UI
 // Returns current school year string e.g. "2025-2026"
@@ -8576,6 +8687,7 @@ if('serviceWorker' in navigator){
     // Check for peer profile or class invite in URL
     try{checkRankUrlImport();}catch(e){}
     try{checkClaseUrlImport();}catch(e){}
+    try{checkNotaUrlImport();}catch(e){}
 
     // Recalculate materia progress on load (based on hours + flashcard levels)
     try{recalcAllProgress();}catch(e){}
@@ -8630,6 +8742,339 @@ if('serviceWorker' in navigator){
     },500);
   }
 });
+
+// ════════════════════════════════════════════════════════
+// BÚSQUEDA GLOBAL
+// ════════════════════════════════════════════════════════
+let busqFiltro='todo';
+
+function openBusqueda(){
+  // Navigate to search screen without changing section
+  document.querySelectorAll('#screens .screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('s-busqueda');
+  if(el)el.classList.add('active');
+  document.getElementById('sub-nav').classList.remove('show');
+  setTimeout(()=>document.getElementById('busq-inp')?.focus(),100);
+}
+
+function bBusqueda(){
+  document.getElementById('busq-inp').value='';
+  document.getElementById('busq-results').innerHTML='<div style="text-align:center;padding:32px;color:var(--t3)">Escribe para buscar...</div>';
+}
+
+function busqFilter(el){
+  busqFiltro=el.dataset.bq;
+  document.querySelectorAll('[data-bq]').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  busqSearch();
+}
+
+function busqSearch(){
+  const q=(document.getElementById('busq-inp')?.value||'').trim().toLowerCase();
+  const el=document.getElementById('busq-results');
+  if(!el)return;
+  if(q.length<2){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--t3)">Escribe al menos 2 letras...</div>';return;}
+
+  const results=[];
+
+  // — Apuntes (nuevo sistema) —
+  if(busqFiltro==='todo'||busqFiltro==='apuntes'){
+    getNotesDB().forEach(note=>{
+      if((note.title+note.body+note.mat).toLowerCase().includes(q)){
+        const idx=note.body.toLowerCase().indexOf(q);
+        const snippet=idx>=0?'…'+note.body.slice(Math.max(0,idx-30),idx+60)+'…':note.body.slice(0,80);
+        results.push({type:'apunte',ico:'📝',title:note.title||note.mat,sub:note.mat,snippet,action:`apu_openNote('${note.id}');navSection('estudiar');setTimeout(()=>goTo('apuntes'),50)`});
+      }
+    });
+  }
+
+  // — Flashcards —
+  if(busqFiltro==='todo'||busqFiltro==='cards'){
+    D.cards.filter(c=>(c.q+c.a+c.m).toLowerCase().includes(q)).slice(0,10).forEach(c=>{
+      const mat=D.mats.find(m=>m.n===c.m);
+      results.push({type:'card',ico:mat?.e||'🃏',title:c.q.slice(0,60),sub:c.m,snippet:'→ '+c.a.slice(0,80),action:`navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)`});
+    });
+  }
+
+  // — Clases (temario, actividades, exámenes) —
+  if(busqFiltro==='todo'||busqFiltro==='clases'){
+    const myIds=getMyClaseIds();
+    getClases().filter(c=>myIds.includes(c.id)).forEach(clase=>{
+      const allItems=[
+        ...(clase.temario||[]).map(i=>({...i,tipo:'📌 Tema',clase:clase.nombre})),
+        ...(clase.actividades||[]).map(i=>({...i,tipo:'📝 Actividad',clase:clase.nombre})),
+        ...(clase.examenes||[]).map(i=>({...i,tipo:'📈 Examen',clase:clase.nombre})),
+        ...(clase.deberes_clase||[]).map(i=>({titulo:i.desc,desc:'',fecha:i.fecha,tipo:'📋 Tarea',clase:clase.nombre})),
+      ];
+      allItems.filter(i=>(i.titulo+i.desc+i.clase).toLowerCase().includes(q)).slice(0,5).forEach(i=>{
+        results.push({type:'clase',ico:MAT_EMOJI[clase.materia]||'🏫',title:i.titulo?.slice(0,60)||'',sub:i.tipo+' · '+i.clase,snippet:i.desc?.slice(0,80)||'',action:`currentClaseId='${clase.id}';navSection('clase');setTimeout(()=>goTo('clase-detalle'),50)`});
+      });
+    });
+  }
+
+  if(!results.length){el.innerHTML=`<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:32px;margin-bottom:8px">🔍</div>Sin resultados para "<b>${q}</b>"</div>`;return;}
+
+  el.innerHTML=`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">${results.length} resultado${results.length!==1?'s':''}</div>`+
+    results.slice(0,25).map(r=>`
+    <div class="card fade-in" style="margin-bottom:8px;cursor:pointer" onclick="${r.action}">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <span style="font-size:20px;flex-shrink:0">${r.ico}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${r.title}</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:1px">${r.sub}</div>
+          ${r.snippet?`<div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.4">${r.snippet.replace(new RegExp(q,'gi'),m=>`<b style="color:var(--y)">${m}</b>`)}</div>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// BACKUP / RESTAURAR DATOS
+// ════════════════════════════════════════════════════════
+const ALL_BACKUP_KEYS=[
+  'lumio_state','lumio_apuntes','lumio_notes_v2','lumio_plan','lumio_tl',
+  'lumio_horario','lumio_theme','lumio_seen_onboarding','lumio_seen_tutorial',
+  'lumio_user','lumio_deberes','lumio_animos','lumio_anaya','lumio_peers',
+  'lumio_clases','lumio_mis_clases','lumio_device_id','lumio_notas_hist',
+  'lumio_notas_v2','lumio_gas_url','lumio_notif_time','lumio_notif_on',
+];
+
+function exportBackup(){
+  const backup={version:APP_VERSION,date:new Date().toISOString(),data:{}};
+  ALL_BACKUP_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)backup.data[k]=v;});
+  const json=JSON.stringify(backup,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date().toISOString().slice(0,10);
+  a.href=url;a.download=`Lumio_backup_${D.user.name||'datos'}_${d}.json`;
+  a.click();URL.revokeObjectURL(url);
+  toast('📤 Backup exportado — guárdalo en lugar seguro');gainXP(5);
+}
+
+function importBackup(input){
+  const file=input.files[0];if(!file)return;
+  if(!file.name.endsWith('.json')){toast('❌ Selecciona un fichero .json de Lumio');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.data||!backup.version){toast('❌ Fichero de backup inválido');return;}
+      if(!confirm(`¿Restaurar backup del ${backup.date?.slice(0,10)||'?'}?\n\nSe sobreescribirán todos tus datos actuales.`))return;
+      // Restore all keys
+      Object.entries(backup.data).forEach(([k,v])=>localStorage.setItem(k,v));
+      toast('✅ Datos restaurados — reiniciando...');
+      setTimeout(()=>location.reload(),1200);
+    }catch(err){
+      toast('❌ Error al leer el backup: '+err.message.slice(0,40));
+    }
+  };
+  reader.readAsText(file);
+  input.value=''; // reset so same file can be selected again
+}
+
+// ════════════════════════════════════════════════════════
+// NOTIFICACIONES PROGRAMADAS
+// ════════════════════════════════════════════════════════
+let _notifTimer=null;
+
+function _notifRenderStatus(){
+  const on=localStorage.getItem('lumio_notif_on')==='1';
+  const time=localStorage.getItem('lumio_notif_time')||'19:00';
+  const dot=document.getElementById('notif-toggle-dot');
+  const bg=document.getElementById('notif-toggle');
+  const wrap=document.getElementById('notif-time-wrap');
+  const status=document.getElementById('notif-status');
+  const inp=document.getElementById('notif-time');
+  if(dot)dot.style.cssText=`position:absolute;width:20px;height:20px;border-radius:50%;top:2px;transition:all .2s;${on?'left:22px;background:var(--y)':'left:2px;background:var(--t3)'}`;
+  if(bg)bg.style.background=on?'rgba(245,197,24,.2)':'var(--bg2)';
+  if(wrap)wrap.style.display=on?'block':'none';
+  if(status)status.textContent=on?'Activado · todos los días a las '+time:'Sin recordatorio activo';
+  if(inp)inp.value=time;
+}
+
+function toggleNotifAlarm(){
+  const on=localStorage.getItem('lumio_notif_on')==='1';
+  if(!on){
+    // Request permission first
+    if('Notification' in window&&Notification.permission==='default'){
+      Notification.requestPermission().then(p=>{
+        if(p==='granted'){localStorage.setItem('lumio_notif_on','1');_notifRenderStatus();_notifSchedule();toast('🔔 Recordatorio activado');}
+        else{toast('⚠️ Necesitas permitir notificaciones en el navegador');}
+      });
+    }else if('Notification' in window&&Notification.permission==='granted'){
+      localStorage.setItem('lumio_notif_on','1');_notifRenderStatus();_notifSchedule();toast('🔔 Recordatorio activado');
+    }else{
+      toast('⚠️ Activa las notificaciones en ajustes del navegador primero');
+    }
+  }else{
+    localStorage.setItem('lumio_notif_on','0');
+    if(_notifTimer){clearTimeout(_notifTimer);_notifTimer=null;}
+    _notifRenderStatus();toast('🔕 Recordatorio desactivado');
+  }
+}
+
+function saveNotifAlarm(){
+  const time=document.getElementById('notif-time')?.value||'19:00';
+  localStorage.setItem('lumio_notif_time',time);
+  _notifRenderStatus();_notifSchedule();
+  toast('🔔 Recordatorio actualizado a las '+time);
+}
+
+function _notifSchedule(){
+  if(_notifTimer){clearTimeout(_notifTimer);_notifTimer=null;}
+  if(localStorage.getItem('lumio_notif_on')!=='1')return;
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const [h,m]=(localStorage.getItem('lumio_notif_time')||'19:00').split(':').map(Number);
+  const now=new Date();
+  const next=new Date(now);
+  next.setHours(h,m,0,0);
+  if(next<=now)next.setDate(next.getDate()+1);
+  const ms=next-now;
+  _notifTimer=setTimeout(()=>{
+    try{
+      new Notification('📚 Hora de estudiar — Lumio',{
+        body:`¡Hola, ${D.user.name||'estudiante'}! ¿Listo para el pomodoro de hoy? ${D.user.streak>1?'Llevas '+D.user.streak+' días seguidos 🔥':''}`,
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="54" font-size="56">📚</text></svg>',
+        tag:'lumio-daily',
+        renotify:true
+      });
+    }catch(e){}
+    // Schedule next day
+    setTimeout(_notifSchedule, 500);
+  }, ms);
+}
+
+// ════════════════════════════════════════════════════════
+// COMPARTIR APUNTE (base64 URL)
+// ════════════════════════════════════════════════════════
+function compartirApunte(noteId){
+  const note=getNotesDB().find(n=>n.id===noteId);
+  if(!note){toast('⚠️ Apunte no encontrado');return;}
+  const payload={titulo:note.title,mat:note.mat,body:note.body,autor:D.user.name};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const base=location.href.split('?')[0];
+  const url=base+'?lumio_nota='+encoded;
+  if(navigator.share){
+    navigator.share({title:'📝 '+note.title,text:`Apunte de ${note.mat} por ${D.user.name}`,url}).catch(()=>{});
+  }else{
+    navigator.clipboard?.writeText(url).then(()=>toast('🔗 Enlace del apunte copiado'));
+  }
+}
+
+function checkNotaUrlImport(){
+  const params=new URLSearchParams(location.search);
+  const encoded=params.get('lumio_nota');
+  if(!encoded)return;
+  history.replaceState(null,'',location.pathname);
+  try{
+    const pad=encoded.replace(/-/g,'+').replace(/_/g,'/');
+    const padded=pad.length%4===0?pad:pad+'='.repeat(4-pad.length%4);
+    const data=JSON.parse(decodeURIComponent(escape(atob(padded))));
+    if(!data.body)return;
+    setTimeout(()=>{
+      const div=document.createElement('div');
+      div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+      div.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:20px;padding:22px;width:100%;max-width:360px">
+        <div style="font-size:16px;font-weight:900;color:var(--t1);margin-bottom:4px">📝 ${data.titulo||'Apunte compartido'}</div>
+        <div style="font-size:11px;color:var(--teal);margin-bottom:10px">de ${data.autor||'un compañero'} · ${data.mat||''}</div>
+        <div style="font-size:12px;color:var(--t2);max-height:120px;overflow:hidden;margin-bottom:14px">${data.body.slice(0,200)}${data.body.length>200?'…':''}</div>
+        <div style="display:flex;gap:8px">
+          <button class="gbtn" style="flex:1" onclick="this.closest('div[style]').remove()">Cancelar</button>
+          <button class="mbtn" style="flex:2" onclick="importarNotaCompartida(${JSON.stringify(data).replace(/"/g,'&quot;')});this.closest('div[style]').remove()">⬇️ Guardar en mis apuntes</button>
+        </div>
+      </div>`;
+      document.body.appendChild(div);
+    },600);
+  }catch(e){}
+}
+
+function importarNotaCompartida(data){
+  const notes=getNotesDB();
+  const mat=D.mats.find(m=>m.n===data.mat)?data.mat:(D.mats[0]?.n||'General');
+  notes.unshift({id:'shared_'+Date.now(),mat,title:(data.titulo||'Apunte compartido')+' (de '+data.autor+')',body:data.body,created:Date.now(),updated:Date.now()});
+  saveNotesDB(notes);
+  toast('📝 Apunte guardado en tus notas de '+mat);gainXP(3);
+}
+
+// ════════════════════════════════════════════════════════
+// MODO EXAMEN POR CLASE
+// ════════════════════════════════════════════════════════
+function startExamenClase(claseId){
+  const clases=getClases();
+  const clase=clases.find(c=>c.id===claseId);if(!clase)return;
+  const textos=[
+    ...(clase.temario||[]).map(t=>t.titulo+(t.desc?' — '+t.desc:'')),
+    ...(clase.actividades||[]).map(a=>a.titulo+(a.desc?' — '+a.desc:'')),
+  ].filter(Boolean).join('. ');
+  if(textos.length<50){toast('⚠️ La clase no tiene suficiente contenido para generar preguntas');return;}
+  // Pre-fill exam screen and launch
+  navSection('estudiar');
+  setTimeout(()=>{
+    goTo('examen');
+    setTimeout(()=>{
+      const taEl=document.getElementById('ex-ia-txt');
+      if(taEl)taEl.value=textos;
+      // Switch to IA mode
+      const chips=document.querySelectorAll('[data-src]');
+      chips.forEach(c=>c.classList.remove('on'));
+      const iaChip=document.querySelector('[data-src="ia"]');
+      if(iaChip){iaChip.classList.add('on');ex.src='ia';}
+      const wrap=document.getElementById('ex-ia-txt-wrap');
+      if(wrap)wrap.style.display='block';
+      toast('✅ Listo — pulsa "Empezar examen"');
+    },150);
+  },50);
+}
+
+// ════════════════════════════════════════════════════════
+// SERVICE WORKER INLINE — offline garantizado
+// ════════════════════════════════════════════════════════
+(function registerInlineSW(){
+  if(!('serviceWorker' in navigator))return;
+  const CACHE='lumio-v1';
+  const swCode=`
+const CACHE='lumio-v1';
+const APP_URL=self.location.pathname;
+self.addEventListener('install',e=>{
+  e.waitUntil(caches.open(CACHE).then(c=>c.add(APP_URL)).then(()=>self.skipWaiting()));
+});
+self.addEventListener('activate',e=>{
+  e.waitUntil(clients.claim());
+});
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  const url=new URL(e.request.url);
+  // Only cache same-origin requests for the app HTML
+  if(url.origin!==self.location.origin)return;
+  e.respondWith(
+    fetch(e.request,{cache:'no-store'})
+      .then(r=>{
+        if(r.ok){const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc));}
+        return r;
+      })
+      .catch(()=>caches.match(e.request))
+  );
+});`;
+  try{
+    const blob=new Blob([swCode],{type:'application/javascript'});
+    const url=URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url,{scope:'/'})
+      .then(()=>{})
+      .catch(()=>{});
+    // Revoke after registration (browser has already processed it)
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }catch(e){}
+})();
+
+// Inicializar notificaciones y URL imports al arrancar
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    try{_notifSchedule();}catch(e){}
+    try{checkNotaUrlImport();}catch(e){}
+  },1000);
+});
+
 </script>
 </body>
 </html>
