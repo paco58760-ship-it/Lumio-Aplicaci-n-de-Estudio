@@ -1511,11 +1511,11 @@ button:active{transform:scale(.97)}
       </svg>
     </div>
     <div style="text-align:center">
-      <div style="font-size:14px;font-weight:700;color:var(--t1)">lumio.app/raul</div>
+      <div style="font-size:14px;font-weight:700;color:var(--t1)" id="amigos-url-label">lumio.app/...</div>
       <div style="font-size:11px;color:var(--t2);margin-top:3px">Escanea o comparte el enlace</div>
     </div>
     <button class="mbtn" onclick="toast('🔗 ¡Enlace copiado al portapapeles!')">📋 Copiar enlace</button>
-    <button class="gbtn" style="width:100%" onclick="if(navigator.share)navigator.share({title:'Lumio',text:'¡Mira esta app de estudio!',url:'https://lumio.app/raul'}).catch(()=>{})">📤 Compartir</button>
+    <button class="gbtn" style="width:100%" onclick="shareAmigos()">📤 Compartir Lumio</button>
   </div>
   <div class="card" style="margin-top:4px">
     <div style="display:flex;align-items:center;gap:12px">
@@ -2419,7 +2419,7 @@ const GITHUB_RAW_URL='';
 // Instrucciones más abajo en la pantalla de Ajustes → Feedback
 
 const D={
-  user:{name:'Raúl',curso:'2º ESO',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
+  user:{name:'',curso:'2º ESO',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
   mats:[
     {id:'m1',n:'Matemáticas',      c:'#f5c518',e:'📐',p:0,h:0,t:10,ok:0},
     {id:'m2',n:'Biología y Geo.',  c:'#4ade80',e:'🧬',p:0,h:0,t:8, ok:0},
@@ -2753,13 +2753,13 @@ function updateXP(){
 // POMODORO
 // ════════════════════════════════════════════════════════
 let pomSettings={W:25*60,B:5*60};
-let po={s:pomSettings.W,run:false,brk:false,done:0,t:null};
+let po={s:pomSettings.W,run:false,brk:false,done:0,t:null,endAt:null};
 let focusActive=false;
 
 function showPomPre(){
   const chips=document.getElementById('pom-pre-chips');
   if(!chips)return;
-  chips.innerHTML=D.mats.map(m=>`<div class="chip${m.n===pomMatActiva?' on':''}" onclick="pomMatActiva='${m.n}';this.closest('#pom-pre-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${m.e} ${m.n.split(' ')[0]}</div>`).join('');
+  chips.innerHTML=D.mats.map(m=>`<div class="chip${m.n===pomMatActiva?' on':''}" onclick="pomMatActiva='${m.n}';this.closest('#pom-pre-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${getMatIcon(m.e,16)} ${m.n.split(' ')[0]}</div>`).join('');
   document.getElementById('pom-pre-mo').classList.add('show');
 }
 function confirmPomStart(){
@@ -2805,11 +2805,88 @@ function releaseWakeLock(){
 }
 // Re-adquirir el wake lock si la página vuelve a estar visible (volver del multitarea)
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&po.run)requestWakeLock();
+  if(document.visibilityState==='visible'){
+    if(po.run)requestWakeLock();
+    if(po.run)_pomSync(); // catch up if screen was off
+  }
 });
 
+// ── Audio alert for pomodoro end (Web Audio API, no files needed) ──
+function playPomAlert(isWork){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const notes=isWork?[523,659,784,1047]:[523,440,392]; // fanfare vs mellow
+    notes.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();const g=ctx.createGain();
+      osc.type='sine';osc.frequency.value=freq;
+      const t=ctx.currentTime+i*0.18;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.35,t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+      osc.connect(g);g.connect(ctx.destination);
+      osc.start(t);osc.stop(t+0.3);
+    });
+    // Also vibrate
+    if(navigator.vibrate)navigator.vibrate(isWork?[200,100,200,100,300]:[150,80,150]);
+  }catch(e){}
+}
+
+// ── Background timer: store absolute end timestamp ──
+// po already declared above
+
+function _pomSync(){
+  // Called when page becomes visible again — catch up ticks
+  if(!po.run||!po.endAt)return;
+  const now=Date.now();
+  const remaining=Math.max(0,Math.round((po.endAt-now)/1000));
+  if(remaining===0){
+    // Timer finished while screen was off
+    clearInterval(po.t);po.t=null;po.run=false;po.endAt=null;
+    _pomComplete();
+    upPom();renderStudyToday();saveState();
+  }else{
+    po.s=remaining;
+    upPom();
+  }
+}
+
+function _pomComplete(){
+  releaseWakeLock();
+  const btn=document.getElementById('pom-b');
+  const outer=document.getElementById('pom-circle-outer');
+  if(btn)btn.textContent='▶ Iniciar';
+  if(outer)outer.classList.remove('pom-running');
+  if(!po.brk){
+    // Work session ended → start break
+    playPomAlert(true);
+    po.done++;D.user.pomodorosDone++;
+    D.week[getCurrentDayIdx()].m+=pomSettings.W/60;
+    D.user.hours=+(D.user.hours+(pomSettings.W/60/60)).toFixed(2);
+    addHistorial(pomSettings.W/60);
+    gainXP(10);launchConfetti();
+    const matObj=D.mats.find(m=>m.n===pomMatActiva);
+    if(matObj){matObj.h=+(matObj.h+(pomSettings.W/60/60)).toFixed(2);recalcMatProgress(matObj);}
+    po.brk=true;po.s=pomSettings.B;po.endAt=null;
+    toast('🍅 ¡Pomodoro completado! +10 XP');
+    // Notification API
+    _pomNotify('🍅 ¡Pomodoro completado!','Descansa '+(pomSettings.B/60)+'min. Te lo has ganado.');
+    setTimeout(()=>{const rnd=Math.floor(Math.random()*PAUSAS.length);startPausa(rnd);},600);
+  }else{
+    // Break ended → ready for next work session
+    playPomAlert(false);
+    po.brk=false;po.s=pomSettings.W;po.endAt=null;
+    toast('☕ ¡Descanso terminado! A estudiar.');
+    _pomNotify('☕ Descanso terminado','¡Listo para el siguiente pomodoro!');
+  }
+}
+
+function _pomNotify(title,body){
+  if('Notification' in window&&Notification.permission==='granted'){
+    try{new Notification(title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="54" font-size="56">🍅</text></svg>'});}catch(e){}
+  }
+}
+
 function tgPom(){
-  // Fix: always clear existing interval first to prevent duplication
   if(po.t){clearInterval(po.t);po.t=null;}
   po.run=!po.run;
   const btn=document.getElementById('pom-b');
@@ -2819,46 +2896,34 @@ function tgPom(){
   const outer=document.getElementById('pom-circle-outer');
   if(outer)outer.classList.toggle('pom-running',po.run);
   if(po.run){
-    requestWakeLock(); // ← pantalla siempre encendida
+    requestWakeLock();
+    // Request notification permission on first start
+    if('Notification' in window&&Notification.permission==='default'){
+      Notification.requestPermission();
+    }
+    // Record absolute end time so background sync works
+    po.endAt=Date.now()+po.s*1000;
     po.t=setInterval(()=>{
-      po.s--;upPom();
+      po.s--;
+      // Re-sync from timestamp every tick to avoid drift
+      if(po.endAt)po.s=Math.max(0,Math.round((po.endAt-Date.now())/1000));
+      upPom();
       if(po.s<=0){
-        clearInterval(po.t);po.t=null;po.run=false;
-        releaseWakeLock(); // ← liberamos al terminar
-        if(btn)btn.textContent='▶ Iniciar';
-        if(outer)outer.classList.remove('pom-running');
-        if(!po.brk){
-          po.done++;D.user.pomodorosDone++;
-          D.week[getCurrentDayIdx()].m+=pomSettings.W/60;
-          D.user.hours=+(D.user.hours+(pomSettings.W/60/60)).toFixed(2);
-          addHistorial(pomSettings.W/60);
-          gainXP(10);launchConfetti();
-          // ── Actualizar horas y progreso de la materia activa ──
-          const matObj=D.mats.find(m=>m.n===pomMatActiva);
-          if(matObj){
-            matObj.h=+(matObj.h+(pomSettings.W/60/60)).toFixed(2);
-            recalcMatProgress(matObj);
-          }
-          po.brk=true;po.s=pomSettings.B;
-          toast('🍅 ¡Pomodoro completado! +10 XP');
-          if(navigator.vibrate)navigator.vibrate([200,100,200]);
-          // Suggest active break
-          setTimeout(()=>{
-            const rnd=Math.floor(Math.random()*PAUSAS.length);
-            startPausa(rnd);
-          },600);
-        }else{po.brk=false;po.s=pomSettings.W;toast('☕ ¡A estudiar!');}
+        clearInterval(po.t);po.t=null;po.run=false;po.endAt=null;
+        _pomComplete();
         upPom();renderStudyToday();saveState();
       }
     },1000);
   }else{
-    releaseWakeLock(); // ← liberamos al pausar
+    releaseWakeLock();
+    po.endAt=null; // clear end time on pause
   }
 }
+
 function resetPom(){
   if(po.t){clearInterval(po.t);po.t=null;}
   releaseWakeLock();
-  po.run=false;po.s=pomSettings.W;po.brk=false;
+  po.run=false;po.s=pomSettings.W;po.brk=false;po.endAt=null;
   const btn=document.getElementById('pom-b');if(btn)btn.textContent='▶ Iniciar';
   const outer=document.getElementById('pom-circle-outer');if(outer)outer.classList.remove('pom-running');
   upPom();
@@ -3254,14 +3319,14 @@ function bMats(){
   recalcAllProgress(); // recalculate before rendering
   document.getElementById('m-hex').innerHTML=D.mats.map(m=>`
     <div style="background:var(--bg1);border:1px solid var(--bd);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px;cursor:pointer" onclick="tgM('${m.id}')">
-      <div style="width:38px;height:38px;border-radius:50%;border:2px solid ${m.c};display:flex;align-items:center;justify-content:center;font-size:16px">${m.e}</div>
+      <div style="width:38px;height:38px;border-radius:50%;border:2px solid ${m.c};display:flex;align-items:center;justify-content:center;font-size:16px">${getMatIcon(m.e,18)}</div>
       <div style="font-size:8px;color:var(--t2);text-align:center;line-height:1.2;max-width:50px">${m.n.split(' ')[0]}</div>
       <div style="font-size:10px;font-weight:900;color:${m.c}">${m.p}%</div>
     </div>`).join('');
   document.getElementById('m-list').innerHTML=D.mats.map(m=>`
     <div class="card" id="mc-${m.id}" style="cursor:pointer;margin-bottom:9px" onclick="tgM('${m.id}')">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:40px;height:40px;border-radius:10px;background:${m.c}18;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${m.e}</div>
+        <div style="width:40px;height:40px;border-radius:10px;background:${m.c}18;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${getMatIcon(m.e,20)}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700;color:var(--t1)">${m.n}</div>
           <div style="font-size:11px;color:var(--t2);margin-top:1px">${m.ok}/${m.t} temas · ${+(m.h||0).toFixed(1)}h</div>
@@ -5243,6 +5308,19 @@ function bAmigos(){
   const myH=+(D.user.hours||0).toFixed(1);
   const ami=document.getElementById('ami-hrs');if(ami)ami.textContent=myH+'h';
   const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+  // Update URL label with real user name
+  const urlLabel=document.getElementById('amigos-url-label');
+  if(urlLabel){
+    const slug=(D.user.name||'usuario').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,12)||'lumio';
+    urlLabel.textContent='lumio.app/'+slug;
+  }
+}
+function shareAmigos(){
+  const slug=(D.user.name||'usuario').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,12)||'lumio';
+  const url='https://lumio.app/'+slug;
+  const text='¡Mira esta app de estudio gratuita! Sin anuncios, sin registro. 📚';
+  if(navigator.share){navigator.share({title:'Lumio',text,url}).catch(()=>{});}
+  else{navigator.clipboard?.writeText(url+'\n'+text).then(()=>toast('🔗 Enlace copiado')).catch(()=>toast('lumio.app'));}
 }
 
 // ════════════════════════════════════════════════════════
@@ -5407,6 +5485,16 @@ const MAT_COLORS={
   'Asignatura 1':'#60a5fa','Asignatura 2':'#4ade80','Asignatura 3':'#f472b6',
   'Asignatura 4':'#fb923c','Asignatura 5':'#c084fc',
 };
+
+// Returns display HTML for a materia emoji — language flags use CSS
+function getMatIcon(e,size=20){
+  const flags={
+    '🇬🇧':'<span style="display:inline-flex;align-items:center;gap:0;height:'+size+'px;width:'+(size*1.5)+'px;border-radius:2px;overflow:hidden;vertical-align:middle;flex-shrink:0"><span style="flex:1;height:100%;background:#012169;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;position:relative"><svg viewBox="0 0 30 20" width="'+size*1.5+'" height="'+size+'" style="position:absolute;inset:0"><rect width="30" height="20" fill="#012169"/><line x1="0" y1="0" x2="30" y2="20" stroke="white" stroke-width="4"/><line x1="30" y1="0" x2="0" y2="20" stroke="white" stroke-width="4"/><line x1="0" y1="0" x2="30" y2="20" stroke="#c8102e" stroke-width="2.5"/><line x1="30" y1="0" x2="0" y2="20" stroke="#c8102e" stroke-width="2.5"/><rect x="12" y="0" width="6" height="20" fill="white"/><rect x="0" y="7" width="30" height="6" fill="white"/><rect x="13" y="0" width="4" height="20" fill="#c8102e"/><rect x="0" y="8" width="30" height="4" fill="#c8102e"/></svg></span></span>',
+    '🇫🇷':'<span style="display:inline-flex;height:'+size+'px;width:'+(size*1.5)+'px;border-radius:2px;overflow:hidden;vertical-align:middle;flex-shrink:0"><span style="flex:1;background:#002395"></span><span style="flex:1;background:#fff"></span><span style="flex:1;background:#ED2939"></span></span>',
+    '🇩🇪':'<span style="display:inline-flex;flex-direction:column;height:'+size+'px;width:'+(size*1.5)+'px;border-radius:2px;overflow:hidden;vertical-align:middle;flex-shrink:0"><span style="flex:1;background:#000"></span><span style="flex:1;background:#DD0000"></span><span style="flex:1;background:#FFCE00"></span></span>',
+  };
+  return flags[e]||('<span style="font-size:'+size+'px;line-height:1">'+e+'</span>');
+}
 const MAT_EMOJI={
   'Matemáticas':'📐','Matemáticas I':'📐','Matemáticas II':'📐',
   'Matemáticas Académicas':'📐','Matemáticas Aplicadas':'📐',
@@ -5517,8 +5605,10 @@ function obFinish(){
 // ════════════════════════════════════════════════════════
 // TUTORIAL
 // ════════════════════════════════════════════════════════
-const TUT_STEPS=[
-  {ico:'👋',title:`¡Hola, ${D.user.name||'estudiante'}!`,
+function getTutSteps(){
+  const nm=D.user.name||'estudiante';
+  return [
+  {ico:'👋',title:`¡Hola, ${nm}!`,
     msg:'Bienvenido a <b>Lumio</b>, tu app de estudio. Sin anuncios, sin internet, sin registros. Todo en tu móvil. Toca <b>Siguiente</b> para el recorrido.',
     nav:null,color:'var(--y)',highlight:null},
   {ico:'🏠',title:'Tu inicio personal',
@@ -5566,10 +5656,12 @@ const TUT_STEPS=[
     msg:'Pulsa <b>Compartir mi perfil</b> → manda el enlace a un compañero → aparece en tu ranking automáticamente.',
     nav:'perfil:ranking',color:'var(--orange)',
     tip:'💡 El ranking ordena por XP total'},
-  {ico:'🚀',title:`¡Todo listo, ${D.user.name||'crack'}!`,
+  {ico:'🚀',title:`¡Todo listo, ${nm}!`,
     msg:'Empieza con los apuntes de hoy o crea tus primeras flashcards. <b>¡Mucho ánimo con el curso!</b>',
     nav:'home',color:'var(--y)',highlight:null},
-];
+  ];
+}
+const TUT_STEPS=getTutSteps();
 
 let tutStep=0;
 function forceShowTutorial(){
@@ -5583,17 +5675,18 @@ function startTutorial(){
 
 function showTutStep(){
   const ov=document.getElementById('tutorial-overlay');if(!ov)return;
-  // Clean previous highlight
+  // Regenerate each time so D.user.name is current
+  const STEPS=getTutSteps();
   document.querySelectorAll('.tut-highlight').forEach(el=>el.classList.remove('tut-highlight'));
-  if(tutStep>=TUT_STEPS.length){
+  if(tutStep>=STEPS.length){
     ov.style.display='none';ov.innerHTML='';
     document.body.style.overflow='';
     localStorage.setItem('lumio_seen_tutorial','1');
     navSection('home');
     return;
   }
-  const s=TUT_STEPS[tutStep];
-  const total=TUT_STEPS.length;
+  const s=STEPS[tutStep];
+  const total=STEPS.length;
 
   // Navigate to relevant screen
   if(s.nav){
@@ -5610,7 +5703,7 @@ function showTutStep(){
     },200);
   }
 
-  const dots=TUT_STEPS.map((_,i)=>`<div style="width:${i===tutStep?20:6}px;height:6px;border-radius:999px;background:${i===tutStep?s.color||'var(--y)':'var(--bg3)'};transition:all .3s"></div>`).join('');
+  const dots=STEPS.map((_,i)=>`<div style="width:${i===tutStep?20:6}px;height:6px;border-radius:999px;background:${i===tutStep?s.color||'var(--y)':'var(--bg3)'};transition:all .3s"></div>`).join('');
   const isLast=tutStep===total-1;
   const progress=Math.round((tutStep+1)/total*100);
 
@@ -5642,7 +5735,7 @@ function showTutStep(){
         ${tutStep>0?`<button onclick="tutStep--;showTutStep()" style="flex:1;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">← Atrás</button>`:''}
         <button onclick="tutStep++;showTutStep()" style="flex:2;background:${s.color||'var(--y)'};color:${s.color&&s.color!=='var(--y)'?'#fff':'#0d0f14'};border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
       </div>
-      <button onclick="tutStep=TUT_STEPS.length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:0 0 14px;text-align:center">Saltar recorrido</button>
+      <button onclick="tutStep=STEPS.length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:0 0 14px;text-align:center">Saltar recorrido</button>
     </div>`;
 }
 
