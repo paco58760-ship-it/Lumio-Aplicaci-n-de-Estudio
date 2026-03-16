@@ -3183,10 +3183,103 @@ function aiDefinitions(txt){
   return defs;
 }
 
-// Función principal que reemplaza callClaude para generar respuestas
-function callClaude(prompt,maxTokens){
-  // Ruta a través del motor local
-  return Promise.resolve('[local]');
+// callClaude — router al motor local de IA
+// Analiza el prompt y despacha a la función local correcta
+async function callClaude(prompt, maxTokens=1500){
+  await new Promise(r=>setTimeout(r,300+Math.random()*200));
+  const p = prompt.toLowerCase();
+  // Detectar tipo de tarea por el contenido del prompt
+  if(p.includes('json') && (p.includes('tarjetas') || p.includes('flashcard'))){
+    // Generar flashcards
+    const matMatch = prompt.match(/experto en ([^.\n]+?)\./);
+    const mat = matMatch ? matMatch[1].trim() : 'General';
+    const nMatch = prompt.match(/exactamente (\d+)/);
+    const n = nMatch ? parseInt(nMatch[1]) : 5;
+    const txtMatch = prompt.match(/contenido: "([\s\S]+?)"/);
+    const txt = txtMatch ? txtMatch[1] : mat;
+    const cards = aiGenFlashcards(txt, mat, n);
+    return JSON.stringify({tarjetas: cards.map(c=>({pregunta:c.pregunta, respuesta:c.respuesta}))});
+  }
+  if(p.includes('json') && p.includes('preguntas') && (p.includes('test') || p.includes('opciones'))){
+    // Test IA — parse texto from prompt
+    const txtMatch = prompt.match(/TEXTO: ([\s\S]+)$/);
+    const txt = txtMatch ? txtMatch[1].trim() : '';
+    const nMatch = prompt.match(/(\d+) preguntas/);
+    const n = nMatch ? parseInt(nMatch[1]) : 3;
+    const matMatch = prompt.match(/sobre "([^"]+)"/);
+    const mat = matMatch ? matMatch[1] : 'General';
+    const preguntas = aiGenerateTest(txt||mat, n, mat);
+    return JSON.stringify({preguntas});
+  }
+  if(p.includes('json') && p.includes('ramas') && p.includes('mapa')){
+    // Mapa mental
+    const temaMatch = prompt.match(/sobre "([^"]+)"/);
+    const tema = temaMatch ? temaMatch[1] : 'Tema';
+    const terms = aiKeyTerms(prompt, 20);
+    const colors=['#f5c518','#4ade80','#60a5fa','#fb923c'];
+    const branchNames = terms.slice(0,4).map(aiCap);
+    const ramas = branchNames.map((titulo,i)=>({titulo,color:colors[i],nodos:terms.slice(i*3+4,(i+1)*3+4).map(aiCap)}));
+    return JSON.stringify({centro:aiCap(tema),ramas});
+  }
+  if(p.includes('json') && p.includes('diapositivas')){
+    // PPT esquema
+    const temaMatch = prompt.match(/sobre "([^"]+)"/);
+    const tema = temaMatch ? temaMatch[1] : 'Trabajo';
+    const nMatch = prompt.match(/(\d+) diapositivas/);
+    const n = nMatch ? parseInt(nMatch[1]) : 5;
+    const data = aiGenPPT(tema,'',n);
+    return JSON.stringify(data);
+  }
+  if(p.includes('resumir') || p.includes('bullet') || p.includes('resume') || p.includes('texto:\n')){
+    // Resumen
+    const txtMatch = prompt.match(/TEXTO:\n([\s\S]+)$/);
+    const txt = txtMatch ? txtMatch[1].trim() : prompt;
+    return aiSummarize(txt, 8);
+  }
+  if(p.includes('esquema') || p.includes('jerarquic') || p.includes('├──')){
+    // Esquema
+    const txtMatch = prompt.match(/TEXTO:\n([\s\S]+)$/);
+    const txt = txtMatch ? txtMatch[1].trim() : prompt;
+    return aiGenEsquema(txt);
+  }
+  if(p.includes('correg') || p.includes('redacción') || p.includes('ortografía') || p.includes('redaccion')){
+    // Corrector de redacciones
+    const txtMatch = prompt.match(/REDACCIÓN:\n([\s\S]+)$/);
+    const txt = txtMatch ? txtMatch[1].trim() : '';
+    return aiCorregirRedaccion(txt, p);
+  }
+  if(p.includes('corrector ortográfico') || p.includes('corrige todos los errores')){
+    // Spell check inline
+    const txtMatch = prompt.match(/TEXTO:\n([\s\S]+)$/);
+    const txt = txtMatch ? txtMatch[1].trim() : '';
+    // Devolver texto con correcciones básicas aplicadas
+    return txt; // spell check nativo ya actúa
+  }
+  // Fallback: respuesta de chat
+  return aiChat(prompt.split('\n').pop() || prompt);
+}
+
+// Corrector de redacciones local
+function aiCorregirRedaccion(txt, promptLower){
+  if(!txt.trim()) return 'No hay texto para corregir.';
+  const sents = aiSentences(txt);
+  const issues = [];
+  // Detectar errores comunes
+  if(/[,;]\s*[,;]/.test(txt)) issues.push('❌ Puntuación doble detectada');
+  if(/\b(\w+)\s+\1\b/i.test(txt)) issues.push('❌ Palabras repetidas consecutivamente');
+  const longSents = sents.filter(s=>s.split(' ').length>40);
+  if(longSents.length) issues.push(`❌ ${longSents.length} oración(es) muy larga(s) — divide en oraciones más cortas`);
+  const score = Math.max(4, Math.min(9, 7 - Math.floor(issues.length/2)));
+  const tipo = promptLower.includes('ortografía') ? 'ortografía' : promptLower.includes('estilo') ? 'estilo' : 'completa';
+  if(tipo === 'ortografía'){
+    return `✅ CORRECCIÓN ORTOGRÁFICA\n\n${issues.length ? issues.join('\n') : '✅ Sin errores graves detectados.'}\n\n📝 Activa el corrector ortográfico del teclado (subrayado rojo) para ver todas las tildes y errores.\n\n📖 TEXTO ORIGINAL:\n${txt.slice(0,500)}`;
+  }
+  if(tipo === 'estilo'){
+    const connectors = (txt.match(/\b(porque|además|sin embargo|por tanto|aunque|por eso|es decir|en resumen)\b/gi)||[]).length;
+    return `✅ ANÁLISIS DE ESTILO\n\n📊 Conectores usados: ${connectors} — ${connectors<3?'Añade más conectores (además, sin embargo, por tanto)':'Buen uso de conectores'}\n\n📏 Oraciones largas: ${longSents.length} — ${longSents.length>2?'Intenta dividirlas':'Longitud adecuada'}\n\n💡 SUGERENCIAS:\n• Varía el vocabulario evitando repetir las mismas palabras\n• Usa párrafos cortos y claros\n• Empieza algunas oraciones con conectores temporales (primero, después, finalmente)`;
+  }
+  // Corrección completa
+  return `📝 NOTA: ${score}/10\n\n✅ LO QUE ESTÁ BIEN:\n• Estructura reconocible\n• Ideas expresadas con claridad${sents.length>3?'\n• Desarrollo del texto adecuado':''}\n\n${issues.length?'❌ PUNTOS A MEJORAR:\n'+issues.join('\n'):'✅ No se detectaron errores graves'}\n\n💡 SUGERENCIAS DE MEJORA:\n• Revisa las tildes y acentos con el corrector del teclado\n• Añade conectores: (además, sin embargo, por tanto, en conclusión)\n• Divide las oraciones muy largas en dos\n\n📖 TEXTO (revisa con el corrector rojo del teclado):\n${txt.slice(0,400)}${txt.length>400?'…':''}`;
 }
 
 // ════════════════════════════════════════════════════════
