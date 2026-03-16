@@ -366,6 +366,10 @@ button:active{transform:scale(.97)}
 <script>
 (function(){
   try{
+    // Si venimos de una actualización, limpiar el parámetro de la URL
+    if(location.search.indexOf('lumio_update=')!==-1){
+      history.replaceState(null,'',location.pathname);
+    }
     var pending=localStorage.getItem('lumio_pending_html');
     if(!pending)return;
     localStorage.removeItem('lumio_pending_html');
@@ -1650,7 +1654,7 @@ button:active{transform:scale(.97)}
     <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
     <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
   </div>
-  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a0d0c1c3cf9598979690e0c7cdc1c9cc8ec3cfcd">[email&#160;protected]</a></span></div>
   <div><div class="sl">Tipo</div>
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
       <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
@@ -1833,11 +1837,11 @@ button:active{transform:scale(.97)}
 
 <div id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
-const APP_VERSION='3.2.0';
+const APP_VERSION='3.3.0';
 // Cambia esta URL por la raw de tu archivo en GitHub:
 const GITHUB_RAW_URL='';
 
@@ -5052,9 +5056,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Auto-check silencioso: solo muestra banner si hay versión nueva
 async function autoCheckUpdate(){
   try{
-    // Cache-busting fetch que ignora el service worker completamente
+    // Primero desregistrar SW para que el fetch vaya a la red real
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    // Cache-busting fetch: ignora caché del navegador y del SW
     const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{
-      cache:'no-store',          // nunca usa caché del navegador
+      cache:'no-store',
       headers:{'pragma':'no-cache','cache-control':'no-cache'}
     });
     if(!res.ok)return;
@@ -5062,11 +5071,11 @@ async function autoCheckUpdate(){
     const match=html.match(/const APP_VERSION='([^']+)'/);
     const remoteVersion=match?match[1]:null;
     if(!remoteVersion||remoteVersion===APP_VERSION)return;
-    // Hay versión nueva — guardar html y mostrar banner
+    // Hay versión nueva — guardar html en memoria y mostrar banner
     window._pendingUpdate=html;
     showUpdateBanner(remoteVersion);
   }catch(e){
-    // Sin conexión o fallo — ignorar silenciosamente
+    // Sin conexión o fallo — silencioso
   }
 }
 
@@ -5223,15 +5232,18 @@ async function installUpdate(){
   if(bar)bar.style.width='100%';
   await new Promise(r=>setTimeout(r,300));
 
-  // Paso 5: Recargar — el interceptor al inicio aplicará la actualización
-  location.reload(true);
+  // Paso 5: Navegar con cache-busting para que iOS/Android no usen la versión en caché
+  // location.reload(true) está deprecated y no bypasa el SW — esto sí funciona:
+  const base = location.href.split('?')[0];
+  location.replace(base + '?lumio_update=' + Date.now());
 }
 
 function resetApp(){
   ['lumio_apuntes','lumio_plan','lumio_tl','lumio_horario','lumio_theme',
    'lumio_seen_onboarding','lumio_seen_tutorial','lumio_user','lumio_state',
-   'lumio_deberes','lumio_animos','lumio_anaya','lumio_peers'].forEach(k=>localStorage.removeItem(k));
-  location.reload();
+   'lumio_deberes','lumio_animos','lumio_anaya','lumio_peers',
+   'lumio_pending_html','lumio_update_backup'].forEach(k=>localStorage.removeItem(k));
+  location.replace(location.pathname);
 }
 
 
@@ -5303,7 +5315,12 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(savedUser){D.user.name=savedUser.name;if(savedUser.studyTime)D.user.studyTime=savedUser.studyTime;}
 
     // PWA Service Worker
-    if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+    // SW: si existe uno viejo, lo desregistramos para no bloquear actualizaciones
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  }).catch(()=>{});
+}
 
     // PWA install prompt
     let deferredPrompt;
@@ -5351,13 +5368,12 @@ window.addEventListener('DOMContentLoaded',()=>{
     // Si algo falla en el arranque, al menos quitamos la splash
     clearTimeout(splashGuard);
     console.error('Lumio init error:',e);
-    setTimeout(()=>{
-      const sp=document.getElementById('splash');if(sp)sp.classList.add('out');
+sole.error('Lumio init error:',e);
       setTimeout(()=>{
-        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
-      },600);
-    },500);
-  }
+        const sp=document.getElementById('splash');
+        if(sp)sp.classList.add('out');
+      },500);
+    }
 });
 </script>
 </body>
