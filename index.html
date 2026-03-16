@@ -706,7 +706,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-materias">
 <div class="pw">
   <div class="pt">Mis <em>materias</em></div>
-  <div class="ps">8 asignaturas · 2º ESO Anaya</div>
+  <div class="ps" id="mats-subtitle">Mis materias</div>
   <div style="display:flex;gap:7px;margin-bottom:12px" id="mat-tabs">
     <button class="tabb on" data-t="info" onclick="matTab(this)">Progreso</button>
     <button class="tabb" data-t="apuntes" onclick="matTab(this)">📝 Apuntes</button>
@@ -900,7 +900,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-chat" style="display:flex;flex-direction:column;padding-bottom:0 !important">
   <div style="padding:16px 16px 10px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <div class="pt" style="margin-bottom:2px">Chat <em>IA</em> 💬</div>
-    <div style="font-size:11px;color:var(--t2)">Pregunta cualquier duda de 2º ESO</div>
+    <div style="font-size:11px;color:var(--t2)" id="chat-subtitle">Pregunta cualquier duda de tus clases</div>
   </div>
   <div class="chat-msgs" id="chat-msgs">
     <div class="msg msg-ai">¡Hola! 👋 Soy tu tutor de IA de Lumio. Puedes preguntarme cualquier duda de tus clases. ¿En qué te ayudo?</div>
@@ -915,7 +915,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-vocab">
 <div class="pw">
   <div class="pt">Vocabu<em>lario</em> 🌐</div>
-  <div class="ps">Inglés — 2º ESO</div>
+  <div class="ps">Inglés — vocabulario académico</div>
   <div style="display:flex;gap:7px;margin-bottom:12px">
     <button class="tabb on" data-v="all" onclick="vocabTab(this)">Todas</button>
     <button class="tabb" data-v="verbs" onclick="vocabTab(this)">Verbos</button>
@@ -999,7 +999,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-tabla">
 <div class="pw">
   <div class="pt">Tabla <em>periódica</em> ⚗️</div>
-  <div class="ps">Elementos principales · 2º ESO</div>
+  <div class="ps">Elementos principales</div>
   <input class="inp" id="el-search" placeholder="Buscar elemento o símbolo..." oninput="filterEl()" style="margin-bottom:12px">
   <div class="chip-row" id="el-type-row"></div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="el-grid"></div>
@@ -1010,7 +1010,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-timeline">
 <div class="pw">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-    <div><div class="pt">Línea del <em>tiempo</em> 📜</div><div class="ps" style="margin-bottom:0">Historia · 2º ESO Anaya</div></div>
+    <div><div class="pt">Línea del <em>tiempo</em> 📜</div><div class="ps" style="margin-bottom:0">Historia</div></div>
     <button class="gbtn" onclick="showAddTL()">+ Añadir</button>
   </div>
   <div class="chip-row" id="tl-filter"></div>
@@ -1192,7 +1192,7 @@ button:active{transform:scale(.97)}
     <div style="height:1px;background:var(--bd);margin:12px 0"></div>
     <div style="font-size:12px;color:var(--t2);line-height:1.8">
       <div><span style="color:var(--t3)">Creado por</span> <span style="font-weight:700;color:var(--t1)" id="about-creator">Raúl</span></div>
-      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)">2º ESO · 2024–2025</span></div>
+      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)" id="about-curso-label">2º ESO · 2024–2025</span></div>
       <div><span style="color:var(--t3)">Tecnología</span> <span style="font-weight:700;color:var(--t1)">HTML · CSS · JS · Claude AI</span></div>
     </div>
   </div>
@@ -1383,7 +1383,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-formulas">
 <div class="pw">
   <div class="pt">Fórmu<em>las</em> 📐</div>
-  <div class="ps">Matemáticas y Física · 2º ESO</div>
+  <div class="ps">Matemáticas y Física</div>
   <input class="inp" id="form-search" placeholder="Buscar fórmula..." oninput="filterFormulas()" style="margin-bottom:10px">
   <div class="chip-row" id="form-cats"></div>
   <div id="form-list"></div>
@@ -3160,7 +3160,7 @@ async function genResumen(){
   const btn=document.querySelector('#s-resumenia .mbtn');
   if(btn){btn.disabled=true;btn.textContent='Resumiendo...';}
   try{
-    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${resMat}. Resume el siguiente texto en bullet points claros y concisos, organizados por conceptos clave. Máximo 10 bullets. Usa lenguaje simple para un alumno de 2º ESO. Responde en español.\n\nTEXTO:\n${txt}`;
+    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${resMat}. Resume el siguiente texto en bullet points claros y concisos, organizados por conceptos clave. Máximo 10 bullets. Usa lenguaje simple para un alumno de ${D.user.curso||'ESO'}. Responde en español.\n\nTEXTO:\n${txt}`;
     const res=await callClaude(prompt,800);
     lastResumen=res;
     document.getElementById('res-content').innerHTML=res.split('\n').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start"><span style="color:var(--y);flex-shrink:0;margin-top:2px">•</span><span style="font-size:13px;color:var(--t1);line-height:1.5;flex:1">${l.replace(/^[-•*]\s*/,'')}</span></div>`).join('');
@@ -3239,7 +3239,7 @@ async function sendChat(){
   chatHistory.push({role:'user',content:msg});
   const typing=appendMsg('...','ai');
   try{
-    const prompt=`Eres un tutor de 2º ESO Anaya. El alumno se llama Raúl. Responde de forma clara, concisa y amigable. Usa ejemplos simples. Materias: Matemáticas, Biología, Física y Química, Geografía e Historia, Lengua, Inglés, Tecnología y Ed. Plástica.\n\nHistorial: ${chatHistory.slice(-4).map(m=>m.role+': '+m.content).join('\n')}\n\nRaúl: ${msg}`;
+    const prompt=`Eres un tutor de ${D.user.curso||'ESO'} Anaya. El alumno se llama ${D.user.name}. Responde de forma clara, concisa y amigable. Usa ejemplos simples. Materias: ${D.mats.map(m=>m.n).join(', ')}.\n\nHistorial: ${chatHistory.slice(-4).map(m=>m.role+': '+m.content).join('\n')}\n\n${D.user.name}: ${msg}`;
     const res=await callClaude(prompt,500);
     typing.textContent=res;
     chatHistory.push({role:'assistant',content:res});
@@ -3908,7 +3908,7 @@ function obFinish(){
 // ════════════════════════════════════════════════════════
 const TUT_STEPS=[
   {ico:'💡',title:'Bienvenido a Lumio',
-    msg:'Tu app de estudio para 2º ESO. Vamos a hacer un recorrido rápido por toda la app. ¡Solo 2 minutos!',
+    msg:`Tu app de estudio para ${D.user&&D.user.curso?D.user.curso:'ESO'}. Vamos a hacer un recorrido rápido. ¡Solo 2 minutos!`,
     nav:null},
   {ico:'🏠',title:'Inicio — tu dashboard',
     msg:'Aquí ves tu progreso semanal, racha de días y exámenes próximos. El botón amarillo grande arranca el Pomodoro directamente.',
@@ -4050,7 +4050,7 @@ function exportApuntePDF(){
   .logo{width:40px;height:40px;background:#f5c518;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
   .meta{font-size:13px;color:#888;margin-top:20px}
   </style></head><body>
-  <div class="header"><div class="logo">💡</div><div><strong style="font-size:18px">${apuMat}</strong><div style="font-size:12px;color:#888">Apuntes de ${D.user.name} · Lumio · 2º ESO Anaya</div></div></div>
+  <div class="header"><div class="logo">💡</div><div><strong style="font-size:18px">${apuMat}</strong><div style="font-size:12px;color:#888">Apuntes de ${D.user.name} · Lumio · ${D.user.curso||"ESO"}</div></div></div>
   ${mdToHtml(ta.value)}
   <div class="meta">Exportado desde Lumio · ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}</div>
   </body></html>`;
@@ -4914,8 +4914,11 @@ function bAjustes(){
 // Update all hardcoded course references throughout the UI
 function updateCursoLabels(){
   const curso=D.user.curso||'2º ESO';
-  // Update any visible course labels
   document.querySelectorAll('[data-curso-label]').forEach(el=>{el.textContent=curso;});
+  const acl=document.getElementById('about-curso-label');
+  if(acl)acl.textContent=curso+' · 2024–2025';
+  const ms=document.getElementById('mats-subtitle');
+  if(ms)ms.textContent=D.mats.length+' materias · '+curso;
 }
 
 // Change course from Ajustes (without full re-onboarding)
@@ -5343,6 +5346,7 @@ if('serviceWorker' in navigator){
     try{bVocab();}catch(e){}
     try{bResumen();}catch(e){}
     try{bExamen();}catch(e){}
+    try{updateCursoLabels();}catch(e){}
 
     // Init swipe on flashcards (delayed so DOM is ready)
     setTimeout(()=>{try{initSwipe();}catch(e){}}, 500);
