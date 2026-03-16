@@ -1273,39 +1273,45 @@ button:active{transform:scale(.97)}
   </div>
 
   <!-- Feedback -->
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Contacto y feedback</div>
-  <div class="card" style="margin-bottom:10px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <div style="font-size:28px">💬</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--t1)">Enviar feedback</div>
-        <div style="font-size:11px;color:var(--t2)">Ideas, bugs o sugerencias directamente al desarrollador</div>
-      </div>
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Contacto</div>
+  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1)">Enviar feedback</div>
+      <div style="font-size:11px;color:var(--t2)">Ideas, bugs o sugerencias</div>
     </div>
-    <button class="mbtn" style="margin-bottom:8px" onclick="showFeedback()">✉️ Enviar mensaje</button>
+    <button onclick="navSection('perfil');setTimeout(()=>goTo('feedback'),50)" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">💬 Ir →</button>
   </div>
-  <div class="card" style="margin-bottom:14px" id="gas-setup-card">
-    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚙️ Configurar envío automático</div>
-    <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:10px">Para que el mensaje llegue solo sin abrir el correo, pega la URL de tu Google Apps Script:</div>
-    <input class="inp" id="gas-url-inp" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:8px">
-    <button class="mbtn" onclick="saveGasUrl()" style="margin-bottom:8px">💾 Guardar URL</button>
-    <div style="font-size:11px;color:var(--t3);line-height:1.6;padding:8px;background:var(--bg2);border-radius:8px">
-      <b style="color:var(--t1)">Cómo obtener la URL (2 min):</b><br>
-      1. Ve a <b>script.google.com</b><br>
-      2. Crea proyecto → pega el código que está debajo<br>
-      3. Implementar → Nueva implementación → Aplicación web<br>
-      4. Ejecutar como: <b>Yo</b> · Acceso: <b>Cualquier usuario</b><br>
-      5. Copia la URL y pégala aquí
-    </div>
-    <div style="margin-top:8px;padding:8px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--teal);line-height:1.8;font-family:monospace;word-break:break-all" id="gas-code-display">
-      function doPost(e){<br>
-      &nbsp;&nbsp;var d=JSON.parse(e.postData.contents);<br>
-      &nbsp;&nbsp;GmailApp.sendEmail(d.to,d.subject,d.body);<br>
-      &nbsp;&nbsp;return ContentService.createTextOutput('ok');<br>
-      }
-    </div>
-    <button onclick="copyGasCode()" class="gbtn" style="width:100%;margin-top:6px;font-size:11px">📋 Copiar código del script</button>
+</div>
+</div>
+
+<!-- ══ FEEDBACK ══ -->
+<div class="screen" id="s-feedback">
+<div class="pw">
+  <div class="pt">Feed<em>back</em> 💬</div>
+  <div class="ps">Tu opinión llega directamente al desarrollador</div>
+
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tipo de mensaje</div>
+  <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap" id="fb-tipo-row">
+    <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
+    <div class="chip" data-t="bug" onclick="fbTipo(this)">🐛 Bug</div>
+    <div class="chip" data-t="pregunta" onclick="fbTipo(this)">❓ Pregunta</div>
+    <div class="chip" data-t="otro" onclick="fbTipo(this)">✉️ Otro</div>
   </div>
+
+  <div><div class="sl">Asunto <span style="color:var(--t3);font-weight:400">(opcional)</span></div>
+    <input class="inp" id="fb-asunto" placeholder="Ej: No me carga el pomodoro..." style="margin-bottom:12px">
+  </div>
+
+  <div><div class="sl">Mensaje</div>
+    <textarea class="inp ta" id="fb-msg" style="min-height:120px;margin-bottom:4px" placeholder="Cuéntanos qué pasó, qué mejorarías o cualquier duda..."></textarea>
+    <div id="fb-char" style="font-size:10px;color:var(--t3);text-align:right">0 caracteres</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;margin-top:8px;background:rgba(45,212,191,.06);border-color:rgba(45,212,191,.2)">
+    <div style="font-size:11px;color:var(--t2);line-height:1.6" id="fb-info">📨 El mensaje llegará directamente a paco58760@gmail.com.</div>
+  </div>
+
+  <button class="mbtn" id="fb-send-btn" onclick="sendFeedback()">📧 Enviar mensaje</button>
 </div>
 </div>
 
@@ -1557,15 +1563,33 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-ranking">
 <div class="pw">
   <div class="pt">Ran<em>king</em> 🏅</div>
-  <div class="ps">Comparte tu progreso con amigos</div>
+  <div class="ps">Comparte tu perfil · compite con tus compañeros</div>
+
+  <!-- Mi perfil + compartir -->
   <div id="rank-mi-tarjeta" style="margin-bottom:14px"></div>
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Añadir compañero</div>
-  <div class="card" style="margin-bottom:14px">
-    <div class="sl">Pega el código de tu compañero</div>
-    <input class="inp" id="rank-code-inp" placeholder="Código de Lumio..." style="margin-bottom:8px">
-    <button class="mbtn" onclick="importRankCode()">Añadir al ranking</button>
+
+  <!-- Cómo funciona -->
+  <div class="card" style="margin-bottom:14px;background:rgba(245,197,24,.06);border-color:var(--yb)">
+    <div style="font-size:12px;font-weight:700;color:var(--y);margin-bottom:6px">¿Cómo funciona?</div>
+    <div style="font-size:11px;color:var(--t2);line-height:1.7">
+      1. Pulsa <b>Compartir mi perfil</b> → envía el enlace a un compañero<br>
+      2. Tu compañero abre el enlace → aparece en tu ranking automáticamente<br>
+      3. También puedes pegar el código de un compañero manualmente
+    </div>
   </div>
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Clasificación</div>
+
+  <!-- Añadir compañero por código -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Añadir por código</div>
+  <div class="card" style="margin-bottom:14px">
+    <input class="inp" id="rank-code-inp" placeholder="Pega el código de tu compañero..." style="margin-bottom:8px">
+    <button class="mbtn" onclick="importRankCode()">➕ Añadir al ranking</button>
+  </div>
+
+  <!-- Clasificación -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Clasificación</div>
+    <button onclick="renderRanking()" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer">↺ Actualizar</button>
+  </div>
   <div id="rank-lista"></div>
 </div>
 </div>
@@ -1647,34 +1671,6 @@ button:active{transform:scale(.97)}
 
 <!-- MODALS -->
 <!-- API key not needed - built into Lumio -->
-
-<!-- MODAL FEEDBACK -->
-<div class="mo" id="feedback-mo" style="display:none"><div class="mobox">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-    <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
-    <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
-  </div>
-  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
-  <div><div class="sl">Tipo</div>
-    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
-      <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
-      <div class="chip" data-t="bug" onclick="fbTipo(this)">🐛 Bug</div>
-      <div class="chip" data-t="pregunta" onclick="fbTipo(this)">❓ Pregunta</div>
-      <div class="chip" data-t="otro" onclick="fbTipo(this)">✉️ Otro</div>
-    </div>
-  </div>
-  <div><div class="sl">Asunto</div>
-    <input class="inp" id="fb-asunto" placeholder="Ej: No funciona el pomodoro" style="margin-bottom:8px">
-  </div>
-  <div><div class="sl">Mensaje</div>
-    <textarea class="inp ta" id="fb-msg" style="min-height:90px" placeholder="Cuéntanos qué pasó o qué mejorarías..."></textarea>
-  </div>
-  <div style="font-size:11px;color:var(--t2);margin-top:4px;line-height:1.5" id="fb-info">Cargando...</div>
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <button class="gbtn" style="flex:1" onclick="clsMo('feedback')">Cancelar</button>
-    <button class="mbtn" style="flex:2;border-radius:10px;padding:11px" onclick="sendFeedback()">📧 Enviar mensaje</button>
-  </div>
-</div></div>
 
 <!-- MODAL CREAR / EDITAR FLASHCARD -->
 <div class="mo" id="fc-add-mo" style="display:none"><div class="mobox">
@@ -1847,7 +1843,6 @@ const GITHUB_RAW_URL='';
 
 // ── Google Apps Script — pega aquí la URL de tu web app desplegada ──
 // Instrucciones más abajo en la pantalla de Ajustes → Feedback
-const GAS_FEEDBACK_URL = '';   // p.ej: https://script.google.com/macros/s/XXXXX/exec
 
 const D={
   user:{name:'Raúl',curso:'2º ESO',streak:0,hours:0,pomodorosDone:0,cardsRevised:0,xp:0},
@@ -2025,8 +2020,8 @@ const SECTIONS={
     labels:['🔢 Calculadora','📐 Fórmulas','🔤 Conjugador','⚖️ Conversor','⚗️ Tabla P.','🌐 Vocabulario','🎓 Calc. notas','📊 Presentación','📜 Historia'],
   },
   perfil:{
-    screens:['stats','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','ajustes'],
-    labels:['📊 Estadísticas','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','⚙️ Ajustes'],
+    screens:['stats','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','feedback','ajustes'],
+    labels:['📊 Estadísticas','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','💬 Feedback','⚙️ Ajustes'],
   },
 };
 let currentSection='home';let currentScreen='home';
@@ -2052,7 +2047,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes};
+  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback};
   if(bldrs[id])bldrs[id]();
   document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
   const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
@@ -3760,6 +3755,12 @@ function toggleTheme(){
 // ════════════════════════════════════════════════════════
 // Cursos disponibles
 const CURSOS=[
+  {id:'1pri', label:'1º Primaria', ico:'🌈'},
+  {id:'2pri', label:'2º Primaria', ico:'⭐'},
+  {id:'3pri', label:'3º Primaria', ico:'🌟'},
+  {id:'4pri', label:'4º Primaria', ico:'🎯'},
+  {id:'5pri', label:'5º Primaria', ico:'🚀'},
+  {id:'6pri', label:'6º Primaria', ico:'🏅'},
   {id:'1eso', label:'1º ESO', ico:'🌱'},
   {id:'2eso', label:'2º ESO', ico:'📗'},
   {id:'3eso', label:'3º ESO', ico:'📘'},
@@ -3770,14 +3771,20 @@ const CURSOS=[
   {id:'otro', label:'Otro',        ico:'📚'},
 ];
 const MATS_POR_CURSO={
-  '1eso':['Matemáticas','Lengua','Inglés','Ciencias Naturales','Ciencias Sociales','Tecnología','Ed. Plástica','Ed. Física','Música','Religión'],
-  '2eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés'],
-  '3eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés'],
-  '4eso':['Matemáticas Académicas','Matemáticas Aplicadas','Lengua','Inglés','Biología','Física y Química','Historia','Geografía','Tecnología','Economía','Latín','Francés'],
-  '1bach':['Matemáticas I','Lengua y Literatura','Inglés','Física','Química','Biología','Historia del Mundo','Filosofía','Economía','Dibujo Técnico','Latín','Francés'],
-  '2bach':['Matemáticas II','Lengua y Literatura','Inglés','Física','Química','Biología','Historia de España','Historia del Arte','Filosofía','Economía','Latín','Griego'],
-  'fp':   ['Módulo 1','Módulo 2','Módulo 3','Módulo 4','FCT/Prácticas'],
-  'otro': ['Asignatura 1','Asignatura 2','Asignatura 3','Asignatura 4','Asignatura 5'],
+  '1pri':['Lengua','Matemáticas','Inglés','Conocimiento del Medio','Ed. Artística','Ed. Física','Religión','Catalán'],
+  '2pri':['Lengua','Matemáticas','Inglés','Conocimiento del Medio','Ed. Artística','Ed. Física','Religión','Catalán'],
+  '3pri':['Lengua','Matemáticas','Inglés','Ciencias Naturales','Ciencias Sociales','Ed. Artística','Ed. Física','Música','Religión','Catalán'],
+  '4pri':['Lengua','Matemáticas','Inglés','Ciencias Naturales','Ciencias Sociales','Ed. Artística','Ed. Física','Música','Religión','Catalán'],
+  '5pri':['Lengua','Matemáticas','Inglés','Ciencias Naturales','Ciencias Sociales','Ed. Artística','Ed. Física','Música','Religión','Francés','Catalán'],
+  '6pri':['Lengua','Matemáticas','Inglés','Ciencias Naturales','Ciencias Sociales','Ed. Artística','Ed. Física','Música','Religión','Francés','Catalán'],
+  '1eso':['Matemáticas','Lengua','Inglés','Ciencias Naturales','Ciencias Sociales','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Alemán','Catalán','Cooperación'],
+  '2eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés','Alemán','Catalán','Cooperación'],
+  '3eso':['Matemáticas','Biología y Geo.','Física y Química','Geografía e Hist.','Lengua','Inglés','Tecnología','Ed. Plástica','Ed. Física','Música','Religión','Francés','Alemán','Catalán','Cooperación'],
+  '4eso':['Matemáticas Académicas','Matemáticas Aplicadas','Lengua','Inglés','Biología','Física y Química','Historia','Geografía','Tecnología','Economía','Latín','Francés','Alemán','Catalán','Cooperación'],
+  '1bach':['Matemáticas I','Lengua y Literatura','Inglés','Física','Química','Biología','Historia del Mundo','Filosofía','Economía','Dibujo Técnico','Latín','Francés','Alemán','Catalán','Cooperación'],
+  '2bach':['Matemáticas II','Lengua y Literatura','Inglés','Física','Química','Biología','Historia de España','Historia del Arte','Filosofía','Economía','Latín','Griego','Alemán','Catalán','Cooperación'],
+  'fp':   ['Módulo 1','Módulo 2','Módulo 3','Módulo 4','FCT/Prácticas','Alemán','Catalán','Cooperación'],
+  'otro': ['Asignatura 1','Asignatura 2','Asignatura 3','Asignatura 4','Asignatura 5','Alemán','Catalán','Cooperación'],
 };
 const MAT_COLORS={
   'Matemáticas':'#f5c518','Matemáticas I':'#f5c518','Matemáticas II':'#f5c518',
@@ -3789,8 +3796,10 @@ const MAT_COLORS={
   'Ciencias Sociales':'#fb923c','Historia del Arte':'#a3e635',
   'Lengua':'#f472b6','Lengua y Literatura':'#f472b6',
   'Inglés':'#c084fc','Francés':'#a78bfa','Latín':'#e879f9','Griego':'#d946ef',
+  'Alemán':'#e11d48','Catalán':'#f59e0b','Cooperación':'#0ea5e9',
   'Tecnología':'#2dd4bf','Dibujo Técnico':'#14b8a6',
-  'Ed. Plástica':'#e879f9','Economía':'#34d399','Filosofía':'#94a3b8',
+  'Ed. Plástica':'#e879f9','Ed. Artística':'#f0abfc','Conocimiento del Medio':'#34d399',
+  'Economía':'#34d399','Filosofía':'#94a3b8',
   'Ed. Física':'#f87171','Música':'#fbbf24','Religión':'#e2e8f0',
   'Módulo 1':'#60a5fa','Módulo 2':'#34d399','Módulo 3':'#f472b6',
   'Módulo 4':'#fb923c','FCT/Prácticas':'#f5c518',
@@ -3806,10 +3815,11 @@ const MAT_EMOJI={
   'Historia de España':'🏛️','Historia':'📜','Geografía':'🌎',
   'Ciencias Sociales':'🌍','Historia del Arte':'🖼️',
   'Lengua':'📖','Lengua y Literatura':'📖',
-  'Inglés':'🇬🇧','Francés':'🇫🇷',
+  'Inglés':'🇬🇧','Francés':'🇫🇷','Alemán':'🇩🇪','Catalán':'🟡','Cooperación':'🤝',
   'Latín':'📜','Griego':'🏛️',
   'Tecnología':'🔧','Dibujo Técnico':'📏',
-  'Ed. Plástica':'🎨','Economía':'💰','Filosofía':'🤔',
+  'Ed. Plástica':'🎨','Ed. Artística':'🎨','Conocimiento del Medio':'🌿',
+  'Economía':'💰','Filosofía':'🤔',
   'Ed. Física':'🏃','Música':'🎵','Religión':'✝️',
   'Módulo 1':'📋','Módulo 2':'📋','Módulo 3':'📋',
   'Módulo 4':'📋','FCT/Prácticas':'🏭',
@@ -4708,52 +4718,167 @@ function bVacaciones(){
 // ════════════════════════════════════════════════════════
 // RANKING
 // ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// RANKING — P2P vía enlaces compartibles (sin servidor)
+// ════════════════════════════════════════════════════════
+
+// Genera un perfil comprimido como base64
+function getRankProfile(){
+  return {
+    n: D.user.name,
+    c: D.user.curso||'ESO',
+    h: +(D.user.hours||0).toFixed(1),
+    p: D.user.pomodorosDone||0,
+    xp: D.user.xp||0,
+    s: D.user.streak||0,
+    t: Date.now(), // timestamp — para ver si los datos son recientes
+  };
+}
+function encodeProfile(profile){
+  return btoa(JSON.stringify(profile)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+}
+function decodeProfile(code){
+  const padded=code.replace(/-/g,'+').replace(/_/g,'/');
+  const pad=padded.length%4===0?0:4-(padded.length%4);
+  return JSON.parse(atob(padded+'='.repeat(pad)));
+}
+function getRankUrl(){
+  // Genera una URL que al abrirse auto-importa el perfil
+  const base=location.href.split('#')[0].split('?')[0];
+  return base+'?lumio_peer='+encodeProfile(getRankProfile());
+}
+
+// Al cargar la app, comprobar si hay un perfil en la URL para auto-importar
+function checkRankUrlImport(){
+  const params=new URLSearchParams(location.search);
+  const peerCode=params.get('lumio_peer');
+  if(!peerCode)return;
+  // Limpiar la URL sin recargar
+  history.replaceState(null,'',location.pathname);
+  try{
+    const data=decodeProfile(peerCode);
+    if(!data.n)return;
+    const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]');
+    if(peers.find(p=>p.n===data.n)){
+      // Actualizar datos si ya existe
+      const idx=peers.findIndex(p=>p.n===data.n);
+      peers[idx]={...data,code:peerCode,fecha:new Date().toLocaleDateString('es-ES')};
+      localStorage.setItem('lumio_peers',JSON.stringify(peers));
+      toast('🔄 Perfil de '+data.n+' actualizado');
+    }else{
+      peers.push({...data,code:peerCode,fecha:new Date().toLocaleDateString('es-ES')});
+      localStorage.setItem('lumio_peers',JSON.stringify(peers));
+      toast('🏅 ¡'+data.n+' añadido al ranking!');
+    }
+  }catch(e){}
+}
+
 function bRanking(){
-  const myCode=btoa(JSON.stringify({n:D.user.name,h:+(D.user.hours||0).toFixed(1),p:D.user.pomodorosDone||0,xp:D.user.xp||0,s:D.user.streak||0})).slice(0,24);
+  const myCode=encodeProfile(getRankProfile());
+  const myUrl=getRankUrl();
   document.getElementById('rank-mi-tarjeta').innerHTML=`
     <div class="card card-y">
-      <div style="font-size:10px;font-weight:800;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tu código Lumio</div>
-      <div style="font-size:14px;font-weight:800;color:var(--t1);letter-spacing:.05em;margin-bottom:8px;font-family:monospace">${myCode}</div>
-      <button class="gbtn" style="font-size:12px;width:100%" onclick="navigator.clipboard?.writeText('${myCode}').then(()=>toast('📋 Código copiado'))">📋 Copiar mi código</button>
-      <div style="margin-top:10px;display:flex;justify-content:space-around;text-align:center">
-        <div><div style="font-size:20px;font-weight:900;color:var(--y)">${+(D.user.hours||0).toFixed(1)}h</div><div style="font-size:10px;color:var(--t2)">estudiadas</div></div>
-        <div><div style="font-size:20px;font-weight:900;color:var(--teal)">${D.user.pomodorosDone||0}</div><div style="font-size:10px;color:var(--t2)">pomodoros</div></div>
-        <div><div style="font-size:20px;font-weight:900;color:var(--orange)">${D.user.streak||0}🔥</div><div style="font-size:10px;color:var(--t2)">racha</div></div>
+      <div style="font-size:10px;font-weight:800;color:var(--y);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Tu perfil Lumio</div>
+      <div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:12px">
+        <div><div style="font-size:22px;font-weight:900;color:var(--y)">${+(D.user.hours||0).toFixed(1)}h</div><div style="font-size:10px;color:var(--t2)">estudiadas</div></div>
+        <div><div style="font-size:22px;font-weight:900;color:var(--teal)">${D.user.pomodorosDone||0}</div><div style="font-size:10px;color:var(--t2)">pomodoros</div></div>
+        <div><div style="font-size:22px;font-weight:900;color:var(--orange)">${D.user.streak||0}🔥</div><div style="font-size:10px;color:var(--t2)">racha</div></div>
+        <div><div style="font-size:22px;font-weight:900;color:var(--purple)">${D.user.xp||0}</div><div style="font-size:10px;color:var(--t2)">XP</div></div>
       </div>
+      <div style="display:flex;gap:7px">
+        <button class="mbtn" style="flex:1;font-size:12px" onclick="shareRankProfile()">📤 Compartir mi perfil</button>
+        <button class="gbtn" style="flex:1;font-size:12px" onclick="copyRankCode()">📋 Copiar código</button>
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:8px;text-align:center">Tu código: <span style="font-family:monospace;color:var(--y);letter-spacing:.05em">${myCode.slice(0,16)}…</span></div>
     </div>`;
   renderRanking();
 }
+
+async function shareRankProfile(){
+  const url=getRankUrl();
+  const text=`¡Únete a mi ranking en Lumio! Toca el enlace para ver mi progreso 🏅`;
+  if(navigator.share){
+    try{
+      await navigator.share({title:'Lumio — Mi perfil',text,url});
+    }catch(e){}
+  }else{
+    // Fallback: copiar al portapapeles
+    navigator.clipboard?.writeText(url)
+      .then(()=>toast('🔗 Enlace copiado — compártelo con tus compañeros'))
+      .catch(()=>toast('🔗 Copia este enlace: '+url.slice(0,50)+'…'));
+  }
+}
+function copyRankCode(){
+  const code=encodeProfile(getRankProfile());
+  navigator.clipboard?.writeText(code)
+    .then(()=>toast('📋 Código copiado — pásaselo a tu compañero'))
+    .catch(()=>toast('Copia manualmente: '+code.slice(0,20)+'…'));
+}
+
 function importRankCode(){
-  const code=document.getElementById('rank-code-inp').value.trim();
-  if(!code){toast('⚠️ Pega el código de tu compañero');return;}
+  const raw=document.getElementById('rank-code-inp').value.trim();
+  if(!raw){toast('⚠️ Pega el código o enlace de tu compañero');return;}
   try{
-    const data=JSON.parse(atob(code.padEnd(code.length+((4-code.length%4)%4),'=')));
-    if(!data.n){throw new Error('Código inválido');}
+    // Aceptar tanto código puro como URL completa
+    let code=raw;
+    if(raw.includes('lumio_peer=')){
+      code=new URL(raw).searchParams.get('lumio_peer')||raw;
+    }
+    const data=decodeProfile(code);
+    if(!data.n)throw new Error('Código inválido');
     const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]');
-    if(peers.find(p=>p.n===data.n)){toast('⚠️ '+data.n+' ya está en tu ranking');return;}
-    peers.push({...data,code,fecha:new Date().toLocaleDateString('es-ES')});
+    const idx=peers.findIndex(p=>p.n===data.n);
+    if(idx>=0){
+      peers[idx]={...data,code,fecha:new Date().toLocaleDateString('es-ES')};
+      toast('🔄 Perfil de '+data.n+' actualizado');
+    }else{
+      peers.push({...data,code,fecha:new Date().toLocaleDateString('es-ES')});
+      toast('🏅 '+data.n+' añadido al ranking!');gainXP(5);
+    }
     localStorage.setItem('lumio_peers',JSON.stringify(peers));
     document.getElementById('rank-code-inp').value='';
-    renderRanking();toast('🏅 '+data.n+' añadido al ranking');gainXP(5);
+    renderRanking();
   }catch(e){toast('❌ Código inválido');}
 }
+
 function renderRanking(){
   const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]');
-  const todos=[{n:D.user.name,h:+(D.user.hours||0).toFixed(1),p:D.user.pomodorosDone||0,xp:D.user.xp||0,s:D.user.streak||0,yo:true},...peers];
-  todos.sort((a,b)=>b.h-a.h);
+  const yo={n:D.user.name,c:D.user.curso||'ESO',h:+(D.user.hours||0).toFixed(1),p:D.user.pomodorosDone||0,xp:D.user.xp||0,s:D.user.streak||0,yo:true};
+  const todos=[yo,...peers];
+  todos.sort((a,b)=>b.xp-a.xp); // ordenar por XP
   const medals=['🥇','🥈','🥉'];
-  document.getElementById('rank-lista').innerHTML=todos.map((u,i)=>`
-    <div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px${u.yo?';border-color:var(--yb)':''}">
-      <div style="font-size:22px;width:28px;text-align:center">${medals[i]||i+1}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:var(--t1)">${u.n}${u.yo?' (tú)':''}</div>
-        <div style="font-size:10px;color:var(--t2);margin-top:1px">${u.p} pomodoros · ${u.s}🔥 racha · ${u.xp} XP</div>
+  const el=document.getElementById('rank-lista');
+  if(!el)return;
+  if(todos.length===1){
+    el.innerHTML=`<div style="text-align:center;padding:24px 16px;color:var(--t3)">
+      <div style="font-size:32px;margin-bottom:8px">👥</div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Sois solo tú por ahora</div>
+      <div style="font-size:11px;line-height:1.6">Comparte tu perfil con compañeros<br>para empezar a competir</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=todos.map((u,i)=>{
+    const isTop=i<3;
+    const freshness=u.yo?'Ahora':u.t?(() => {const d=Math.round((Date.now()-u.t)/864e5);return d===0?'Hoy':d===1?'Ayer':d+'d atrás';})():'—';
+    return`<div class="card fade-in" style="margin-bottom:8px;display:flex;align-items:center;gap:12px${u.yo?';border-color:var(--yb)':''}">
+      <div style="font-size:${isTop?'24':'16'}px;width:30px;text-align:center;flex-shrink:0">${medals[i]||'#'+(i+1)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:${u.yo?'var(--y)':'var(--t1)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.n}${u.yo?' 👈':''}</div>
+        <div style="font-size:10px;color:var(--t2);margin-top:1px">${u.c||''} · ${u.p} 🍅 · ${u.s}🔥 · ${freshness}</div>
       </div>
-      <div style="text-align:right">
-        <div style="font-size:18px;font-weight:900;color:var(--y)">${u.h}h</div>
-        <div style="font-size:9px;color:var(--t3)">esta semana</div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:18px;font-weight:900;color:var(--purple)">${u.xp}</div>
+        <div style="font-size:9px;color:var(--t3)">XP</div>
       </div>
-    </div>`).join('');
+      ${!u.yo?`<button onclick="removeRankPeer('${u.n}')" style="background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer;padding:4px">✕</button>`:''}
+    </div>`;
+  }).join('');
+}
+function removeRankPeer(name){
+  if(!confirm('¿Eliminar a '+name+' del ranking?'))return;
+  const peers=JSON.parse(localStorage.getItem('lumio_peers')||'[]').filter(p=>p.n!==name);
+  localStorage.setItem('lumio_peers',JSON.stringify(peers));
+  renderRanking();toast('🗑 '+name+' eliminado');
 }
 
 // ════════════════════════════════════════════════════════
@@ -4939,94 +5064,95 @@ function changeCurso(id){
   setTimeout(bAjustes,100);
 }
 
-function saveGasUrl(){
-  const url=(document.getElementById('gas-url-inp')?.value||'').trim();
-  if(url&&!url.startsWith('https://script.google.com')){
-    toast('⚠️ La URL debe empezar por https://script.google.com');return;
-  }
-  localStorage.setItem('lumio_gas_url',url);
-  // Update the global constant at runtime
-  window._gasUrl=url;
-  toast(url?'✅ URL guardada — el feedback se enviará automáticamente':'🗑 URL eliminada');
-  bAjustes();
-}
-// Override GAS_FEEDBACK_URL with saved value at runtime
-Object.defineProperty(window,'GAS_FEEDBACK_URL',{get:()=>localStorage.getItem('lumio_gas_url')||'',configurable:true});
-function copyGasCode(){
-  const code=`function doPost(e){
-  var d=JSON.parse(e.postData.contents);
-  GmailApp.sendEmail(d.to,d.subject,d.body);
-  return ContentService.createTextOutput('ok');
-}`;
-  navigator.clipboard?.writeText(code)
-    .then(()=>toast('📋 Código copiado — pégalo en script.google.com'))
-    .catch(()=>toast('Copia el código manualmente'));
-}
+// (feedback via FormSubmit — see sendFeedback)
 
 // ════════════════════════════════════════════════════════
-// FEEDBACK
+// FEEDBACK — FormSubmit.co (sin servidor, sin configuración)
+// formsubmit.co es un relay gratuito: solo hace falta confirmar
+// el email la primera vez que llega un mensaje.
 // ════════════════════════════════════════════════════════
+const FEEDBACK_EMAIL = 'paco58760@gmail.com';
 let fbTipoSel='idea';
-function showFeedback(){
+
+function bFeedback(){
+  // Reset form when entering the screen
   fbTipoSel='idea';
   document.querySelectorAll('#fb-tipo-row .chip').forEach(c=>c.classList.remove('on'));
   const defChip=document.querySelector('#fb-tipo-row .chip[data-t="idea"]');
   if(defChip)defChip.classList.add('on');
-  const asunto=document.getElementById('fb-asunto');
-  const msg=document.getElementById('fb-msg');
-  if(asunto)asunto.value='';
-  if(msg)msg.value='';
-  const info=document.getElementById('fb-info');
-  if(info){
-    info.innerHTML=GAS_FEEDBACK_URL
-      ?'✅ Envío automático activo.'
-      :'⚙️ Configura Google Apps Script para envío automático. Instrucciones en <b>Ajustes → Configurar feedback</b>.';
+  // Wire char counter
+  const msgEl=document.getElementById('fb-msg');
+  const charEl=document.getElementById('fb-char');
+  if(msgEl&&charEl){
+    msgEl.addEventListener('input',function(){charEl.textContent=this.value.length+' caracteres';});
   }
-  document.getElementById('feedback-mo').style.display='flex';
-  setTimeout(()=>document.getElementById('fb-asunto')?.focus(),150);
 }
+
 function fbTipo(el){
   fbTipoSel=el.dataset.t;
   document.querySelectorAll('#fb-tipo-row .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
 }
+
 async function sendFeedback(){
   const asunto=(document.getElementById('fb-asunto')?.value||'').trim();
   const msg=(document.getElementById('fb-msg')?.value||'').trim();
   if(!msg){toast('⚠️ Escribe un mensaje antes de enviar');return;}
   const tipoLabel={'idea':'💡 Idea','bug':'🐛 Bug','pregunta':'❓ Pregunta','otro':'✉️ Otro'}[fbTipoSel]||'Otro';
   const subject=`[Lumio ${APP_VERSION}] ${tipoLabel}${asunto?' — '+asunto:''}`;
-  const bodyText=`Tipo: ${tipoLabel}\n\nMensaje:\n${msg}\n\n---\nLumio v${APP_VERSION} · ${D.user.name}\nPomodoros: ${D.user.pomodorosDone} · XP: ${D.user.xp}`;
-  // ── Envío automático vía Google Apps Script (tu propia cuenta Google) ──
-  if(GAS_FEEDBACK_URL){
-    const sendBtn=document.querySelector('#feedback-mo .mbtn');
-    if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Enviando...';}
-    try{
-      const res=await fetch(GAS_FEEDBACK_URL,{
-        method:'POST',
-        mode:'no-cors', // GAS no devuelve CORS headers — usamos no-cors
-        headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({to:'paco58760@gmail.com',subject,body:bodyText,user:D.user.name,version:APP_VERSION})
-      });
-      // no-cors siempre devuelve respuesta opaca — asumimos éxito si no hay excepción
-      clsMo('feedback');
-      toast('✅ ¡Mensaje enviado! Gracias por tu feedback');
-    }catch(e){
-      toast('❌ Error al enviar. Comprueba tu conexión.');
-    }finally{
-      if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='📧 Enviar mensaje';}
+  const bodyText=`Tipo: ${tipoLabel}\n\nMensaje:\n${msg}\n\n---\nLumio v${APP_VERSION} · ${D.user.name}\nCurso: ${D.user.curso||'—'}\nPomodoros: ${D.user.pomodorosDone} · XP: ${D.user.xp}`;
+
+  const sendBtn=document.getElementById('fb-send-btn');
+  const info=document.getElementById('fb-info');
+  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Enviando...';}
+
+  try{
+    const res=await fetch(`https://formsubmit.co/ajax/${FEEDBACK_EMAIL}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({
+        _subject: subject,
+        _template: 'table',
+        _captcha: 'false',
+        nombre: D.user.name,
+        curso: D.user.curso||'—',
+        tipo: tipoLabel,
+        asunto: asunto||'(sin asunto)',
+        mensaje: msg,
+        version: APP_VERSION,
+        stats: `${D.user.pomodorosDone} pomodoros · ${D.user.xp} XP`,
+      })
+    });
+    const data=await res.json();
+    if(data.success==='true'||data.success===true){
+      // Clear form
+      const msgEl=document.getElementById('fb-msg');
+      const asuEl=document.getElementById('fb-asunto');
+      if(msgEl)msgEl.value='';
+      if(asuEl)asuEl.value='';
+      if(info)info.innerHTML='✅ <b style="color:var(--green)">¡Mensaje enviado!</b> Gracias por tu feedback.';
+      toast('✅ ¡Mensaje enviado! Gracias');
+      gainXP(5);
+    }else{
+      throw new Error(data.message||'Error desconocido');
     }
-    return;
+  }catch(e){
+    // Fallback: Web Share nativo del móvil
+    if(navigator.share){
+      try{
+        await navigator.share({title:subject,text:'Hola,\n\n'+bodyText});
+        toast('✅ Compartido correctamente');
+        if(info)info.innerHTML='✅ Mensaje compartido.';
+      }catch(shareErr){
+        if(info)info.innerHTML='ℹ️ Envío cancelado.';
+      }
+    }else{
+      if(info)info.innerHTML='⚠️ Sin conexión. Comprueba el internet e inténtalo de nuevo.';
+      toast('❌ Error de red — inténtalo de nuevo');
+    }
+  }finally{
+    if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='📧 Enviar mensaje';}
   }
-  // ── Fallback: abrir app de correo ──
-  const mailtoUrl='mailto:paco58760@gmail.com'
-    +'?subject='+encodeURIComponent(subject)
-    +'&body='+encodeURIComponent('Hola,\n\n'+bodyText);
-  const link=document.createElement('a');
-  link.href=mailtoUrl;link.target='_blank';
-  document.body.appendChild(link);link.click();document.body.removeChild(link);
-  clsMo('feedback');
-  toast('📧 Abriendo tu app de correo...');
 }
 
 function toggleAnayaPass(){
@@ -5342,6 +5468,9 @@ if('serviceWorker' in navigator){
 
     // Update about creator name
     const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
+
+    // Check for peer profile in URL (shared ranking link)
+    try{checkRankUrlImport();}catch(e){}
 
     // Init screens — each wrapped so one crash doesn't stop the rest
     try{bHome();}catch(e){}
