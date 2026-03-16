@@ -1524,13 +1524,13 @@ button:active{transform:scale(.97)}
       </div>
       <div>
         <div style="font-size:16px;font-weight:900;color:var(--t1)">Lumio</div>
-        <div style="font-size:11px;color:var(--t2)">Versión <span id="about-version">3.1.0</span> · 2025</div>
+        <div style="font-size:11px;color:var(--t2)">Versión <span id="about-version">3.1.0</span> · 2026</div>
       </div>
     </div>
     <div style="height:1px;background:var(--bd);margin:12px 0"></div>
     <div style="font-size:12px;color:var(--t2);line-height:1.8">
       <div><span style="color:var(--t3)">Creado por</span> <span style="font-weight:700;color:var(--t1)" id="about-creator">Raúl</span></div>
-      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)" id="about-curso-label">2º ESO · 2024–2025</span></div>
+      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)" id="about-curso-label">2º ESO · 2025–2026</span></div>
       <div><span style="color:var(--t3)">Tecnología</span> <span style="font-weight:700;color:var(--t1)">HTML · CSS · JS · Claude AI</span></div>
     </div>
   </div>
@@ -1950,7 +1950,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-vacaciones">
 <div class="pw">
   <div class="pt">Calen<em>dario escolar</em> 🗓️</div>
-  <div class="ps">Curso 2024–2025</div>
+  <div class="ps" id="vac-curso-label">Curso 2025–2026</div>
   <div id="vac-countdown" style="margin-bottom:14px"></div>
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Próximas fechas</div>
   <div id="vac-list"></div>
@@ -3482,7 +3482,12 @@ function setTemas(matId,val){
 
 function matTab(btn){
   document.querySelectorAll('#mat-tabs .tabb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
-  ['info','apuntes','grafica'].forEach(t=>document.getElementById('mat-'+t).style.display=t===btn.dataset.t?'block':'none');
+  const t=btn.dataset.t;
+  ['info','editar','apuntes','grafica'].forEach(id=>{
+    const el=document.getElementById('mat-'+id);
+    if(el)el.style.display=id===t?'block':'none';
+  });
+  if(t==='editar')renderMatEdit();
 }
 function openApunte(mat){
   apuMat=mat;
@@ -5735,7 +5740,7 @@ function showTutStep(){
         ${tutStep>0?`<button onclick="tutStep--;showTutStep()" style="flex:1;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">← Atrás</button>`:''}
         <button onclick="tutStep++;showTutStep()" style="flex:2;background:${s.color||'var(--y)'};color:${s.color&&s.color!=='var(--y)'?'#fff':'#0d0f14'};border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
       </div>
-      <button onclick="tutStep=STEPS.length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:0 0 14px;text-align:center">Saltar recorrido</button>
+      <button onclick="tutStep=getTutSteps().length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:0 0 14px;text-align:center">Saltar recorrido</button>
     </div>`;
 }
 
@@ -6341,21 +6346,23 @@ function deleteDeber(id){
 // VACACIONES Y CALENDARIO ESCOLAR
 // ════════════════════════════════════════════════════════
 const CALENDARIO_ESCOLAR=[
-  {n:'Inicio curso',fecha:'2024-09-09',ico:'🏫',tipo:'inicio'},
-  {n:'Fiestas Nacionales (12 oct)',fecha:'2024-10-12',ico:'🇪🇸',tipo:'festivo'},
-  {n:'Vacaciones de Navidad',fecha:'2024-12-21',fechaFin:'2025-01-07',ico:'🎄',tipo:'vacaciones'},
-  {n:'Vuelta de Navidad',fecha:'2025-01-08',ico:'📚',tipo:'inicio'},
-  {n:'Semana Santa',fecha:'2025-04-12',fechaFin:'2025-04-20',ico:'🐣',tipo:'vacaciones'},
-  {n:'Vuelta de Semana Santa',fecha:'2025-04-22',ico:'📚',tipo:'inicio'},
-  {n:'Festivo 1 de Mayo',fecha:'2025-05-01',ico:'🌹',tipo:'festivo'},
-  {n:'Fin de curso ESO',fecha:'2025-06-20',ico:'🎓',tipo:'fin'},
+  {n:'Inicio curso',fecha:'2025-09-08',ico:'🏫',tipo:'inicio'},
+  {n:'Fiesta Nacional (12 oct)',fecha:'2025-10-12',ico:'🇪🇸',tipo:'festivo'},
+  {n:'Vacaciones de Navidad',fecha:'2025-12-22',fechaFin:'2026-01-06',ico:'🎄',tipo:'vacaciones'},
+  {n:'Vuelta de Navidad',fecha:'2026-01-07',ico:'📚',tipo:'inicio'},
+  {n:'Semana Santa',fecha:'2026-04-01',fechaFin:'2026-04-09',ico:'🐣',tipo:'vacaciones'},
+  {n:'Vuelta de Semana Santa',fecha:'2026-04-09',ico:'📚',tipo:'inicio'},
+  {n:'Festivo 1 de Mayo',fecha:'2026-05-01',ico:'🌹',tipo:'festivo'},
+  {n:'Fin de curso',fecha:'2026-06-19',ico:'🎓',tipo:'fin'},
 ];
 const TRIMESTRES=[
-  {n:'1er Trimestre',inicio:'2024-09-09',fin:'2024-12-20',ico:'🍂'},
-  {n:'2º Trimestre',inicio:'2025-01-08',fin:'2025-04-11',ico:'❄️'},
-  {n:'3er Trimestre',inicio:'2025-04-22',fin:'2025-06-20',ico:'🌸'},
+  {n:'1er Trimestre',inicio:'2025-09-08',fin:'2025-12-19',ico:'🍂'},
+  {n:'2º Trimestre',inicio:'2026-01-07',fin:'2026-03-27',ico:'❄️'},
+  {n:'3er Trimestre',inicio:'2026-04-09',fin:'2026-06-19',ico:'🌸'},
 ];
 function bVacaciones(){
+  const vcl=document.getElementById('vac-curso-label');if(vcl)vcl.textContent='Curso '+getSchoolYear();
+
   const now=new Date();const hoy=now.toISOString().split('T')[0];
   // Next vacation countdown
   const proxVac=CALENDARIO_ESCOLAR.filter(e=>e.tipo==='vacaciones'&&e.fecha>hoy).sort((a,b)=>a.fecha.localeCompare(b.fecha))[0];
@@ -8125,11 +8132,20 @@ function bAjustes(){
   }
 }
 // Update all hardcoded course references throughout the UI
+// Returns current school year string e.g. "2025-2026"
+function getSchoolYear(){
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=now.getMonth()+1; // 1-12
+  // School year starts in September
+  const startYear=m>=9?y:y-1;
+  return startYear+'–'+(startYear+1);
+}
 function updateCursoLabels(){
   const curso=D.user.curso||'2º ESO';
   document.querySelectorAll('[data-curso-label]').forEach(el=>{el.textContent=curso;});
   const acl=document.getElementById('about-curso-label');
-  if(acl)acl.textContent=curso+' · 2024–2025';
+  if(acl)acl.textContent=curso+' · '+getSchoolYear();
   const ms=document.getElementById('mats-subtitle');
   if(ms)ms.textContent=D.mats.length+' materias · '+curso;
 }
