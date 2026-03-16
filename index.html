@@ -35,8 +35,8 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .ni{font-size:18px;line-height:1}
 .nb span{font-size:8px;font-weight:700;white-space:nowrap}
 /* SPLASH */
-#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;transition:opacity .5s ease .1s}
-#splash.out{opacity:0;pointer-events:none}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;transition:opacity .5s ease .1s,visibility .5s ease .1s}
+#splash.out{opacity:0;pointer-events:none;visibility:hidden}
 .sp-ico{width:76px;height:76px;background:var(--y);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;animation:spul 1.6s ease-in-out infinite}
 @keyframes spul{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .sp-bar{width:50px;height:3px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:10px}
@@ -1654,7 +1654,7 @@ button:active{transform:scale(.97)}
     <div style="font-size:18px;font-weight:800;color:var(--t1)">💬 Enviar feedback</div>
     <button onclick="clsMo('feedback')" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer">✕</button>
   </div>
-  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a0d0c1c3cf9598979690e0c7cdc1c9cc8ec3cfcd">[email&#160;protected]</a></span></div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Tu mensaje se enviará a <span style="color:var(--y);font-weight:700">paco58760@gmail.com</span></div>
   <div><div class="sl">Tipo</div>
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="fb-tipo-row">
       <div class="chip on" data-t="idea" onclick="fbTipo(this)">💡 Idea</div>
@@ -1837,11 +1837,11 @@ button:active{transform:scale(.97)}
 
 <div id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
-const APP_VERSION='3.3.0';
+const APP_VERSION='3.4.0';
 // Cambia esta URL por la raw de tu archivo en GitHub:
 const GITHUB_RAW_URL='';
 
@@ -3908,7 +3908,7 @@ function obFinish(){
 // ════════════════════════════════════════════════════════
 const TUT_STEPS=[
   {ico:'💡',title:'Bienvenido a Lumio',
-    msg:`Tu app de estudio para ${D.user&&D.user.curso?D.user.curso:'ESO'}. Vamos a hacer un recorrido rápido. ¡Solo 2 minutos!`,
+    msg:'Tu app de estudio inteligente. Vamos a hacer un recorrido rápido por toda la app. ¡Solo 2 minutos!',
     nav:null},
   {ico:'🏠',title:'Inicio — tu dashboard',
     msg:'Aquí ves tu progreso semanal, racha de días y exámenes próximos. El botón amarillo grande arranca el Pomodoro directamente.',
@@ -5295,15 +5295,19 @@ window.addEventListener('DOMContentLoaded',()=>{
 
   // ── Garantía absoluta: la splash siempre desaparece ──────────────
   // Si cualquier cosa falla, este timer fuerza la salida a los 4s
+  // Safety net: if splash still visible after 5s, force-remove it and boot app
   const splashGuard=setTimeout(()=>{
-    const sp=document.getElementById('splash');
-    if(sp&&sp.style.opacity!=='0'){
-      sp.classList.add('out');
-      setTimeout(()=>{
-        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
-      },600);
-    }
-  },4000);
+    try{
+      const sp=document.getElementById('splash');
+      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
+      // Ensure screens are initialized even if normal flow failed
+      try{bHome();}catch(e){}
+      try{navSection('home');}catch(e){}
+      if(!localStorage.getItem('lumio_seen_onboarding')){
+        try{showOnboarding();}catch(e){}
+      }
+    }catch(e){}
+  },5000);
 
   try{
     // Load full persisted state FIRST
@@ -5356,28 +5360,38 @@ if('serviceWorker' in navigator){
 
     // Splash → onboarding or app
     setTimeout(()=>{
-      clearTimeout(splashGuard); // ya no necesitamos el guard
+      clearTimeout(splashGuard); // normal flow succeeded — cancel the safety net
       const sp=document.getElementById('splash');
-      if(sp)sp.classList.add('out');
+      if(sp){sp.classList.add('out');sp.style.opacity='0';}
       setTimeout(()=>{
-        if(!localStorage.getItem('lumio_seen_onboarding')){
-          showOnboarding();
-        }else{
-          setTimeout(()=>{try{startTutorial();}catch(e){}},600);
+        try{
+          if(!localStorage.getItem('lumio_seen_onboarding')){
+            showOnboarding();
+          }else{
+            // Ensure home screen is visible
+            try{navSection('home');}catch(e){}
+            setTimeout(()=>{try{startTutorial();}catch(e){}},600);
+          }
+        }catch(e2){
+          // Last resort: if onboarding/tutorial fails, at least show home
+          try{navSection('home');}catch(e){}
         }
       },600);
     },1800);
 
   }catch(e){
-    // Si algo falla en el arranque, al menos quitamos la splash
-    clearTimeout(splashGuard);
+    // Si algo falla, el splashGuard sigue activo como último recurso
+    // NO cancelamos splashGuard aquí
     console.error('Lumio init error:',e);
-sole.error('Lumio init error:',e);
-      setTimeout(()=>{
+    // Forzar salida de splash en 500ms
+    setTimeout(()=>{
+      try{
         const sp=document.getElementById('splash');
-        if(sp)sp.classList.add('out');
-      },500);
-    }
+        if(sp){sp.classList.add('out');sp.style.opacity='0';}
+        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
+      }catch(e2){}
+    },500);
+  }
 });
 </script>
 </body>
