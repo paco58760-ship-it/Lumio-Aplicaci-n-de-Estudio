@@ -1829,7 +1829,7 @@ button:active{transform:scale(.97)}
   </div>
 
   <div class="card" style="margin-bottom:14px;margin-top:8px;background:rgba(45,212,191,.06);border-color:rgba(45,212,191,.2)">
-    <div style="font-size:11px;color:var(--t2);line-height:1.6" id="fb-info">📨 El mensaje llegará directamente a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8b8a9aba7fdf0fffef888afa5a9a1a4e6aba7a5">[email&#160;protected]</a>.</div>
+    <div style="font-size:11px;color:var(--t2);line-height:1.6" id="fb-info">📨 El mensaje llegará directamente a paco58760@gmail.com.</div>
   </div>
 
   <button class="mbtn" id="fb-send-btn" onclick="sendFeedback()">📧 Enviar mensaje</button>
@@ -2731,7 +2731,7 @@ button:active{transform:scale(.97)}
   <button class="pwa-btn-skip" onclick="pwaClose()">Continuar en el navegador</button>
   <div class="pwa-already">¿Ya está instalada? <span style="color:var(--y);cursor:pointer" onclick="pwaClose()">Entrar a la app →</span></div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
@@ -8964,15 +8964,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Si cualquier cosa falla, este timer fuerza la salida a los 4s
   // Safety net: if splash still visible after 5s, force-remove it and boot app
   const splashGuard=setTimeout(()=>{
-    try{
-      const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
-      try{bHome();}catch(e){}
-      try{navSection('home');}catch(e){}
-      if(!localStorage.getItem('lumio_seen_onboarding')){
-        try{showOnboarding();}catch(e){}
-      }
-    }catch(e){}
+    try{ if(typeof window._hideSplashAndStart==='function') window._hideSplashAndStart(); }catch(e){}
   },3500);
 
   try{
@@ -9057,40 +9049,32 @@ if('serviceWorker' in navigator){
     // Check for imminent exams
     setTimeout(()=>{try{checkImminentExam();}catch(e){}}, 2000);
 
-    // Splash → onboarding or app
-    // CSS already auto-hides splash at 3s — JS does it faster at 1200ms
-    function hideSplashAndStart(){
-      clearTimeout(splashGuard);
-      const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('out');sp.style.display='none';}
-      try{
-        if(!localStorage.getItem('lumio_seen_onboarding')){
-          showOnboarding();
-        }else{
-          try{navSection('home');}catch(e){}
-          setTimeout(()=>{try{startTutorial();}catch(e){}},600);
-        }
-      }catch(e2){
-        try{navSection('home');}catch(e){}
-      }
-    }
-    setTimeout(hideSplashAndStart, 1200);
+    setTimeout(()=>{ try{window._hideSplashAndStart();}catch(e){} }, 1200);
 
   }catch(e){
-    // Si algo falla, el splashGuard sigue activo como último recurso
-    // NO cancelamos splashGuard aquí
     console.error('Lumio init error:',e);
-    // Forzar salida de splash en 500ms
-    setTimeout(()=>{
-      try{
-        const sp=document.getElementById('splash');
-        if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
-        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
-        else try{navSection('home');}catch(e){}
-      }catch(e2){}
-    },500);
+    setTimeout(()=>{ try{window._hideSplashAndStart();}catch(e2){} },500);
   }
 });
+
+// Global — funciona aunque el try/catch del init falle
+window._hideSplashAndStart=function(){
+  const sp=document.getElementById('splash');
+  if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
+  const _nav=window['navSection'];
+  const _onb=window['showOnboarding'];
+  const _tut=window['startTutorial'];
+  try{
+    if(!localStorage.getItem('lumio_seen_onboarding')){
+      if(typeof _onb==='function') _onb();
+    }else{
+      if(typeof _nav==='function') _nav('home');
+      setTimeout(()=>{ if(typeof _tut==='function') _tut(); },600);
+    }
+  }catch(e2){
+    if(typeof _nav==='function') try{_nav('home');}catch(e){}
+  }
+};
 
 // ════════════════════════════════════════════════════════
 // BÚSQUEDA GLOBAL
@@ -9668,4 +9652,14 @@ self.addEventListener('fetch',e=>{
   }catch(e){}
 })();
 
-// Inicializar 
+// Inicializar notificaciones y URL imports al arrancar
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    try{_notifSchedule();}catch(e){}
+    try{checkNotaUrlImport();}catch(e){}
+  },1000);
+});
+
+</script>
+</body>
+</html>
