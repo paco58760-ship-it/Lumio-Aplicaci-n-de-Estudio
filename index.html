@@ -32,12 +32,14 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0f14;--bg1:#171a22;--bg2:#1e2230;--bg3:#252a3a;
-  --y:#f5c518;--yd:rgba(245,197,24,.1);--yb:rgba(245,197,24,.28);
+  /* Dark — deep slate, warm cream text */
+  --bg:#0b0d12;--bg1:#131620;--bg2:#191d2a;--bg3:#20253a;
+  --y:#f5c518;--yd:rgba(245,197,24,.13);--yb:rgba(245,197,24,.32);
   --teal:#2dd4bf;--coral:#f472b6;--blue:#60a5fa;--green:#4ade80;
   --orange:#fb923c;--purple:#c084fc;--red:#f87171;--danger:#ff4500;
-  --t1:#f0ebe0;--t2:#8a94a6;--t3:#454e61;
-  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
+  --t1:#ece8df;--t2:#7c8799;--t3:#3d4555;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.14);
+  --card-shadow:0 2px 12px rgba(0,0,0,.45);
   --font:'Geist',Arial,sans-serif;
 }
 html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
@@ -197,9 +199,65 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;z-index:900}
 .mobox{width:100%;max-width:390px;margin:0 auto;background:var(--bg1);border:1px solid var(--bd2);border-radius:18px 18px 0 0;padding:22px 18px 34px;display:flex;flex-direction:column;gap:12px;max-height:88vh;overflow-y:auto}
 /* QUICK NOTES FLOAT */
-#quick-note-btn{position:fixed;bottom:82px;right:14px;width:48px;height:48px;border-radius:50%;background:var(--y);color:#0d0f14;font-size:22px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:500;box-shadow:0 4px 20px rgba(245,197,24,.4);transition:transform .15s}
-#quick-note-btn:active{transform:scale(.92)}
-#quick-note-btn.hidden{display:none}
+/* quick-note-btn moved to fab-bar */
+
+/* ── FAB BAR — stacked pill buttons above nav ── */
+#fab-bar{
+  position:fixed;
+  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 12px);
+  right:14px;z-index:600;
+  display:flex;flex-direction:column;gap:10px;
+  align-items:center;
+  pointer-events:none;
+  transition:opacity .25s,transform .25s;
+}
+#fab-bar.hidden-fab{opacity:0;pointer-events:none;transform:translateY(12px)}
+.fab-wrap{position:relative;display:flex;align-items:center;pointer-events:all}
+.fab-label{
+  position:absolute;right:54px;
+  background:rgba(13,15,20,.88);color:#fff;
+  font-size:11px;font-weight:700;font-family:var(--font);
+  padding:5px 10px;border-radius:8px;white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .15s;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+}
+[data-theme="light"] .fab-label{background:rgba(17,19,24,.85)}
+.fab-wrap:hover .fab-label,.fab-wrap:focus-within .fab-label{opacity:1}
+.fab-btn{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 18px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s;
+  font-family:var(--font);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.fab-btn:active{transform:scale(.86)!important;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+#fab-note{
+  background:var(--y);color:#0d0f14;
+  box-shadow:0 4px 20px rgba(245,197,24,.5),0 1px 4px rgba(0,0,0,.3);
+}
+#fab-note:hover{transform:scale(1.08)}
+#fab-search{
+  background:var(--bg2);
+  border:1.5px solid var(--bd2);
+  color:var(--t1);font-size:18px;
+}
+#fab-search:hover{transform:scale(1.08);background:var(--bg3)}
+#fab-theme{
+  background:var(--bg2);
+  border:1.5px solid var(--bd2);
+  color:var(--t1);font-size:17px;
+}
+#fab-theme:hover{transform:scale(1.08);background:var(--bg3)}
+[data-theme="light"] #fab-note{box-shadow:0 4px 20px rgba(232,181,0,.5),0 1px 4px rgba(0,0,0,.2)}
+[data-theme="light"] #fab-search,[data-theme="light"] #fab-theme{
+  background:#fff;border-color:rgba(0,0,0,.16);
+  box-shadow:0 2px 12px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);
+}
+
 /* SPELL CHECK HIGHLIGHT */
 .spell-error{text-decoration:underline;text-decoration-color:#f87171;text-decoration-style:wavy}
 .spell-toolbar{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
@@ -207,9 +265,14 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .spell-tag:hover{background:rgba(248,113,113,.25)}
 /* DARK/LIGHT MODE */
 [data-theme="light"]{
-  --bg:#ffffff;--bg1:#ffffff;--bg2:#f4f4f5;--bg3:#e4e4e7;
-  --t1:#0d0f14;--t2:#52525b;--t3:#a1a1aa;
-  --bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.14);
+  /* Light — warm paper white, soft borders */
+  --bg:#f5f4f0;--bg1:#fffffe;--bg2:#edece8;--bg3:#e3e2dd;
+  --y:#d4a400;--yd:rgba(212,164,0,.13);--yb:rgba(212,164,0,.32);
+  --teal:#0e8a7c;--coral:#c4246a;--blue:#1d55d0;--green:#1a7a40;
+  --orange:#d44f0a;--purple:#6626cc;--red:#c01f1f;--danger:#ae1500;
+  --t1:#0f1116;--t2:#484f5e;--t3:#939aaa;
+  --bd:rgba(0,0,0,.10);--bd2:rgba(0,0,0,.18);
+  --card-shadow:0 1px 6px rgba(0,0,0,.10);
 }
 /* ONBOARDING */
 #onboarding{position:fixed;inset:0;background:var(--bg);z-index:980;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0;transition:opacity .4s}
@@ -271,7 +334,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .today-card{background:var(--bg1);border-left:3px solid var(--y);border-radius:0 13px 13px 0;padding:11px 14px;margin-bottom:8px;cursor:pointer;transition:transform .1s}
 .today-card:active{transform:scale(.98)}
 /* THEME TOGGLE */
-#theme-btn{position:fixed;top:12px;right:14px;width:36px;height:36px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:200;transition:all .2s}
+/* theme-btn moved to fab-bar */
 @media(min-width:420px){#phone{box-shadow:0 0 100px rgba(0,0,0,.9)}body{background:#04050a}}
 
 /* ══ SCREEN TRANSITIONS ══ */
@@ -533,7 +596,7 @@ button:active{transform:scale(.97)}
 </div>
 
 <!-- THEME TOGGLE -->
-<button id="theme-btn" onclick="toggleTheme()" title="Modo claro/oscuro">🌙</button>
+
 
 <!-- CONFETTI -->
 <canvas id="confetti-canvas"></canvas>
@@ -2501,7 +2564,7 @@ button:active{transform:scale(.97)}
 </div></div>
 
 <!-- QUICK NOTE FLOAT -->
-<button id="quick-note-btn" onclick="openQuickNote()" title="Nota rápida">📝</button>
+
 
 <!-- QUICK NOTE MODAL -->
 <div class="mo" id="qnote-mo" style="display:none"><div class="mobox">
@@ -2525,7 +2588,23 @@ button:active{transform:scale(.97)}
 <div id="exam-imminent-overlay"></div>
 
 <div id="toast"></div>
-<button id="search-fab" onclick="navSection('perfil');setTimeout(()=>goTo('busqueda'),50)" style="position:fixed;bottom:76px;left:14px;width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--bd2);font-size:16px;cursor:pointer;z-index:500;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.3);transition:transform .15s" ontouchstart="this.style.transform='scale(.9)'" ontouchend="this.style.transform=''">🔍</button>
+
+<!-- ═══ FAB BAR — stacked above nav ═══ -->
+<div id="fab-bar">
+  <div class="fab-wrap">
+    <span class="fab-label">Cambiar tema</span>
+    <button class="fab-btn" id="fab-theme" onclick="toggleTheme()" aria-label="Modo claro/oscuro">🌙</button>
+  </div>
+  <div class="fab-wrap">
+    <span class="fab-label">Búsqueda</span>
+    <button class="fab-btn" id="fab-search" onclick="navSection('perfil');setTimeout(()=>goTo('busqueda'),50)" aria-label="Buscar">🔍</button>
+  </div>
+  <div class="fab-wrap">
+    <span class="fab-label">Nota rápida</span>
+    <button class="fab-btn" id="fab-note" onclick="openQuickNote()" aria-label="Nota rápida">📝</button>
+  </div>
+</div>
+
 
 <!-- ═══ PWA INSTALL OVERLAY ═══ -->
 <div id="pwa-overlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.92);display:none;align-items:flex-end;justify-content:center;padding:0 0 20px">
@@ -2785,8 +2864,7 @@ function goTo(id){
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
   const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
-  document.getElementById('quick-note-btn').classList.toggle('hidden',id==='chat');
-  const tb=document.getElementById('theme-btn');if(tb)tb.style.display=id==='chat'?'none':'flex';
+  const fabBar=document.getElementById('fab-bar');if(fabBar)fabBar.classList.toggle('hidden-fab',id==='chat');
 }
 
 
@@ -5667,10 +5745,12 @@ function toggleTheme(){
   localStorage.setItem('lumio_theme_manual','1'); // user chose manually
   isDark=!isDark;
   document.documentElement.setAttribute('data-theme',isDark?'':'light');
-  const btn=document.getElementById('theme-btn');
+  const btn=document.getElementById('fab-theme');
   const tbtn=document.getElementById('theme-toggle-btn');
+  const ttb2=document.getElementById('theme-btn');
   if(btn)btn.textContent=isDark?'🌙':'☀️';
   if(tbtn)tbtn.textContent=isDark?'🌙 Oscuro':'☀️ Claro';
+  if(ttb2)ttb2.textContent=isDark?'🌙':'☀️';
   localStorage.setItem('lumio_theme',isDark?'dark':'light');
 }
 
@@ -9284,7 +9364,8 @@ function showInstallPrompt(){pwaShow('android');}
     const apply=(dark)=>{
       isDark=dark;
       document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-      const tb=document.getElementById('theme-btn');if(tb)tb.textContent=dark?'🌙 Oscuro':'☀️ Claro';
+      const tb=document.getElementById('fab-theme');if(tb)tb.textContent=dark?'🌙':'☀️';
+      const tb2=document.getElementById('theme-btn');if(tb2)tb2.textContent=dark?'🌙':'☀️';
       localStorage.setItem('lumio_theme',dark?'dark':'light');
     };
     apply(prefersDark.matches);
