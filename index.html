@@ -4,12 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Lumio — Tu compañero de estudio</title>
+<meta name="description" content="App de estudio gratuita para el colegio. Flashcards, pomodoro, apuntes, clases y mucho más. Sin anuncios.">
 <meta name="theme-color" content="#f5c518">
+<!-- PWA / iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lumio">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Lumio">
+<!-- Inline manifest (no server needed) -->
+<script>
+(function(){
+  const icon='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="%23f5c518"/><text x="256" y="340" text-anchor="middle" font-size="300" font-family="Arial">📚</text><text x="256" y="460" text-anchor="middle" font-size="72" font-weight="900" font-family="Arial" fill="%230d0f14">Lumio</text></svg>`);
+  const manifest={name:'Lumio — Tu compañero de estudio',short_name:'Lumio',description:'App de estudio gratuita para el colegio.',start_url:location.pathname,display:'standalone',background_color:'#0d0f14',theme_color:'#f5c518',orientation:'portrait-primary',icons:[{src:icon,sizes:'192x192',type:'image/svg+xml'},{src:icon,sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('link');link.rel='manifest';link.href=url;
+  document.head.appendChild(link);
+  // Apple touch icon inline
+  const iconLink=document.createElement('link');iconLink.rel='apple-touch-icon';iconLink.href=icon;
+  document.head.appendChild(iconLink);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -549,9 +565,7 @@ button:active{transform:scale(.97)}
 </div>
 
 <div id="phone">
-<!-- SEARCH BUTTON (fixed top-right) -->
-<button id="global-search-btn" onclick="openBusqueda()" title="Búsqueda global"
-  style="position:absolute;top:10px;right:12px;z-index:600;background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:7px 11px;font-size:14px;cursor:pointer;font-family:var(--font)">🔍</button>
+
 <!-- SUB-NAV (shown for multi-screen sections) -->
 <div id="sub-nav"></div>
 <div id="screens">
@@ -611,6 +625,9 @@ button:active{transform:scale(.97)}
       <button onclick="enterFocus()" style="font-size:11px;font-weight:700;color:var(--t3);background:none;border:none;cursor:pointer;font-family:var(--font)">🎯 Modo foco</button>
     </div>
   </div>
+
+  <!-- Próxima clase widget -->
+  <div id="h-next-class" style="display:none;margin-bottom:4px"></div>
 
   <!-- Hoy toca -->
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Hoy toca</div>
@@ -713,6 +730,18 @@ button:active{transform:scale(.97)}
 
   <!-- Mejor racha / día / hora -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px" id="st-records"></div>
+
+  <!-- Racha por materia -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Racha por materia 🔥</div>
+  <div class="card" style="margin-bottom:14px" id="st-mat-streaks">
+    <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">Estudia materias con Pomodoro para ver tu racha</div>
+  </div>
+
+  <!-- Historial de exámenes -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Historial de tests 📈</div>
+  <div class="card" style="margin-bottom:14px" id="st-exam-hist">
+    <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">Sin tests realizados todavía</div>
+  </div>
 </div>
 </div>
 
@@ -1317,10 +1346,19 @@ button:active{transform:scale(.97)}
 
     <!-- Fuente de preguntas -->
     <div><div class="sl">Fuente de preguntas</div>
-      <div style="display:flex;gap:7px">
-        <div class="chip on" data-src="cards" onclick="exPickSrc(this,'cards')">🃏 Flashcards</div>
-        <div class="chip" data-src="ia" onclick="exPickSrc(this,'ia')">✨ IA (texto)</div>
-        <div class="chip" data-src="apuntes" onclick="exPickSrc(this,'apuntes')">📝 Apuntes</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="chip on" data-src="cards" onclick="exPickSrc(this,'cards')" style="display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 14px;text-align:left;white-space:normal;height:auto">
+          <span style="font-size:22px;flex-shrink:0">🃏</span>
+          <div><div style="font-size:13px;font-weight:700">Flashcards</div><div style="font-size:11px;color:var(--t2);font-weight:400">Usa tus tarjetas guardadas. Ideal si ya tienes material.</div></div>
+        </div>
+        <div class="chip" data-src="ia" onclick="exPickSrc(this,'ia')" style="display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 14px;text-align:left;white-space:normal;height:auto">
+          <span style="font-size:22px;flex-shrink:0">✨</span>
+          <div><div style="font-size:13px;font-weight:700">IA desde texto</div><div style="font-size:11px;color:var(--t2);font-weight:400">Pega cualquier texto y la IA genera preguntas al momento.</div></div>
+        </div>
+        <div class="chip" data-src="apuntes" onclick="exPickSrc(this,'apuntes')" style="display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 14px;text-align:left;white-space:normal;height:auto">
+          <span style="font-size:22px;flex-shrink:0">📝</span>
+          <div><div style="font-size:13px;font-weight:700">Mis apuntes</div><div style="font-size:11px;color:var(--t2);font-weight:400">Genera un examen de los apuntes que ya tienes guardados.</div></div>
+        </div>
       </div>
     </div>
 
@@ -1468,10 +1506,29 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-recordatorios">
 <div class="pw">
   <div class="pt">Recorda<em>torios</em> 🔔</div>
-  <div class="ps">Tarjetas pendientes según SM-2</div>
+  <div class="ps">Avisos de repaso y recordatorio diario</div>
+
+  <!-- Recordatorio diario — shown prominently here -->
+  <div class="card" style="margin-bottom:14px;background:rgba(245,197,24,.07);border-color:var(--yb)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:28px">⏰</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Recordatorio diario</div>
+          <div style="font-size:11px;color:var(--t2)" id="notif-status-rec">Sin recordatorio activo</div></div>
+      </div>
+      <div style="width:44px;height:26px;border-radius:999px;background:var(--bg2);border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .2s" id="notif-toggle-rec" onclick="toggleNotifAlarm()">
+        <div style="position:absolute;width:20px;height:20px;border-radius:50%;top:2px;left:2px;transition:all .2s" id="notif-dot-rec"></div>
+      </div>
+    </div>
+    <div id="notif-time-wrap-rec" style="display:none">
+      <input type="time" class="inp" id="notif-time-rec" value="19:00" onchange="saveNotifAlarmRec()" style="margin-bottom:4px">
+      <div style="font-size:11px;color:var(--t3)">Recibirás una notificación todos los días a esa hora.</div>
+    </div>
+  </div>
+
   <div id="notif-banner" class="card card-y" style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
     <div style="font-size:26px">🔔</div>
-    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">Activar notificaciones</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Recibe avisos cuando tengas que repasar</div></div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">Notificaciones del navegador</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Necesario para recibir avisos de repaso</div></div>
     <button class="gbtn" style="padding:7px 11px;font-size:11px" onclick="reqNotif()">Activar</button>
   </div>
   <div class="sl" id="due-title">Pendientes hoy (0)</div>
@@ -1599,6 +1656,14 @@ button:active{transform:scale(.97)}
         <input class="inp" type="number" id="pom-break-inp" min="1" max="30" value="5" oninput="updatePomSettings()">
       </div>
     </div>
+  </div>
+
+  <!-- Instalar app -->
+  <div id="aj-install-wrap" style="margin-bottom:14px">
+    <button onclick="showInstallPrompt()" style="width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:10px">
+      <span style="font-size:22px">📲</span> Instalar Lumio en este dispositivo
+    </button>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:6px">Accede como app desde tu pantalla de inicio</div>
   </div>
 
   <!-- Tutorial y datos -->
@@ -2460,7 +2525,46 @@ button:active{transform:scale(.97)}
 <div id="exam-imminent-overlay"></div>
 
 <div id="toast"></div>
+<button id="search-fab" onclick="navSection('perfil');setTimeout(()=>goTo('busqueda'),50)" style="position:fixed;bottom:76px;left:14px;width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--bd2);font-size:16px;cursor:pointer;z-index:500;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.3);transition:transform .15s" ontouchstart="this.style.transform='scale(.9)'" ontouchend="this.style.transform=''">🔍</button>
 
+<!-- ═══ PWA INSTALL OVERLAY ═══ -->
+<div id="pwa-overlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.92);display:none;align-items:flex-end;justify-content:center;padding:0 0 20px">
+  <div id="pwa-card" style="background:var(--bg1);border:1px solid var(--bd2);border-radius:28px 28px 20px 20px;padding:32px 24px 24px;width:calc(100%-24px);max-width:380px;text-align:center;transform:translateY(100px);transition:transform .4s cubic-bezier(.34,1.56,.64,1)">
+    <!-- Logo grande -->
+    <div style="width:96px;height:96px;background:var(--y);border-radius:24px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:0 8px 32px rgba(245,197,24,.4)">📚</div>
+    <div style="font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px">Lumio</div>
+    <div style="font-size:14px;color:var(--t2);margin-bottom:20px;line-height:1.5">Tu compañero de estudio.<br>Gratis, sin anuncios, sin registro.</div>
+    <!-- Stars / features -->
+    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:22px">
+      <div style="text-align:center"><div style="font-size:24px">🃏</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Flashcards</div></div>
+      <div style="text-align:center"><div style="font-size:24px">⏱️</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Pomodoro</div></div>
+      <div style="text-align:center"><div style="font-size:24px">🧠</div><div style="font-size:10px;color:var(--t3);margin-top:4px">IA local</div></div>
+      <div style="text-align:center"><div style="font-size:24px">🏫</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Clases</div></div>
+    </div>
+    <!-- Main install button -->
+    <button id="pwa-install-btn" onclick="pwaInstall()" style="width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;cursor:pointer;font-family:var(--font);margin-bottom:10px;box-shadow:0 4px 20px rgba(245,197,24,.4)">
+      📲 Instalar en mi dispositivo
+    </button>
+    <!-- iOS specific instructions (shown on iOS) -->
+    <div id="pwa-ios-hint" style="display:none;background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:10px;text-align:left">
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📱 Cómo instalar en iPhone / iPad:</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        1. Pulsa <b style="color:var(--y)">⬆ Compartir</b> en Safari<br>
+        2. Selecciona <b style="color:var(--y)">"Añadir a pantalla de inicio"</b><br>
+        3. Pulsa <b style="color:var(--y)">Añadir</b> — ¡listo!
+      </div>
+    </div>
+    <!-- Samsung / other hint -->
+    <div id="pwa-android-hint" style="display:none;background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:10px;text-align:left">
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📱 Si no aparece el botón automático:</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        1. Pulsa <b style="color:var(--y)">⋮ Menú</b> del navegador<br>
+        2. Selecciona <b style="color:var(--y)">"Añadir a pantalla de inicio"</b>
+      </div>
+    </div>
+    <button onclick="pwaClose()" style="background:none;border:none;color:var(--t3);font-size:13px;cursor:pointer;font-family:var(--font);padding:4px 0">Ahora no</button>
+  </div>
+</div>
 <script>
 // ════════════════════════════════════════════════════════
 // DATA
@@ -2652,8 +2756,8 @@ const SECTIONS={
     labels:['🔢 Calculadora','📐 Fórmulas','🔤 Conjugador','⚖️ Conversor','⚗️ Tabla P.','🌐 Vocabulario','🎓 Calc. notas','📊 Presentación','📜 Historia'],
   },
   perfil:{
-    screens:['stats','heatmap','informe','detector','predictor','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','feedback','ajustes'],
-    labels:['📊 Estadísticas','🔥 Heatmap','📋 Informe','🔎 Detector','🎯 Predictor','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','💬 Feedback','⚙️ Ajustes'],
+    screens:['stats','heatmap','informe','detector','predictor','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','busqueda','feedback','ajustes'],
+    labels:['📊 Estadísticas','🔥 Heatmap','📋 Informe','🔎 Detector','🎯 Predictor','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','🔍 Buscar','💬 Feedback','⚙️ Ajustes'],
   },
 };
 let currentSection='home';let currentScreen='home';
@@ -3097,6 +3201,45 @@ function bStats(){
         <div style="font-size:26px;font-weight:900;color:var(--coral)">${D.user.cardsRevised||0}</div>
         <div style="font-size:11px;color:var(--t2);margin-top:3px">tarjetas revisadas</div>
       </div>`;
+  }
+  // Exam history
+  const histEl=document.getElementById('st-exam-hist');
+  if(histEl){
+    const hist=getExamHistory();
+    if(!hist.length){
+      histEl.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">Sin tests realizados todavía</div>';
+    }else{
+      histEl.innerHTML=hist.slice(0,8).map(h=>{
+        const col=h.pct>=75?'var(--green)':h.pct>=50?'var(--y)':'#f87171';
+        return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
+          <div style="width:38px;height:38px;border-radius:10px;background:${col}18;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:${col};flex-shrink:0">${h.nota}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:var(--t1)">${h.mat}</div>
+            <div style="font-size:10px;color:var(--t2)">${h.n} preg · ${h.src==='ia'?'IA':h.src==='apuntes'?'Apuntes':'Tarjetas'} · ${h.date}</div>
+          </div>
+          <div style="font-size:18px;font-weight:900;color:${col}">${h.pct}%</div>
+        </div>`;
+      }).join('');
+    }
+  }
+  // Materia streaks
+  const streaksEl=document.getElementById('st-mat-streaks');
+  if(streaksEl){
+    const streaks=getMatStreaks();
+    const matWithStreaks=D.mats.filter(m=>streaks[m.n]&&streaks[m.n].streak>0);
+    if(!matWithStreaks.length){
+      streaksEl.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">Estudia materias con Pomodoro para ver tu racha</div>';
+    }else{
+      streaksEl.innerHTML=matWithStreaks.sort((a,b)=>(streaks[b.n]?.streak||0)-(streaks[a.n]?.streak||0)).map(m=>{
+        const s=streaks[m.n];
+        return`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd)">
+          <span style="font-size:20px">${m.e}</span>
+          <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${m.n}</div>
+          <div style="font-size:10px;color:var(--t2)">Mejor racha: ${s.maxStreak||s.streak} días</div></div>
+          <div style="font-size:18px;font-weight:900;color:var(--orange)">${s.streak}🔥</div>
+        </div>`;
+      }).join('');
+    }
   }
 }
 function enterFocus(){
@@ -3682,6 +3825,12 @@ let apuShowPreview=false;
 
 function bApuntesScreen(){
   apu_syncLegacy();
+  const notes=getNotesDB();
+  // Auto-open single note
+  if(notes.length===1&&!apuEditId){
+    apu_openNote(notes[0].id);
+    return;
+  }
   apu_render();
   document.getElementById('apuntes-list-view').style.display='block';
   document.getElementById('apuntes-editor-view').style.display='none';
@@ -5372,6 +5521,8 @@ function logrosTab(btn){document.querySelectorAll('#s-logros .tabb').forEach(b=>
 // ════════════════════════════════════════════════════════
 function bRecord(){
   if(Notification.permission==='granted')document.getElementById('notif-banner').style.display='none';
+  // Render notif toggle state
+  try{_notifRenderStatus();}catch(e){}
   const due=D.cards.filter(c=>c.lv===1).slice(0,8);
   const upcoming=D.cards.filter(c=>c.lv>=2).slice(0,6);
   document.getElementById('due-title').textContent=`Pendientes hoy (${due.length})`;
@@ -5513,6 +5664,7 @@ function launchConfetti(){
 // ════════════════════════════════════════════════════════
 let isDark=true;
 function toggleTheme(){
+  localStorage.setItem('lumio_theme_manual','1'); // user chose manually
   isDark=!isDark;
   document.documentElement.setAttribute('data-theme',isDark?'':'light');
   const btn=document.getElementById('theme-btn');
@@ -6741,6 +6893,7 @@ function bClaseDetalle(){
       <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
         <button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="compartirClase('${clase.id}')">📤 ${clase.codigo}</button>
         ${isAdmin?`<button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="showMiembros()">👥</button>`:''}
+        ${isAdmin||isEditor?`<button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="showEditClase('${clase.id}')" title="Editar clase">✏️</button>`:''}
       <button class="gbtn" style="font-size:11px;padding:5px 10px" onclick="startExamenClase('${clase.id}')" title="Generar examen del temario">🧠</button>
       </div>
     </div>
@@ -8200,6 +8353,12 @@ function openAnaya(){
   else toast('⚠️ Añade el enlace de Anaya Digital primero');
 }
 function bAjustes(){
+  // Hide install button if already installed as PWA
+  const installWrap=document.getElementById('aj-install-wrap');
+  if(installWrap){
+    const installed=localStorage.getItem('lumio_pwa_installed')||window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+    installWrap.style.display=installed?'none':'block';
+  }
   // Sync theme button
   const ttb=document.getElementById('theme-toggle-btn');
   if(ttb)ttb.textContent=isDark?'🌙 Oscuro':'☀️ Claro';
@@ -8670,16 +8829,25 @@ if('serviceWorker' in navigator){
   }).catch(()=>{});
 }
 
-    // PWA install prompt
-    let deferredPrompt;
+    // ── PWA Install — funciona en Chrome/Edge/Samsung/Android + guía para iOS ──
+    window.window._pwaPrompt=null;
     window.addEventListener('beforeinstallprompt',e=>{
-      e.preventDefault();deferredPrompt=e;
-      const btn=document.createElement('button');
-      btn.textContent='📲 Instalar Lumio';
-      btn.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--y);color:#0d0f14;border:none;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
-      btn.onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>btn.remove());};
-      document.body.appendChild(btn);setTimeout(()=>btn.remove(),10000);
+      e.preventDefault();
+      window._pwaPrompt=e;
+      // Show our custom overlay after 3s if not already installed
+      if(!localStorage.getItem('lumio_pwa_dismissed')){
+        setTimeout(()=>pwaShow('android'),3000);
+      }
     });
+    // Detect already installed
+    if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
+      localStorage.setItem('lumio_pwa_installed','1');
+    }
+    // iOS: show install hint if not installed and not dismissed
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    if(isIOS&&!navigator.standalone&&!localStorage.getItem('lumio_pwa_dismissed')){
+      setTimeout(()=>pwaShow('ios'),4000);
+    }
 
     // Update about creator name
     const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
@@ -8881,6 +9049,7 @@ let _notifTimer=null;
 function _notifRenderStatus(){
   const on=localStorage.getItem('lumio_notif_on')==='1';
   const time=localStorage.getItem('lumio_notif_time')||'19:00';
+  // Ajustes elements
   const dot=document.getElementById('notif-toggle-dot');
   const bg=document.getElementById('notif-toggle');
   const wrap=document.getElementById('notif-time-wrap');
@@ -8891,6 +9060,25 @@ function _notifRenderStatus(){
   if(wrap)wrap.style.display=on?'block':'none';
   if(status)status.textContent=on?'Activado · todos los días a las '+time:'Sin recordatorio activo';
   if(inp)inp.value=time;
+  // Recordatorios screen elements
+  const dotR=document.getElementById('notif-dot-rec');
+  const bgR=document.getElementById('notif-toggle-rec');
+  const wrapR=document.getElementById('notif-time-wrap-rec');
+  const statusR=document.getElementById('notif-status-rec');
+  const inpR=document.getElementById('notif-time-rec');
+  if(dotR)dotR.style.cssText=`position:absolute;width:20px;height:20px;border-radius:50%;top:2px;transition:all .2s;${on?'left:22px;background:var(--y)':'left:2px;background:var(--t3)'}`;
+  if(bgR)bgR.style.background=on?'rgba(245,197,24,.2)':'var(--bg2)';
+  if(wrapR)wrapR.style.display=on?'block':'none';
+  if(statusR)statusR.textContent=on?'Activado · todos los días a las '+time:'Sin recordatorio activo';
+  if(inpR)inpR.value=time;
+}
+// Alias for recordatorios screen time input
+function saveNotifAlarmRec(){
+  const v=document.getElementById('notif-time-rec')?.value||'19:00';
+  const inp=document.getElementById('notif-time');if(inp)inp.value=v;
+  localStorage.setItem('lumio_notif_time',v);
+  _notifRenderStatus();_notifSchedule();
+  toast('🔔 Recordatorio a las '+v);
 }
 
 function toggleNotifAlarm(){
@@ -9026,6 +9214,218 @@ function startExamenClase(claseId){
     },150);
   },50);
 }
+
+// ════════════════════════════════════════════════════════
+// PWA INSTALL — banner universal para todos los navegadores
+// ════════════════════════════════════════════════════════
+function pwaShow(mode){
+  // Don't show if already installed or recently dismissed
+  if(localStorage.getItem('lumio_pwa_installed'))return;
+  if(localStorage.getItem('lumio_pwa_dismissed'))return;
+  const ov=document.getElementById('pwa-overlay');
+  const card=document.getElementById('pwa-card');
+  const iosHint=document.getElementById('pwa-ios-hint');
+  const androidHint=document.getElementById('pwa-android-hint');
+  const installBtn=document.getElementById('pwa-install-btn');
+  if(!ov||!card)return;
+  // Configure based on platform
+  if(mode==='ios'){
+    if(installBtn)installBtn.style.display='none';
+    if(iosHint)iosHint.style.display='block';
+  }else{
+    if(installBtn)installBtn.style.display='block';
+    if(androidHint){
+      // Show Android manual hint after 1.5s if no auto-prompt
+      setTimeout(()=>{if(!window._pwaPrompt&&androidHint)androidHint.style.display='block';},1500);
+    }
+  }
+  ov.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(card)card.style.transform='translateY(0)';
+  }));
+}
+function pwaClose(){
+  const ov=document.getElementById('pwa-overlay');
+  const card=document.getElementById('pwa-card');
+  if(card)card.style.transform='translateY(100px)';
+  setTimeout(()=>{if(ov)ov.style.display='none';},400);
+  // Dismiss for 7 days
+  localStorage.setItem('lumio_pwa_dismissed',Date.now()+'');
+  // Clear dismissal after 7 days so it shows again
+  setTimeout(()=>localStorage.removeItem('lumio_pwa_dismissed'),7*864e5);
+}
+async function pwaInstall(){
+  if(window._pwaPrompt){
+    window._pwaPrompt.prompt();
+    const result=await window._pwaPrompt.userChoice;
+    if(result.outcome==='accepted'){
+      localStorage.setItem('lumio_pwa_installed','1');
+      toast('✅ ¡Lumio instalado! Búscalo en tu pantalla de inicio');
+    }
+    window._pwaPrompt=null;
+    pwaClose();
+  }else{
+    // Fallback: show manual instructions
+    const androidHint=document.getElementById('pwa-android-hint');
+    if(androidHint)androidHint.style.display='block';
+    const btn=document.getElementById('pwa-install-btn');
+    if(btn){btn.textContent='⬆ Ver instrucciones arriba';btn.style.background='var(--bg2)';btn.style.color='var(--t1)';}
+  }
+}
+// Expose for Ajustes install button
+function showInstallPrompt(){pwaShow('android');}
+
+// ════════════════════════════════════════════════════════
+// MODO OSCURO AUTOMÁTICO
+// ════════════════════════════════════════════════════════
+(function initAutoTheme(){
+  if(!localStorage.getItem('lumio_theme_manual')){
+    const prefersDark=window.matchMedia('(prefers-color-scheme: dark)');
+    const apply=(dark)=>{
+      isDark=dark;
+      document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+      const tb=document.getElementById('theme-btn');if(tb)tb.textContent=dark?'🌙 Oscuro':'☀️ Claro';
+      localStorage.setItem('lumio_theme',dark?'dark':'light');
+    };
+    apply(prefersDark.matches);
+    prefersDark.addEventListener('change',e=>{if(!localStorage.getItem('lumio_theme_manual'))apply(e.matches);});
+  }
+})();
+
+// ════════════════════════════════════════════════════════
+// WIDGET PRÓXIMA CLASE EN HOME
+// ════════════════════════════════════════════════════════
+function renderHomeHorarioWidget(){
+  const el=document.getElementById('h-next-class');if(!el)return;
+  const now=new Date();
+  const dayIdx=now.getDay()===0?6:now.getDay()-1;
+  const hour=now.getHours()*60+now.getMinutes();
+  const HORAS_MINS=[8*60,9*60,10*60,11*60,12*60,13*60,15*60,16*60,17*60];
+  const HORAS_LBL=['08:00','09:00','10:00','11:00','12:00','13:00','15:00','16:00','17:00'];
+  const DIAS_NOM=['Lun','Mar','Mié','Jue','Vie'];
+  let nextMat=null,nextTime=null,nextDay=null;
+  for(let offset=0;offset<7&&!nextMat;offset++){
+    const di=(dayIdx+offset)%7;
+    if(di>=5)continue;
+    for(let hi=0;hi<HORAS_MINS.length;hi++){
+      if(offset===0&&HORAS_MINS[hi]<=hour)continue;
+      const key=hi+'-'+di;
+      const mat=horarioDB[key];
+      if(mat){nextMat=mat;nextTime=HORAS_LBL[hi];nextDay=offset===0?'Hoy':offset===1?'Mañana':DIAS_NOM[di];break;}
+    }
+  }
+  if(!nextMat){el.style.display='none';return;}
+  const m=D.mats.find(x=>x.n===nextMat);
+  el.style.display='block';
+  el.innerHTML=`<div style="background:${m?.c||'var(--y)'}18;border:1px solid ${m?.c||'var(--y)'}44;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px" onclick="navSection('agenda');setTimeout(()=>goTo('horario'),50)">
+    <span style="font-size:22px">${m?.e||'📚'}</span>
+    <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${nextMat}</div><div style="font-size:10px;color:${m?.c||'var(--y)'}">${nextDay} · ${nextTime}</div></div>
+    <div style="font-size:10px;color:var(--t3)">→</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// HISTORIAL DE EXÁMENES
+// ════════════════════════════════════════════════════════
+function getExamHistory(){return JSON.parse(localStorage.getItem('lumio_exam_hist')||'[]');}
+function saveExamHistory(arr){localStorage.setItem('lumio_exam_hist',JSON.stringify(arr.slice(0,50)));}
+function recordExamResult(pct,mat,n,src){
+  const hist=getExamHistory();
+  hist.unshift({pct,mat:mat||'General',n,src:src||'cards',nota:pct>=90?'A':pct>=75?'B':pct>=60?'C':pct>=50?'D':'F',date:new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
+  saveExamHistory(hist);
+}
+
+// ════════════════════════════════════════════════════════
+// RACHA POR MATERIA
+// ════════════════════════════════════════════════════════
+function getMatStreaks(){return JSON.parse(localStorage.getItem('lumio_mat_streaks')||'{}');}
+function saveMatStreaks(obj){localStorage.setItem('lumio_mat_streaks',JSON.stringify(obj));}
+function updateMatStreak(matName){
+  const streaks=getMatStreaks();
+  const today=new Date().toISOString().slice(0,10);
+  if(!streaks[matName])streaks[matName]={streak:0,lastDate:null,maxStreak:0};
+  const s=streaks[matName];
+  if(s.lastDate===today)return;
+  const yesterday=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  s.streak=s.lastDate===yesterday?s.streak+1:1;
+  s.lastDate=today;
+  s.maxStreak=Math.max(s.maxStreak||0,s.streak);
+  streaks[matName]=s;
+  saveMatStreaks(streaks);
+}
+
+// ════════════════════════════════════════════════════════
+// GESTIÓN DE CLASES MEJORADA — editar nombre/descripción
+// ════════════════════════════════════════════════════════
+function showEditClase(claseId){
+  const clases=getClases();const clase=clases.find(c=>c.id===claseId);if(!clase)return;
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;padding:0 0 20px';
+  div.innerHTML=`<div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:22px 22px 16px 16px;padding:22px 20px;width:calc(100% - 24px);max-width:380px">
+    <div style="font-size:17px;font-weight:800;color:var(--t1);margin-bottom:14px">✏️ Editar clase</div>
+    <div class="sl">Nombre</div>
+    <input class="inp" id="edit-clase-nombre" value="${clase.nombre.replace(/"/g,'&quot;')}" style="margin-bottom:10px">
+    <div class="sl">Materia</div>
+    <select class="inp" id="edit-clase-mat" style="margin-bottom:10px">
+      <option value="__todas__"${clase.materia==='__todas__'?' selected':''}>📚 Todas las asignaturas</option>
+      ${D.mats.map(m=>`<option value="${m.n}"${m.n===clase.materia?' selected':''}>${m.e} ${m.n}</option>`).join('')}
+    </select>
+    <div class="sl">Descripción</div>
+    <textarea class="inp ta" id="edit-clase-desc" style="min-height:60px;margin-bottom:14px">${clase.desc||''}</textarea>
+    <div style="display:flex;gap:8px">
+      <button class="gbtn" style="flex:1" onclick="this.closest('div[style*=position]').remove()">Cancelar</button>
+      <button class="mbtn" style="flex:2" onclick="saveEditClase('${claseId}',this.closest('div[style*=position]'))">✅ Guardar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+function saveEditClase(claseId,overlay){
+  const nombre=(document.getElementById('edit-clase-nombre')?.value||'').trim();
+  const materia=document.getElementById('edit-clase-mat')?.value||'__todas__';
+  const desc=(document.getElementById('edit-clase-desc')?.value||'').trim();
+  if(!nombre){toast('⚠️ El nombre no puede estar vacío');return;}
+  const clases=getClases();const clase=clases.find(c=>c.id===claseId);if(!clase)return;
+  clase.nombre=nombre;clase.materia=materia;clase.desc=desc;
+  saveClases(clases);
+  if(overlay)overlay.remove();
+  toast('✅ Clase actualizada');bClaseDetalle();
+}
+
+// ════════════════════════════════════════════════════════
+// PATCH FUNCTIONS — hook into existing code
+// ════════════════════════════════════════════════════════
+(function patches(){
+  // 1. bHome: add horario widget
+  const origBHome=window.bHome;
+  if(typeof origBHome==='function'){
+    window.bHome=function(){origBHome();try{renderHomeHorarioWidget();}catch(e){}try{_notifRenderStatus();}catch(e){};};
+  }
+  // 2. showExRes: record exam result + materia streak
+  const origShowExRes=window.showExRes;
+  if(typeof origShowExRes==='function'){
+    window.showExRes=function(){
+      origShowExRes();
+      try{
+        let right=0;
+        ex.cards.forEach((c,i)=>{if(ex.ans[i]===ex.cLetters[i])right++;});
+        const pct=Math.round(right/ex.cards.length*100);
+        const mat=ex.mat==='Todas'?(ex.cards[0]?.m||'General'):ex.mat;
+        recordExamResult(pct,mat,ex.cards.length,ex.src||'cards');
+        updateMatStreak(mat);
+      }catch(e){}
+    };
+  }
+  // 3. Toggle theme: mark as manual
+  const origToggle=window.toggleTheme;
+  if(typeof origToggle==='function'){
+    window.toggleTheme=function(){localStorage.setItem('lumio_theme_manual','1');origToggle();};
+  }
+  // 4. Pomodoro complete: update materia streak
+  const origPomComplete=window._pomComplete;
+  if(typeof origPomComplete==='function'){
+    window._pomComplete=function(){origPomComplete();try{if(pomMatActiva)updateMatStreak(pomMatActiva);}catch(e){};};
+  }
+})();
 
 // ════════════════════════════════════════════════════════
 // SERVICE WORKER INLINE — offline garantizado
