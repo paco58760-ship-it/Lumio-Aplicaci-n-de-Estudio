@@ -70,7 +70,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .pt{font-size:23px;font-weight:800;color:var(--t1);margin-bottom:4px}
 .pt em{color:var(--y);font-style:normal}
 .ps{font-size:12px;color:var(--t2);margin-bottom:14px}
-.sl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.sl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .card{background:var(--bg1);border:1px solid var(--bd);border-radius:14px;padding:16px 16px;margin-bottom:12px;transition:border-color .15s}
 .card-y{border-color:var(--yb);background:rgba(245,197,24,.04)}
 .prog-bg{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
@@ -310,7 +310,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 /* CONFETTI */
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:970;display:none}
 /* ── TUTORIAL ── */
-#tutorial-overlay{position:fixed;inset:0;z-index:960;display:none;pointer-events:all}
+#tutorial-overlay{position:fixed;inset:0;z-index:9500;display:none;pointer-events:all}
 /* Spotlight: dark mask with a transparent cutout */
 #tut-mask{position:absolute;inset:0;pointer-events:none}
 /* Card slides up from bottom */
@@ -1161,7 +1161,7 @@ button:active{transform:scale(.97)}
 </div>
 
 <!-- Editor fullscreen -->
-<div id="apuntes-editor-view" style="display:none;height:100%;display:none;flex-direction:column">
+<div id="apuntes-editor-view" style="display:none;height:100%;flex-direction:column;position:relative;z-index:1">
   <!-- Toolbar -->
   <div style="background:var(--bg1);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0">
     <button onclick="apu_closeEditor()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);padding:2px;line-height:1">←</button>
@@ -2154,12 +2154,22 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-notas-historial"><div class="pw">
   <div class="pt">Mis <em>notas</em> 📊</div>
   <div class="ps">Registra tus notas y calcula la media</div>
-  <div class="chip-row" id="notas-mats" class="chip-wrap" style="margin-bottom:12px;display:flex;flex-wrap:wrap"></div>
+  <div id="notas-mats" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
   <div class="card" style="margin-bottom:12px">
-    <div style="display:flex;gap:8px;align-items:flex-end">
-      <div style="flex:1"><div class="sl">Examen / Trabajo</div><input class="inp" id="nota-nombre" placeholder="Ej: Examen T1..."></div>
-      <div style="width:70px"><div class="sl">Nota</div><input class="inp" id="nota-valor" type="number" min="0" max="10" step="0.1" placeholder="7.5"></div>
-      <button class="mbtn" style="flex-shrink:0;padding:10px 14px" onclick="addNota()">+</button>
+    <div class="sl" style="margin-bottom:8px">Nueva nota</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input class="inp" id="nota-nombre" placeholder="Examen T1, Trabajo..." style="flex:1">
+      <input class="inp" id="nota-valor" type="number" min="0" max="10" step="0.1" placeholder="7.5" style="width:72px">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <select class="inp" id="nota-tipo" style="flex:1;color:var(--t2)">
+        <option value="Examen">📝 Examen</option>
+        <option value="Trabajo">📋 Trabajo</option>
+        <option value="Oral">🎤 Oral</option>
+        <option value="Práctica">🔬 Práctica</option>
+        <option value="Otro">📌 Otro</option>
+      </select>
+      <button onclick="addNota()" style="background:var(--y);color:#0d0f14;border:none;border-radius:11px;padding:0 20px;font-size:18px;font-weight:900;cursor:pointer;flex-shrink:0;height:42px;display:flex;align-items:center;justify-content:center;line-height:1">+</button>
     </div>
   </div>
   <div id="notas-list"></div>
@@ -2644,7 +2654,7 @@ button:active{transform:scale(.97)}
   <div id="checkin-sugerencia" style="font-size:12px;color:var(--teal);min-height:18px;margin-bottom:12px"></div>
   <div style="display:flex;gap:8px">
     <button class="gbtn" style="flex:1" onclick="clsMo('checkin');confirmPomStart()">Saltar</button>
-    <button class="mbtn" style="flex:2" id="checkin-ok-btn" onclick="confirmCheckinAndStart()" disabled>▶ Empezar</button>
+    <button class="mbtn" style="flex:2" id="checkin-ok-btn" onclick="confirmCheckinAndStart()">▶ Empezar</button>
   </div>
 </div></div>
 
@@ -6055,30 +6065,27 @@ function _isDarkColor(hex){
 }
 
 function applyAccentColor(hex, id){
-  // Build rgba variants
   const{r,g,b}=_hexToRgb(hex);
   const dark=`rgba(${r},${g},${b},.13)`;
   const border=`rgba(${r},${g},${b},.32)`;
   const textColor=_isDarkColor(hex)?'#ffffff':'#0d0f14';
 
-  // Inject CSS variables
   const root=document.documentElement;
   root.style.setProperty('--y', hex);
   root.style.setProperty('--yd', dark);
   root.style.setProperty('--yb', border);
   root.style.setProperty('--accent-text', textColor);
 
-  // Also fix the text-on-yellow color for buttons etc
-  // We add a <style> override so mbtn color works
-  let overrideEl=document.getElementById('accent-override-style');
-  if(!overrideEl){
-    overrideEl=document.createElement('style');
-    overrideEl.id='accent-override-style';
-    document.head.appendChild(overrideEl);
-  }
-  overrideEl.textContent=`.mbtn{color:${textColor}!important}.pwa-btn-main{color:${textColor}!important}.pwa-btn-main span{color:${textColor}!important}`;
+  // Update browser top bar color (theme-color meta)
+  let themeMeta=document.querySelector('meta[name="theme-color"]');
+  if(!themeMeta){themeMeta=document.createElement('meta');themeMeta.name='theme-color';document.head.appendChild(themeMeta);}
+  themeMeta.content=hex;
 
-  // Save
+  // Update button text colors via style override
+  let overrideEl=document.getElementById('accent-override-style');
+  if(!overrideEl){overrideEl=document.createElement('style');overrideEl.id='accent-override-style';document.head.appendChild(overrideEl);}
+  overrideEl.textContent=`.mbtn{color:${textColor}!important}.pwa-btn-main{color:${textColor}!important}.pwa-btn-main span{color:${textColor}!important}.nb.active{color:${hex}!important}.nb.active::after{background:${hex}!important}.chip.on{color:${hex}!important;border-color:${border}!important;background:${dark}!important}.tut-highlight{box-shadow:0 0 0 3px ${hex},0 0 0 6px rgba(${r},${g},${b},.25),0 0 32px rgba(${r},${g},${b},.4)!important}`;
+
   localStorage.setItem('lumio_accent', JSON.stringify({hex, id}));
 
   // Update custom swatch + hex label
@@ -6506,12 +6513,14 @@ function getTutSteps(){
 function tutFinish(){
   const ov=document.getElementById('tutorial-overlay');
   if(ov){ov.style.display='none';}
-  // Remove all highlights
   document.querySelectorAll('.tut-highlight,.tut-nav-highlight').forEach(el=>{
     el.classList.remove('tut-highlight','tut-nav-highlight');
   });
   _tutHL=null;
   document.body.style.overflow='';
+  // Close apuntes editor if open
+  const editorView=document.getElementById('apuntes-editor-view');
+  if(editorView)editorView.style.display='none';
   localStorage.setItem('lumio_seen_tutorial','1');
   try{navSection('home');}catch(e){}
 }
@@ -6551,7 +6560,18 @@ function showTutStep(){
   if(s.nav){
     const parts=s.nav.split(':');
     try{navSection(parts[0]);}catch(e){}
-    if(parts[1])setTimeout(()=>{try{goTo(parts[1]);}catch(e){}},80);
+    if(parts[1])setTimeout(()=>{
+      try{
+        // Close apuntes editor if open (it covers the tutorial card)
+        const editorView=document.getElementById('apuntes-editor-view');
+        if(editorView)editorView.style.display='none';
+        goTo(parts[1]);
+      }catch(e){}
+    },80);
+  } else {
+    // When nav is null (e.g. welcome step), close editor if open
+    const editorView=document.getElementById('apuntes-editor-view');
+    if(editorView)editorView.style.display='none';
   }
 
   // Highlight element after navigation
@@ -6588,11 +6608,11 @@ function showTutStep(){
   if(cnt){cnt.textContent=`Paso ${tutStep+1} de ${total}`;}
 
   const text=document.getElementById('tut-text');
-  if(text){text.innerHTML=s.text;}
+  if(text){text.innerHTML=s.msg||s.text||'';}
 
   const visual=document.getElementById('tut-visual');
   if(visual){
-    if(s.visual){visual.innerHTML=s.visual;visual.style.display='block';}
+    if(s.demo||s.visual){visual.innerHTML=s.demo||s.visual;visual.style.display='block';}
     else{visual.style.display='none';}
   }
 
@@ -8691,19 +8711,29 @@ function addNota(){
   const valor=parseFloat(document.getElementById('nota-valor')?.value||'');
   if(!nombre||isNaN(valor)||valor<0||valor>10){toast('⚠️ Introduce un nombre y una nota válida (0-10)');return;}
   const db=getNotasDB();if(!db[notasMat])db[notasMat]=[];
-  db[notasMat].push({id:'n'+Date.now(),nombre,valor,fecha:new Date().toLocaleDateString('es-ES')});
-  saveNotasDB(db);document.getElementById('nota-nombre').value='';document.getElementById('nota-valor').value='';
+  const tipo=document.getElementById('nota-tipo')?.value||'Examen';
+  db[notasMat].push({id:'n'+Date.now(),nombre,valor,tipo,fecha:new Date().toLocaleDateString('es-ES')});
+  saveNotasDB(db);document.getElementById('nota-nombre').value='';document.getElementById('nota-valor').value='';const nt=document.getElementById('nota-tipo');if(nt)nt.selectedIndex=0;
   renderNotas();toast('✅ Nota guardada');gainXP(1);
 }
 function renderNotas(){
   const db=getNotasDB();const notas=db[notasMat]||[];
   const el=document.getElementById('notas-list');if(!el)return;
   if(!notas.length){el.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Sin notas guardadas en '+notasMat+'</div>';return;}
-  el.innerHTML=notas.map(n=>`<div class="card" style="margin-bottom:7px;display:flex;align-items:center;gap:10px">
-    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">${n.nombre}</div><div style="font-size:10px;color:var(--t3)">${n.fecha}</div></div>
-    <div style="font-size:20px;font-weight:900;color:${n.valor>=7?'var(--green)':n.valor>=5?'var(--y)':'#f87171'}">${n.valor}</div>
-    <button onclick="deleteNota('${n.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px">🗑</button>
-  </div>`).join('');
+  const tipoIco={'Examen':'📝','Trabajo':'📋','Oral':'🎤','Práctica':'🔬','Otro':'📌'};
+  el.innerHTML=notas.map(n=>{
+    const col=n.valor>=7?'var(--green)':n.valor>=5?'var(--y)':'#f87171';
+    const ico=tipoIco[n.tipo||'Examen']||'📝';
+    return `<div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;padding:12px 14px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(${n.valor>=7?'74,222,128':n.valor>=5?'245,197,24':'248,113,113'},.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${ico}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.nombre}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:1px">${n.tipo||'Examen'} · ${n.fecha}</div>
+      </div>
+      <div style="font-size:22px;font-weight:900;color:${col};flex-shrink:0">${n.valor}</div>
+      <button onclick="deleteNota('${n.id}')" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:8px;color:#f87171;cursor:pointer;font-size:12px;padding:5px 8px;flex-shrink:0;font-family:var(--font)">🗑</button>
+    </div>`;
+  }).join('');
   const media=notas.reduce((s,n)=>s+n.valor,0)/notas.length;
   const mediaEl=document.getElementById('notas-media');
   if(mediaEl){mediaEl.style.display='block';
