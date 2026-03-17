@@ -53,8 +53,9 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .ni{font-size:18px;line-height:1}
 .nb span{font-size:8px;font-weight:700;white-space:nowrap}
 /* SPLASH */
-#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s,-webkit-transform .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0)}
-#splash.out{opacity:0;pointer-events:none;visibility:hidden;-webkit-transform:translate3d(0,0,0)}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0);animation:splash-auto-hide 0.5s ease 3s forwards;animation-fill-mode:forwards}
+@keyframes splash-auto-hide{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden;pointer-events:none}}
+#splash.out{opacity:0;pointer-events:none;visibility:hidden;display:none!important}
 .sp-ico{width:76px;height:76px;background:var(--y);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;animation:spul 1.6s ease-in-out infinite}
 @keyframes spul{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .sp-bar{width:50px;height:3px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:10px}
@@ -1828,7 +1829,7 @@ button:active{transform:scale(.97)}
   </div>
 
   <div class="card" style="margin-bottom:14px;margin-top:8px;background:rgba(45,212,191,.06);border-color:rgba(45,212,191,.2)">
-    <div style="font-size:11px;color:var(--t2);line-height:1.6" id="fb-info">📨 El mensaje llegará directamente a paco58760@gmail.com.</div>
+    <div style="font-size:11px;color:var(--t2);line-height:1.6" id="fb-info">📨 El mensaje llegará directamente a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8b8a9aba7fdf0fffef888afa5a9a1a4e6aba7a5">[email&#160;protected]</a>.</div>
   </div>
 
   <button class="mbtn" id="fb-send-btn" onclick="sendFeedback()">📧 Enviar mensaje</button>
@@ -2606,45 +2607,131 @@ button:active{transform:scale(.97)}
 </div>
 
 
-<!-- ═══ PWA INSTALL OVERLAY ═══ -->
-<div id="pwa-overlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.92);display:none;align-items:flex-end;justify-content:center;padding:0 0 20px">
-  <div id="pwa-card" style="background:var(--bg1);border:1px solid var(--bd2);border-radius:28px 28px 20px 20px;padding:32px 24px 24px;width:calc(100%-24px);max-width:380px;text-align:center;transform:translateY(100px);transition:transform .4s cubic-bezier(.34,1.56,.64,1)">
-    <!-- Logo grande -->
-    <div style="width:96px;height:96px;background:var(--y);border-radius:24px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:0 8px 32px rgba(245,197,24,.4)">📚</div>
-    <div style="font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px">Lumio</div>
-    <div style="font-size:14px;color:var(--t2);margin-bottom:20px;line-height:1.5">Tu compañero de estudio.<br>Gratis, sin anuncios, sin registro.</div>
-    <!-- Stars / features -->
-    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:22px">
-      <div style="text-align:center"><div style="font-size:24px">🃏</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Flashcards</div></div>
-      <div style="text-align:center"><div style="font-size:24px">⏱️</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Pomodoro</div></div>
-      <div style="text-align:center"><div style="font-size:24px">🧠</div><div style="font-size:10px;color:var(--t3);margin-top:4px">IA local</div></div>
-      <div style="text-align:center"><div style="font-size:24px">🏫</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Clases</div></div>
+<!-- ═══ PWA INSTALL SCREEN ═══ -->
+<style>
+#pwa-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 20px 40px;
+  opacity:0;
+  transition:opacity .45s ease;
+  overflow-y:auto;
+}
+#pwa-overlay.pwa-visible{
+  display:flex;
+  opacity:1;
+}
+.pwa-logo-ring{
+  width:110px;height:110px;
+  background:var(--y);
+  border-radius:28px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:60px;
+  box-shadow:0 0 0 12px rgba(245,197,24,.12), 0 0 0 24px rgba(245,197,24,.05), 0 16px 48px rgba(245,197,24,.35);
+  animation:pwa-pulse 2.8s ease-in-out infinite;
+  flex-shrink:0;
+  margin-bottom:24px;
+}
+@keyframes pwa-pulse{0%,100%{box-shadow:0 0 0 12px rgba(245,197,24,.12),0 0 0 24px rgba(245,197,24,.05),0 16px 48px rgba(245,197,24,.35)}50%{box-shadow:0 0 0 16px rgba(245,197,24,.18),0 0 0 32px rgba(245,197,24,.07),0 16px 56px rgba(245,197,24,.45)}}
+.pwa-title{font-size:42px;font-weight:900;color:var(--t1);letter-spacing:-2px;line-height:1;margin-bottom:6px;text-align:center}
+.pwa-sub{font-size:15px;color:var(--t2);text-align:center;line-height:1.5;margin-bottom:32px;max-width:300px}
+.pwa-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px;margin-bottom:32px}
+.pwa-feat{
+  background:var(--bg1);border:1px solid var(--bd);border-radius:14px;
+  padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+}
+.pwa-feat-icon{font-size:26px;line-height:1}
+.pwa-feat-name{font-size:11px;font-weight:700;color:var(--t1)}
+.pwa-feat-desc{font-size:10px;color:var(--t3);line-height:1.3}
+.pwa-btn-main{
+  width:100%;max-width:320px;
+  background:var(--y);color:#0d0f14;
+  border:none;border-radius:16px;
+  padding:18px;font-size:18px;font-weight:900;
+  cursor:pointer;font-family:var(--font);
+  box-shadow:0 6px 28px rgba(245,197,24,.45);
+  transition:transform .12s,box-shadow .12s;
+  margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.pwa-btn-main:active{transform:scale(.97);box-shadow:0 3px 14px rgba(245,197,24,.3)}
+.pwa-btn-skip{
+  background:none;border:none;color:var(--t3);font-size:13px;
+  cursor:pointer;font-family:var(--font);padding:8px;
+  text-decoration:underline;text-underline-offset:3px;
+}
+#pwa-ios-box,#pwa-android-box{
+  display:none;
+  background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
+  padding:16px;margin-bottom:14px;text-align:left;
+  width:100%;max-width:320px;
+}
+#pwa-ios-box .step,#pwa-android-box .step{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:var(--t2);line-height:1.5;
+  margin-bottom:8px;
+}
+#pwa-ios-box .step:last-child,#pwa-android-box .step:last-child{margin-bottom:0}
+#pwa-ios-box .step-num,#pwa-android-box .step-num{
+  width:22px;height:22px;min-width:22px;background:var(--y);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;color:#0d0f14;margin-top:1px;
+}
+.pwa-already{font-size:11px;color:var(--t3);text-align:center;margin-top:8px}
+</style>
+<div id="pwa-overlay">
+  <div class="pwa-logo-ring">📚</div>
+  <div class="pwa-title">Lumio</div>
+  <div class="pwa-sub">Tu compañero de estudio.<br>Gratis · Sin anuncios · Sin registro.</div>
+
+  <div class="pwa-features">
+    <div class="pwa-feat">
+      <div class="pwa-feat-icon">🃏</div>
+      <div class="pwa-feat-name">Flashcards</div>
+      <div class="pwa-feat-desc">Repaso con IA y swipe</div>
     </div>
-    <!-- Main install button -->
-    <button id="pwa-install-btn" onclick="pwaInstall()" style="width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;cursor:pointer;font-family:var(--font);margin-bottom:10px;box-shadow:0 4px 20px rgba(245,197,24,.4)">
-      📲 Instalar en mi dispositivo
-    </button>
-    <!-- iOS specific instructions (shown on iOS) -->
-    <div id="pwa-ios-hint" style="display:none;background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:10px;text-align:left">
-      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📱 Cómo instalar en iPhone / iPad:</div>
-      <div style="font-size:12px;color:var(--t2);line-height:1.7">
-        1. Pulsa <b style="color:var(--y)">⬆ Compartir</b> en Safari<br>
-        2. Selecciona <b style="color:var(--y)">"Añadir a pantalla de inicio"</b><br>
-        3. Pulsa <b style="color:var(--y)">Añadir</b> — ¡listo!
-      </div>
+    <div class="pwa-feat">
+      <div class="pwa-feat-icon">⏱️</div>
+      <div class="pwa-feat-name">Pomodoro</div>
+      <div class="pwa-feat-desc">Timer con alertas</div>
     </div>
-    <!-- Samsung / other hint -->
-    <div id="pwa-android-hint" style="display:none;background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:10px;text-align:left">
-      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📱 Si no aparece el botón automático:</div>
-      <div style="font-size:12px;color:var(--t2);line-height:1.7">
-        1. Pulsa <b style="color:var(--y)">⋮ Menú</b> del navegador<br>
-        2. Selecciona <b style="color:var(--y)">"Añadir a pantalla de inicio"</b>
-      </div>
+    <div class="pwa-feat">
+      <div class="pwa-feat-icon">🧠</div>
+      <div class="pwa-feat-name">IA local</div>
+      <div class="pwa-feat-desc">Test y resúmenes</div>
     </div>
-    <button onclick="pwaClose()" style="background:none;border:none;color:var(--t3);font-size:13px;cursor:pointer;font-family:var(--font);padding:4px 0">Ahora no</button>
+    <div class="pwa-feat">
+      <div class="pwa-feat-icon">🏫</div>
+      <div class="pwa-feat-name">Clases</div>
+      <div class="pwa-feat-desc">Temario y deberes</div>
+    </div>
   </div>
+
+  <!-- iOS instructions -->
+  <div id="pwa-ios-box">
+    <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:12px">📱 Instalar en iPhone / iPad</div>
+    <div class="step"><div class="step-num">1</div><div>Pulsa el botón <b style="color:var(--y)">⬆ Compartir</b> en la barra de Safari</div></div>
+    <div class="step"><div class="step-num">2</div><div>Desliza y elige <b style="color:var(--y)">"Añadir a pantalla de inicio"</b></div></div>
+    <div class="step"><div class="step-num">3</div><div>Pulsa <b style="color:var(--y)">Añadir</b> — ¡listo! Lumio aparece en tu home</div></div>
+  </div>
+
+  <!-- Android manual instructions -->
+  <div id="pwa-android-box">
+    <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:12px">📱 Instalar en Android</div>
+    <div class="step"><div class="step-num">1</div><div>Pulsa el menú <b style="color:var(--y)">⋮</b> del navegador (arriba a la derecha)</div></div>
+    <div class="step"><div class="step-num">2</div><div>Elige <b style="color:var(--y)">"Añadir a pantalla de inicio"</b> o <b style="color:var(--y)">"Instalar app"</b></div></div>
+    <div class="step"><div class="step-num">3</div><div>Confirma pulsando <b style="color:var(--y)">Añadir</b></div></div>
+  </div>
+
+  <button id="pwa-install-btn" class="pwa-btn-main" onclick="pwaInstall()">
+    <span>📲</span><span>Instalar Lumio</span>
+  </button>
+
+  <button class="pwa-btn-skip" onclick="pwaClose()">Continuar en el navegador</button>
+  <div class="pwa-already">¿Ya está instalada? <span style="color:var(--y);cursor:pointer" onclick="pwaClose()">Entrar a la app →</span></div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════
@@ -8879,15 +8966,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   const splashGuard=setTimeout(()=>{
     try{
       const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
-      // Ensure screens are initialized even if normal flow failed
+      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
       try{bHome();}catch(e){}
       try{navSection('home');}catch(e){}
       if(!localStorage.getItem('lumio_seen_onboarding')){
         try{showOnboarding();}catch(e){}
       }
     }catch(e){}
-  },5000);
+  },3500);
 
   try{
     // Load full persisted state FIRST
@@ -8909,25 +8995,41 @@ if('serviceWorker' in navigator){
   }).catch(()=>{});
 }
 
-    // ── PWA Install — funciona en Chrome/Edge/Samsung/Android + guía para iOS ──
-    window.window._pwaPrompt=null;
+    // ── PWA Install — full-screen, lo primero que ves ──
+    window._pwaPrompt=null;
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    const isStandalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+
+    // Mark as installed if already running standalone
+    if(isStandalone){
+      localStorage.setItem('lumio_pwa_installed','1');
+    }
+
+    // Show IMMEDIATELY if not installed
+    (function checkPwaOnLoad(){
+      if(localStorage.getItem('lumio_pwa_installed'))return;
+      if(isStandalone)return;
+      // Small delay so page CSS loads first (1 frame)
+      requestAnimationFrame(()=>{
+        if(isIOS){
+          pwaShow('ios');
+        } else {
+          // For Android/desktop, wait up to 500ms for beforeinstallprompt
+          // If it fires before that we already have the prompt; if not, show anyway
+          setTimeout(()=>pwaShow('android'),500);
+        }
+      });
+    })();
+
     window.addEventListener('beforeinstallprompt',e=>{
       e.preventDefault();
       window._pwaPrompt=e;
-      // Show our custom overlay after 3s if not already installed
-      if(!localStorage.getItem('lumio_pwa_dismissed')){
-        setTimeout(()=>pwaShow('android'),3000);
+      // If overlay isn't visible yet, show it now
+      const ov=document.getElementById('pwa-overlay');
+      if(!localStorage.getItem('lumio_pwa_installed')&&ov&&!ov.classList.contains('pwa-visible')){
+        pwaShow('android');
       }
     });
-    // Detect already installed
-    if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
-      localStorage.setItem('lumio_pwa_installed','1');
-    }
-    // iOS: show install hint if not installed and not dismissed
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-    if(isIOS&&!navigator.standalone&&!localStorage.getItem('lumio_pwa_dismissed')){
-      setTimeout(()=>pwaShow('ios'),4000);
-    }
 
     // Update about creator name
     const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
@@ -8956,25 +9058,23 @@ if('serviceWorker' in navigator){
     setTimeout(()=>{try{checkImminentExam();}catch(e){}}, 2000);
 
     // Splash → onboarding or app
-    setTimeout(()=>{
-      clearTimeout(splashGuard); // normal flow succeeded — cancel the safety net
+    // CSS already auto-hides splash at 3s — JS does it faster at 1200ms
+    function hideSplashAndStart(){
+      clearTimeout(splashGuard);
       const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('out');sp.style.opacity='0';}
-      setTimeout(()=>{
-        try{
-          if(!localStorage.getItem('lumio_seen_onboarding')){
-            showOnboarding();
-          }else{
-            // Ensure home screen is visible
-            try{navSection('home');}catch(e){}
-            setTimeout(()=>{try{startTutorial();}catch(e){}},600);
-          }
-        }catch(e2){
-          // Last resort: if onboarding/tutorial fails, at least show home
+      if(sp){sp.classList.add('out');sp.style.display='none';}
+      try{
+        if(!localStorage.getItem('lumio_seen_onboarding')){
+          showOnboarding();
+        }else{
           try{navSection('home');}catch(e){}
+          setTimeout(()=>{try{startTutorial();}catch(e){}},600);
         }
-      },600);
-    },1800);
+      }catch(e2){
+        try{navSection('home');}catch(e){}
+      }
+    }
+    setTimeout(hideSplashAndStart, 1200);
 
   }catch(e){
     // Si algo falla, el splashGuard sigue activo como último recurso
@@ -8984,8 +9084,9 @@ if('serviceWorker' in navigator){
     setTimeout(()=>{
       try{
         const sp=document.getElementById('splash');
-        if(sp){sp.classList.add('out');sp.style.opacity='0';}
+        if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
         if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
+        else try{navSection('home');}catch(e){}
       }catch(e2){}
     },500);
   }
@@ -9299,61 +9400,80 @@ function startExamenClase(claseId){
 // PWA INSTALL — banner universal para todos los navegadores
 // ════════════════════════════════════════════════════════
 function pwaShow(mode){
-  // Don't show if already installed or recently dismissed
+  // Never show if already installed or dismissed recently
   if(localStorage.getItem('lumio_pwa_installed'))return;
+  if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone)return;
   if(localStorage.getItem('lumio_pwa_dismissed'))return;
   const ov=document.getElementById('pwa-overlay');
-  const card=document.getElementById('pwa-card');
-  const iosHint=document.getElementById('pwa-ios-hint');
-  const androidHint=document.getElementById('pwa-android-hint');
+  if(!ov)return;
+  const iosBox=document.getElementById('pwa-ios-box');
+  const androidBox=document.getElementById('pwa-android-box');
   const installBtn=document.getElementById('pwa-install-btn');
-  if(!ov||!card)return;
-  // Configure based on platform
   if(mode==='ios'){
+    // On iOS: hide install button, show iOS steps
     if(installBtn)installBtn.style.display='none';
-    if(iosHint)iosHint.style.display='block';
+    if(iosBox)iosBox.style.display='block';
   }else{
-    if(installBtn)installBtn.style.display='block';
-    if(androidHint){
-      // Show Android manual hint after 1.5s if no auto-prompt
-      setTimeout(()=>{if(!window._pwaPrompt&&androidHint)androidHint.style.display='block';},1500);
+    // Android/desktop
+    if(installBtn)installBtn.style.display='flex';
+    if(!window._pwaPrompt){
+      // No auto-prompt available — show manual steps
+      setTimeout(()=>{if(!window._pwaPrompt&&androidBox)androidBox.style.display='block';},800);
     }
   }
+  // Full screen takeover — show immediately
   ov.style.display='flex';
+  ov.style.opacity='0';
+  // Force reflow then fade in
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(card)card.style.transform='translateY(0)';
+    ov.style.opacity='1';
   }));
 }
 function pwaClose(){
   const ov=document.getElementById('pwa-overlay');
-  const card=document.getElementById('pwa-card');
-  if(card)card.style.transform='translateY(100px)';
-  setTimeout(()=>{if(ov)ov.style.display='none';},400);
-  // Dismiss for 7 days
+  if(!ov)return;
+  ov.style.opacity='0';
+  ov.style.pointerEvents='none';
+  setTimeout(()=>{
+    ov.style.display='none';
+    ov.classList.remove('pwa-visible');
+    // Make sure the app is showing behind
+    const phone=document.getElementById('phone');
+    if(phone)phone.style.display='';
+    // If splash is gone already, make sure we're on home
+    const sp=document.getElementById('splash');
+    if(sp&&(sp.classList.contains('out')||sp.style.opacity==='0')){
+      try{ bHome(); navSection('home'); }catch(e){}
+    }
+  },450);
   localStorage.setItem('lumio_pwa_dismissed',Date.now()+'');
-  // Clear dismissal after 7 days so it shows again
-  setTimeout(()=>localStorage.removeItem('lumio_pwa_dismissed'),7*864e5);
 }
 async function pwaInstall(){
+  const btn=document.getElementById('pwa-install-btn');
   if(window._pwaPrompt){
     window._pwaPrompt.prompt();
     const result=await window._pwaPrompt.userChoice;
     if(result.outcome==='accepted'){
       localStorage.setItem('lumio_pwa_installed','1');
+      pwaClose();
       toast('✅ ¡Lumio instalado! Búscalo en tu pantalla de inicio');
     }
     window._pwaPrompt=null;
-    pwaClose();
   }else{
-    // Fallback: show manual instructions
-    const androidHint=document.getElementById('pwa-android-hint');
-    if(androidHint)androidHint.style.display='block';
-    const btn=document.getElementById('pwa-install-btn');
-    if(btn){btn.textContent='⬆ Ver instrucciones arriba';btn.style.background='var(--bg2)';btn.style.color='var(--t1)';}
+    // No browser prompt — show manual instructions
+    const androidBox=document.getElementById('pwa-android-box');
+    if(androidBox)androidBox.style.display='block';
+    if(btn){
+      btn.innerHTML='<span>⬆</span><span>Sigue los pasos de arriba</span>';
+      btn.style.background='var(--bg2)';btn.style.color='var(--t1)';
+      btn.style.boxShadow='none';
+    }
   }
 }
 // Expose for Ajustes install button
-function showInstallPrompt(){pwaShow('android');}
+function showInstallPrompt(){
+  pwaShow(typeof isIOS!=='undefined'&&isIOS?'ios':'android');
+}
 
 // ════════════════════════════════════════════════════════
 // MODO OSCURO AUTOMÁTICO
@@ -9548,14 +9668,4 @@ self.addEventListener('fetch',e=>{
   }catch(e){}
 })();
 
-// Inicializar notificaciones y URL imports al arrancar
-document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    try{_notifSchedule();}catch(e){}
-    try{checkNotaUrlImport();}catch(e){}
-  },1000);
-});
-
-</script>
-</body>
-</html>
+// Inicializar 
