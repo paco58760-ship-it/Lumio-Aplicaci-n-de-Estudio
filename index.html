@@ -46,12 +46,16 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 #phone{width:100%;max-width:390px;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 #screens{flex:1;overflow:hidden;position:relative}
 /* NAV */
-#nav{height:64px;background:var(--bg);border-top:1px solid var(--bd);display:flex;align-items:center;overflow-x:auto;flex-shrink:0;padding:0 2px;padding-bottom:env(safe-area-inset-bottom,0px);-webkit-overflow-scrolling:touch}
-#nav::-webkit-scrollbar{display:none}
-.nb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .15s;flex-shrink:0;min-width:52px;border-radius:8px}
+#nav{height:68px;background:rgba(11,13,18,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px 4px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .2s,transform .15s,background .15s;flex-shrink:0;min-width:56px;border-radius:12px;position:relative}.nb:active{background:rgba(245,197,24,.08);transform:scale(.94)}
+.nb.active::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--y);border-radius:0 0 3px 3px;transition:width .2s}
+.nb.active .ni,.nb.active svg{filter:drop-shadow(0 0 6px rgba(245,197,24,.5))}
+.nb:active{transform:scale(.92)}
 .nb.active{color:var(--y)}
-.ni{font-size:18px;line-height:1}
-.nb span{font-size:8px;font-weight:700;white-space:nowrap}
+.nb.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--y);border-radius:999px}
+.ni{font-size:20px;line-height:1;transition:transform .2s}
+.nb.active .ni{transform:translateY(-1px)}
+.nb span{font-size:9px;font-weight:700;white-space:nowrap;letter-spacing:.02em}
 /* SPLASH */
 #splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0);animation:splash-auto-hide 0.5s ease 3s forwards;animation-fill-mode:forwards}
 @keyframes splash-auto-hide{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden;pointer-events:none}}
@@ -67,7 +71,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .pt em{color:var(--y);font-style:normal}
 .ps{font-size:12px;color:var(--t2);margin-bottom:14px}
 .sl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.card{background:var(--bg1);border:1px solid var(--bd);border-radius:13px;padding:16px 16px;margin-bottom:12px}
+.card{background:var(--bg1);border:1px solid var(--bd);border-radius:14px;padding:16px 16px;margin-bottom:12px;transition:border-color .15s}
 .card-y{border-color:var(--yb);background:rgba(245,197,24,.04)}
 .prog-bg{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
@@ -89,7 +93,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .ta{resize:none;min-height:110px;line-height:1.6}
 .spin{width:38px;height:38px;border:3px solid var(--bg2);border-top-color:var(--y);border-radius:50%;animation:spn .75s linear infinite;margin:0 auto}
 @keyframes spn{to{transform:rotate(360deg)}}
-.fade-in{animation:fi .22s ease}
+.fade-in{animation:fi .25s ease}.screen{animation:fi .2s ease}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 /* TOAST */
 #toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg2);border:1px solid var(--bd2);border-radius:999px;padding:9px 20px;font-size:13px;font-weight:700;color:var(--t1);z-index:800;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
@@ -305,9 +309,58 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .snb.active{background:var(--yd);border-color:var(--yb);color:var(--y)}
 /* CONFETTI */
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:970;display:none}
-/* TUTORIAL */
-#tutorial-overlay{position:fixed;inset:0;z-index:960;display:none}
-@keyframes tutCardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+/* ── TUTORIAL ── */
+#tutorial-overlay{position:fixed;inset:0;z-index:960;display:none;pointer-events:all}
+/* Spotlight: dark mask with a transparent cutout */
+#tut-mask{position:absolute;inset:0;pointer-events:none}
+/* Card slides up from bottom */
+#tut-card{
+  position:absolute;left:12px;right:12px;bottom:80px;
+  background:var(--bg1);border:1px solid var(--bd2);border-radius:22px;
+  overflow:hidden;max-width:420px;margin:0 auto;
+  box-shadow:0 12px 48px rgba(0,0,0,.6);
+  animation:tutCardIn .32s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes tutCardIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+#tut-progress-bar{height:3px;background:var(--bg2)}
+#tut-progress-fill{height:100%;transition:width .4s cubic-bezier(.4,0,.2,1)}
+#tut-body{padding:18px 18px 14px}
+#tut-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+#tut-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+#tut-title{font-size:17px;font-weight:900;color:var(--t1);line-height:1.2}
+#tut-step-count{font-size:10px;font-weight:700;color:var(--t3);margin-top:1px}
+#tut-text{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:12px}
+#tut-visual{margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid var(--bd);background:var(--bg2);padding:14px;display:none}
+#tut-tip{font-size:11px;color:var(--teal);background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.18);border-radius:9px;padding:8px 11px;line-height:1.5;margin-bottom:12px;display:none}
+#tut-dots{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+#tut-btns{display:flex;gap:8px}
+#tut-btn-back{flex:1;background:var(--bg2);border:1px solid var(--bd2);border-radius:11px;padding:11px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font);display:none}
+#tut-btn-next{flex:2;border:none;border-radius:11px;padding:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);transition:opacity .12s}
+#tut-btn-next:active{opacity:.8}
+#tut-skip{width:100%;background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:8px 0 0;text-align:center}
+/* Pointer arrow (points at highlighted element) */
+#tut-pointer{
+  position:absolute;width:48px;height:48px;pointer-events:none;
+  display:none;z-index:961;
+}
+#tut-pointer svg{animation:tut-ptr-bounce .9s ease-in-out infinite}
+@keyframes tut-ptr-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* Element highlight ring */
+.tut-highlight{
+  position:relative;z-index:961;
+  box-shadow:0 0 0 3px var(--y),0 0 0 6px rgba(245,197,24,.25),0 0 32px rgba(245,197,24,.4)!important;
+  border-radius:12px;
+  animation:tut-hl 1.4s ease-in-out infinite;
+}
+@keyframes tut-hl{0%,100%{box-shadow:0 0 0 3px var(--y),0 0 0 6px rgba(245,197,24,.25),0 0 32px rgba(245,197,24,.4)}50%{box-shadow:0 0 0 3px var(--y),0 0 0 10px rgba(245,197,24,.12),0 0 48px rgba(245,197,24,.25)}}
+/* Nav highlight for tutorial */
+.tut-nav-highlight{background:rgba(245,197,24,.15)!important;border-radius:10px;}
+/* Demo animations */
+.tut-tap{width:44px;height:44px;border-radius:50%;background:rgba(245,197,24,.3);border:2px solid var(--y);display:flex;align-items:center;justify-content:center;animation:tut-tap-anim 1.5s ease-in-out infinite;margin:0 auto}
+@keyframes tut-tap-anim{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.8);opacity:.6}}
+.tut-card-demo{background:var(--bg1);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--t1);min-width:120px;text-align:center;animation:tut-swipe-anim 2.5s ease-in-out infinite}
+@keyframes tut-swipe-anim{0%,100%{transform:translateX(0);opacity:1}40%{transform:translateX(36px);opacity:.3}50%{transform:translateX(-36px);opacity:.3}}
+.tut-badge{display:inline-flex;align-items:center;gap:4px;background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--y)}
 @keyframes eq0{0%{height:3px}100%{height:14px}}
 @keyframes eq1{0%{height:6px}100%{height:10px}}
 @keyframes eq2{0%{height:10px}100%{height:4px}}
@@ -603,7 +656,39 @@ button:active{transform:scale(.97)}
 <canvas id="confetti-canvas"></canvas>
 
 <!-- TUTORIAL -->
-<div id="tutorial-overlay"></div>
+<div id="tutorial-overlay">
+  <!-- Dark mask (no blur so the app is visible beneath) -->
+  <canvas id="tut-mask"></canvas>
+  <!-- Animated pointer arrow -->
+  <div id="tut-pointer">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="20" fill="rgba(245,197,24,.2)" stroke="#f5c518" stroke-width="2"/>
+      <path d="M24 16v16M17 29l7 7 7-7" stroke="#f5c518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <!-- Tutorial card -->
+  <div id="tut-card">
+    <div id="tut-progress-bar"><div id="tut-progress-fill"></div></div>
+    <div id="tut-body">
+      <div id="tut-header">
+        <div id="tut-icon"></div>
+        <div>
+          <div id="tut-title"></div>
+          <div id="tut-step-count"></div>
+        </div>
+      </div>
+      <div id="tut-text"></div>
+      <div id="tut-visual"></div>
+      <div id="tut-tip"></div>
+      <div id="tut-dots"></div>
+      <div id="tut-btns">
+        <button id="tut-btn-back" onclick="tutStep--;showTutStep()">← Atrás</button>
+        <button id="tut-btn-next" onclick="tutStep++;showTutStep()">Siguiente →</button>
+      </div>
+      <button id="tut-skip" onclick="tutFinish()">Saltar tutorial</button>
+    </div>
+  </div>
+</div>
 
 <!-- POMODORO SUBJECT MODAL -->
 <div id="pom-pre-mo"><div class="mobox">
@@ -693,21 +778,56 @@ button:active{transform:scale(.97)}
   <!-- Próxima clase widget -->
   <div id="h-next-class" style="display:none;margin-bottom:4px"></div>
 
+  <!-- Start here (first time only) -->
+  <div id="h-start-hint" style="display:none;background:rgba(245,197,24,.06);border:1.5px dashed rgba(245,197,24,.35);border-radius:14px;padding:16px;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:800;color:var(--y);margin-bottom:8px">👆 ¿Por dónde empezar?</div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:12px">
+      <b style="color:var(--t1)">1.</b> Ve a <b style="color:var(--teal)">Estudiar → Apuntes</b> y escribe los apuntes de hoy<br>
+      <b style="color:var(--t1)">2.</b> O crea tus primeras <b style="color:var(--purple)">Flashcards</b> para repasar<br>
+      <b style="color:var(--t1)">3.</b> Pulsa el botón amarillo para el <b style="color:var(--orange)">Pomodoro</b>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="navSection('estudiar');setTimeout(()=>goTo('apuntes'),80)" style="flex:1;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">📝 Apuntes</button>
+      <button onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),80)" style="flex:1;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--purple);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">🃏 Flashcards</button>
+      <button onclick="forceShowTutorial()" style="flex:1;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.25);color:var(--y);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">🎓 Tutorial</button>
+    </div>
+  </div>
+
   <!-- Hoy toca -->
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Hoy toca</div>
+  <div style="font-size:11px;font-weight:800;color:var(--t2);letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:14px;background:var(--y);border-radius:2px;display:inline-block"></span>Para hoy</div>
   <div id="study-today" style="margin-bottom:16px"></div>
 
   <!-- Exámenes -->
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Exámenes próximos 📅</div>
+  <div style="font-size:11px;font-weight:800;color:var(--t2);letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:14px;background:var(--orange);border-radius:2px;display:inline-block"></span>Exámenes próximos</div>
   <div id="exams-list" style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)">Añadir →</span></div></div>
 
   <!-- Quick grid -->
-  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Acceso rápido</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
-    <div onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)" style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">🃏</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Flashcards</div><div style="font-size:11px;color:var(--teal);margin-top:2px" id="h-fc">0 tarjetas</div></div>
-    <div onclick="startQuickRep()" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">⚡</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Repaso rápido<span class="quick-rep-badge">5 min</span></div><div style="font-size:11px;color:var(--y);margin-top:2px">10 tarjetas débiles</div></div>
-    <div onclick="navSection('agenda');setTimeout(()=>goTo('agenda'),50)" style="background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📋</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Deberes</div><div style="font-size:11px;color:var(--orange);margin-top:2px" id="h-deberes-count">Ver pendientes</div></div>
-    <div onclick="navSection('perfil');setTimeout(()=>goTo('stats'),50)" style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:13px;padding:14px 12px;cursor:pointer;transition:transform .1s" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''"><div style="font-size:22px;margin-bottom:8px">📊</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Estadísticas</div><div style="font-size:11px;color:var(--purple);margin-top:2px">Tu progreso</div></div>
+  <div style="font-size:11px;font-weight:800;color:var(--t2);letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:14px;background:var(--teal);border-radius:2px;display:inline-block"></span>Acceso rápido</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
+    <div onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),50)" style="background:var(--bg1);border:1px solid var(--bd);border-radius:16px;padding:16px 14px;cursor:pointer;transition:transform .12s,border-color .15s;position:relative;overflow:hidden" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);border-radius:16px 16px 0 0"></div>
+      <div style="font-size:28px;margin-bottom:10px;line-height:1">🃏</div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:3px">Flashcards</div>
+      <div style="font-size:11px;color:var(--teal);font-weight:600" id="h-fc">0 tarjetas</div>
+    </div>
+    <div onclick="startQuickRep()" style="background:var(--bg1);border:1px solid var(--bd);border-radius:16px;padding:16px 14px;cursor:pointer;transition:transform .12s;position:relative;overflow:hidden" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--y);border-radius:16px 16px 0 0"></div>
+      <div style="font-size:28px;margin-bottom:10px;line-height:1">⚡</div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:3px">Repaso rápido</div>
+      <div style="font-size:11px;color:var(--y);font-weight:600">5 min · 10 tarjetas</div>
+    </div>
+    <div onclick="navSection('agenda');setTimeout(()=>goTo('agenda'),50)" style="background:var(--bg1);border:1px solid var(--bd);border-radius:16px;padding:16px 14px;cursor:pointer;transition:transform .12s;position:relative;overflow:hidden" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);border-radius:16px 16px 0 0"></div>
+      <div style="font-size:28px;margin-bottom:10px;line-height:1">📋</div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:3px">Deberes</div>
+      <div style="font-size:11px;color:var(--orange);font-weight:600" id="h-deberes-count">Ver pendientes</div>
+    </div>
+    <div onclick="navSection('perfil');setTimeout(()=>goTo('stats'),50)" style="background:var(--bg1);border:1px solid var(--bd);border-radius:16px;padding:16px 14px;cursor:pointer;transition:transform .12s;position:relative;overflow:hidden" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--purple);border-radius:16px 16px 0 0"></div>
+      <div style="font-size:28px;margin-bottom:10px;line-height:1">📊</div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:3px">Mi progreso</div>
+      <div style="font-size:11px;color:var(--purple);font-weight:600">Estadísticas</div>
+    </div>
   </div>
 </div>
 </div>
@@ -1656,7 +1776,7 @@ button:active{transform:scale(.97)}
     <div style="height:1px;background:var(--bd);margin:12px 0"></div>
     <div style="font-size:12px;color:var(--t2);line-height:1.8">
       <div><span style="color:var(--t3)">Creado por</span> <span style="font-weight:700;color:var(--t1)" id="about-creator">Raúl</span></div>
-      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)" id="about-curso-label">2º ESO · 2025–2026</span></div>
+      <div><span style="color:var(--t3)">Curso</span> <span style="font-weight:700;color:var(--t1)" id="about-curso-label">...</span></div>
       <div><span style="color:var(--t3)">Tecnología</span> <span style="font-weight:700;color:var(--t1)">HTML · CSS · JS · Claude AI</span></div>
     </div>
   </div>
@@ -1675,6 +1795,24 @@ button:active{transform:scale(.97)}
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><div style="font-size:13px;font-weight:700;color:var(--t1)">Tema</div><div style="font-size:11px;color:var(--t2)">Modo claro para proyector o luz solar</div></div>
       <button onclick="toggleTheme()" id="theme-toggle-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">🌙 Oscuro</button>
+    </div>
+  </div>
+
+  <!-- Color de acento -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Color de acento</div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Color principal</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:14px">Cambia el amarillo por el color que prefieras</div>
+    <div id="accent-color-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--bd)">
+      <div style="font-size:11px;color:var(--t2);flex:1">Color personalizado</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="accent-custom-preview" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--bd2);cursor:pointer;position:relative;overflow:hidden">
+          <input type="color" id="accent-custom-input" oninput="applyAccentColor(this.value,'custom')" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;background:none;cursor:pointer;opacity:0">
+          <div id="accent-custom-swatch" style="width:100%;height:100%;background:var(--y)"></div>
+        </div>
+        <span style="font-size:11px;color:var(--t3)" id="accent-custom-hex">#f5c518</span>
+      </div>
     </div>
   </div>
 
@@ -2133,7 +2271,7 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-vacaciones">
 <div class="pw">
   <div class="pt">Calen<em>dario escolar</em> 🗓️</div>
-  <div class="ps" id="vac-curso-label">Curso 2025–2026</div>
+  <div class="ps" id="vac-curso-label">Curso <span class="curso-year-lbl"></span></div>
   <div id="vac-countdown" style="margin-bottom:14px"></div>
   <div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Próximas fechas</div>
   <div id="vac-list"></div>
@@ -2618,110 +2756,125 @@ button:active{transform:scale(.97)}
   transition:opacity .45s ease;
   overflow-y:auto;
 }
-#pwa-overlay.pwa-visible{
-  display:flex;
-  opacity:1;
-}
+#pwa-overlay.pwa-visible{display:flex;opacity:1;}
 .pwa-logo-ring{
-  width:110px;height:110px;
-  background:var(--y);
-  border-radius:28px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:60px;
-  box-shadow:0 0 0 12px rgba(245,197,24,.12), 0 0 0 24px rgba(245,197,24,.05), 0 16px 48px rgba(245,197,24,.35);
-  animation:pwa-pulse 2.8s ease-in-out infinite;
-  flex-shrink:0;
-  margin-bottom:24px;
+  width:110px;height:110px;background:var(--y);border-radius:28px;
+  display:flex;align-items:center;justify-content:center;font-size:60px;
+  box-shadow:0 0 0 12px rgba(245,197,24,.12),0 0 0 24px rgba(245,197,24,.05),0 16px 48px rgba(245,197,24,.35);
+  animation:pwa-pulse 2.8s ease-in-out infinite;flex-shrink:0;margin-bottom:24px;
 }
 @keyframes pwa-pulse{0%,100%{box-shadow:0 0 0 12px rgba(245,197,24,.12),0 0 0 24px rgba(245,197,24,.05),0 16px 48px rgba(245,197,24,.35)}50%{box-shadow:0 0 0 16px rgba(245,197,24,.18),0 0 0 32px rgba(245,197,24,.07),0 16px 56px rgba(245,197,24,.45)}}
 .pwa-title{font-size:42px;font-weight:900;color:var(--t1);letter-spacing:-2px;line-height:1;margin-bottom:6px;text-align:center}
-.pwa-sub{font-size:15px;color:var(--t2);text-align:center;line-height:1.5;margin-bottom:32px;max-width:300px}
-.pwa-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px;margin-bottom:32px}
-.pwa-feat{
-  background:var(--bg1);border:1px solid var(--bd);border-radius:14px;
-  padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
-}
-.pwa-feat-icon{font-size:26px;line-height:1}
-.pwa-feat-name{font-size:11px;font-weight:700;color:var(--t1)}
-.pwa-feat-desc{font-size:10px;color:var(--t3);line-height:1.3}
+.pwa-sub{font-size:15px;color:var(--t2);text-align:center;line-height:1.5;margin-bottom:28px;max-width:300px}
+.pwa-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px;margin-bottom:28px}
+.pwa-feat{background:var(--bg1);border:1px solid var(--bd);border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+.pwa-feat-icon{font-size:26px;line-height:1}.pwa-feat-name{font-size:11px;font-weight:700;color:var(--t1)}.pwa-feat-desc{font-size:10px;color:var(--t3);line-height:1.3}
 .pwa-btn-main{
-  width:100%;max-width:320px;
-  background:var(--y);color:#0d0f14;
-  border:none;border-radius:16px;
-  padding:18px;font-size:18px;font-weight:900;
-  cursor:pointer;font-family:var(--font);
-  box-shadow:0 6px 28px rgba(245,197,24,.45);
-  transition:transform .12s,box-shadow .12s;
-  margin-bottom:10px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;max-width:320px;background:var(--y);color:#0d0f14;border:none;border-radius:16px;
+  padding:18px;font-size:18px;font-weight:900;cursor:pointer;font-family:var(--font);
+  box-shadow:0 6px 28px rgba(245,197,24,.45);transition:transform .12s,box-shadow .12s;
+  margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;
 }
 .pwa-btn-main:active{transform:scale(.97);box-shadow:0 3px 14px rgba(245,197,24,.3)}
-.pwa-btn-skip{
-  background:none;border:none;color:var(--t3);font-size:13px;
-  cursor:pointer;font-family:var(--font);padding:8px;
-  text-decoration:underline;text-underline-offset:3px;
-}
+.pwa-btn-skip{background:none;border:none;color:var(--t3);font-size:13px;cursor:pointer;font-family:var(--font);padding:8px;text-decoration:underline;text-underline-offset:3px;}
 #pwa-ios-box,#pwa-android-box{
-  display:none;
-  background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
-  padding:16px;margin-bottom:14px;text-align:left;
-  width:100%;max-width:320px;
+  display:none;background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
+  padding:16px;margin-bottom:14px;text-align:left;width:100%;max-width:320px;
 }
-#pwa-ios-box .step,#pwa-android-box .step{
-  display:flex;align-items:flex-start;gap:10px;
-  font-size:13px;color:var(--t2);line-height:1.5;
-  margin-bottom:8px;
-}
+#pwa-ios-box .step,#pwa-android-box .step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:8px;}
 #pwa-ios-box .step:last-child,#pwa-android-box .step:last-child{margin-bottom:0}
-#pwa-ios-box .step-num,#pwa-android-box .step-num{
-  width:22px;height:22px;min-width:22px;background:var(--y);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:900;color:#0d0f14;margin-top:1px;
-}
+#pwa-ios-box .step-num,#pwa-android-box .step-num{width:22px;height:22px;min-width:22px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#0d0f14;margin-top:1px;}
 .pwa-already{font-size:11px;color:var(--t3);text-align:center;margin-top:8px}
+
+/* ── Wrong browser warning (iOS + Chrome/Firefox) ── */
+#pwa-wrong-browser{
+  display:none;width:100%;max-width:320px;
+  background:rgba(248,113,113,.1);border:1.5px solid rgba(248,113,113,.4);
+  border-radius:14px;padding:16px;margin-bottom:16px;
+}
+.pwb-title{font-size:14px;font-weight:800;color:#f87171;margin-bottom:8px}
+.pwb-body{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.pwb-copy{
+  width:100%;background:var(--y);color:#0d0f14;border:none;border-radius:10px;
+  padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+
+/* ── Safari share arrow animation ── */
+#pwa-share-arrow{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  pointer-events:none;z-index:10000;
+}
+.pwa-arrow-bar{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding-bottom:16px;
+}
+.pwa-arrow-label{
+  background:var(--y);color:#0d0f14;font-size:12px;font-weight:800;
+  border-radius:999px;padding:6px 14px;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(245,197,24,.5);
+}
+.pwa-arrow-icon{
+  font-size:32px;line-height:1;
+  animation:pwa-bounce 1s ease-in-out infinite;
+}
+@keyframes pwa-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ── QR box ── */
+#pwa-qr-box{
+  display:none;width:100%;max-width:320px;
+  background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
+  padding:16px;margin-bottom:14px;text-align:center;
+}
+#pwa-qr-canvas{border-radius:10px;margin:10px auto;display:block;background:#fff;padding:8px;}
+.pwa-qr-label{font-size:11px;color:var(--t3);margin-top:4px;}
 </style>
+
 <div id="pwa-overlay">
+  <!-- Wrong browser alert (iOS Chrome/Firefox) -->
+  <div id="pwa-wrong-browser">
+    <div class="pwb-title">⚠️ Usa Safari para instalar</div>
+    <div class="pwb-body">Estás usando <b id="pwa-browser-name">Chrome</b> en iPhone.<br>En iOS solo se puede instalar desde <b style="color:var(--y)">Safari</b>.</div>
+    <button class="pwb-copy" onclick="pwaCopyUrl()">
+      <span>📋</span><span id="pwa-copy-btn-text">Copiar enlace para Safari</span>
+    </button>
+  </div>
+
   <div class="pwa-logo-ring">📚</div>
   <div class="pwa-title">Lumio</div>
   <div class="pwa-sub">Tu compañero de estudio.<br>Gratis · Sin anuncios · Sin registro.</div>
 
   <div class="pwa-features">
-    <div class="pwa-feat">
-      <div class="pwa-feat-icon">🃏</div>
-      <div class="pwa-feat-name">Flashcards</div>
-      <div class="pwa-feat-desc">Repaso con IA y swipe</div>
-    </div>
-    <div class="pwa-feat">
-      <div class="pwa-feat-icon">⏱️</div>
-      <div class="pwa-feat-name">Pomodoro</div>
-      <div class="pwa-feat-desc">Timer con alertas</div>
-    </div>
-    <div class="pwa-feat">
-      <div class="pwa-feat-icon">🧠</div>
-      <div class="pwa-feat-name">IA local</div>
-      <div class="pwa-feat-desc">Test y resúmenes</div>
-    </div>
-    <div class="pwa-feat">
-      <div class="pwa-feat-icon">🏫</div>
-      <div class="pwa-feat-name">Clases</div>
-      <div class="pwa-feat-desc">Temario y deberes</div>
-    </div>
+    <div class="pwa-feat"><div class="pwa-feat-icon">🃏</div><div class="pwa-feat-name">Flashcards</div><div class="pwa-feat-desc">Repaso con IA y swipe</div></div>
+    <div class="pwa-feat"><div class="pwa-feat-icon">⏱️</div><div class="pwa-feat-name">Pomodoro</div><div class="pwa-feat-desc">Timer con alertas</div></div>
+    <div class="pwa-feat"><div class="pwa-feat-icon">🧠</div><div class="pwa-feat-name">IA local</div><div class="pwa-feat-desc">Test y resúmenes</div></div>
+    <div class="pwa-feat"><div class="pwa-feat-icon">🏫</div><div class="pwa-feat-name">Clases</div><div class="pwa-feat-desc">Temario y deberes</div></div>
   </div>
 
-  <!-- iOS instructions -->
+  <!-- iOS Safari instructions + animated arrow -->
   <div id="pwa-ios-box">
     <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:12px">📱 Instalar en iPhone / iPad</div>
-    <div class="step"><div class="step-num">1</div><div>Pulsa el botón <b style="color:var(--y)">⬆ Compartir</b> en la barra de Safari</div></div>
+    <div class="step"><div class="step-num">1</div><div>Pulsa el botón <b style="color:var(--y)">⬆ Compartir</b> abajo en Safari <span style="color:var(--t3);font-size:11px">(la flecha de abajo te lo indica)</span></div></div>
     <div class="step"><div class="step-num">2</div><div>Desliza y elige <b style="color:var(--y)">"Añadir a pantalla de inicio"</b></div></div>
-    <div class="step"><div class="step-num">3</div><div>Pulsa <b style="color:var(--y)">Añadir</b> — ¡listo! Lumio aparece en tu home</div></div>
+    <div class="step"><div class="step-num">3</div><div>Pulsa <b style="color:var(--y)">Añadir</b> — ¡listo!</div></div>
   </div>
 
-  <!-- Android manual instructions -->
+  <!-- Android instructions -->
   <div id="pwa-android-box">
     <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:12px">📱 Instalar en Android</div>
     <div class="step"><div class="step-num">1</div><div>Pulsa el menú <b style="color:var(--y)">⋮</b> del navegador (arriba a la derecha)</div></div>
     <div class="step"><div class="step-num">2</div><div>Elige <b style="color:var(--y)">"Añadir a pantalla de inicio"</b> o <b style="color:var(--y)">"Instalar app"</b></div></div>
     <div class="step"><div class="step-num">3</div><div>Confirma pulsando <b style="color:var(--y)">Añadir</b></div></div>
+  </div>
+
+  <!-- QR code (desktop only) -->
+  <div id="pwa-qr-box">
+    <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:4px">📷 Escanea con tu móvil</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Abre Lumio directamente en Safari o Chrome</div>
+    <canvas id="pwa-qr-canvas" width="160" height="160"></canvas>
+    <div class="pwa-qr-label" id="pwa-qr-url-label"></div>
   </div>
 
   <button id="pwa-install-btn" class="pwa-btn-main" onclick="pwaInstall()">
@@ -2730,6 +2883,14 @@ button:active{transform:scale(.97)}
 
   <button class="pwa-btn-skip" onclick="pwaClose()">Continuar en el navegador</button>
   <div class="pwa-already">¿Ya está instalada? <span style="color:var(--y);cursor:pointer" onclick="pwaClose()">Entrar a la app →</span></div>
+</div>
+
+<!-- Flecha animada apuntando al botón Compartir de Safari (solo iOS Safari) -->
+<div id="pwa-share-arrow">
+  <div class="pwa-arrow-bar">
+    <div class="pwa-arrow-label">Pulsa ⬆ Compartir</div>
+    <div class="pwa-arrow-icon">⬇️</div>
+  </div>
 </div>
 <script>
 // ════════════════════════════════════════════════════════
@@ -2767,10 +2928,13 @@ const D={
 // PERSISTENCE — auto-save todo el estado D
 // ════════════════════════════════════════════════════════
 function saveState(){
-  try{localStorage.setItem('lumio_state',JSON.stringify({
-    user:D.user,mats:D.mats,cards:D.cards,week:D.week,
-    exams:D.exams,historial:D.historial,horario:D.horario,objetivoDiario:D.objetivoDiario
-  }));}catch(e){}
+  try{
+    const wk=new Date().getFullYear()+'-W'+_getISOWeek();
+    localStorage.setItem('lumio_state',JSON.stringify({
+      user:D.user,mats:D.mats,cards:D.cards,week:D.week,weekKey:wk,
+      exams:D.exams,historial:D.historial,horario:D.horario,objetivoDiario:D.objetivoDiario
+    }));
+  }catch(e){}
 }
 // IDs de las tarjetas predefinidas originales — nunca se restauran
 const DEFAULT_CARD_IDS=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10',
@@ -2782,19 +2946,42 @@ function cleanDefaultCards(cards){
   return (cards||[]).filter(c=>!DEFAULT_CARD_IDS.has(c.id));
 }
 
+function _getCursoYear(){
+  const y=new Date().getFullYear();
+  const m=new Date().getMonth()+1; // 1-12
+  const start=m>=9?y:y-1;
+  return start+'–'+(start+1);
+}
+function _getISOWeek(){
+  const d=new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate()+4-(d.getDay()||7));
+  const y=new Date(d.getFullYear(),0,1);
+  return Math.ceil((((d-y)/86400000)+1)/7);
+}
+
 function loadState(){
   try{
     const saved=JSON.parse(localStorage.getItem('lumio_state')||'null');
     if(!saved)return;
     if(saved.user)Object.assign(D.user,saved.user);
-    if(!D.user.curso)D.user.curso='2º ESO'; // compatibilidad versiones anteriores
+    if(!D.user.curso)D.user.curso='2eso';
     if(saved.mats&&saved.mats.length)D.mats=saved.mats;
-    // Strip old default cards — user starts fresh, only keeps cards they created
     if(saved.cards){
       const userCards=cleanDefaultCards(saved.cards);
       D.cards=userCards;
     }
-    if(saved.week&&saved.week.length)D.week=saved.week;
+    // Only restore week data if it's the same ISO week — otherwise reset
+    const currentWeek=_getISOWeek();
+    const currentYear=new Date().getFullYear();
+    const savedWeekKey=saved.weekKey||'';
+    const expectedKey=currentYear+'-W'+currentWeek;
+    if(saved.week&&saved.week.length&&savedWeekKey===expectedKey){
+      D.week=saved.week;
+    }else{
+      // New week — keep the 7-day structure but zero the minutes
+      D.week=[{d:'L',m:0},{d:'M',m:0},{d:'X',m:0},{d:'J',m:0},{d:'V',m:0},{d:'S',m:0},{d:'D',m:0}];
+    }
     if(saved.exams)D.exams=saved.exams;
     if(saved.historial)D.historial=saved.historial;
     if(saved.horario)D.horario=saved.horario;
@@ -2973,6 +3160,17 @@ function bHome(){
   document.getElementById('pc-p').textContent=pct+'%';
   setTimeout(()=>{const el=document.getElementById('pc-f');if(el)el.style.width=pct+'%';},350);
   document.getElementById('h-fc').textContent=D.cards.length?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
+  // Show "start here" hint for brand-new users
+  try{
+    const sh=document.getElementById('h-start-hint');
+    if(sh){
+      const noCards=D.cards.length===0;
+      const noTutorial=!localStorage.getItem('lumio_seen_tutorial');
+      let noNotes=true;
+      try{noNotes=(JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]')).length===0;}catch(e){}
+      sh.style.display=(noCards&&noNotes&&noTutorial)?'block':'none';
+    }
+  }catch(e){}
   const strkEl=document.getElementById('h-streak');if(strkEl)strkEl.textContent=D.user.streak||0;
   // Week grid
   const wg=document.getElementById('h-week-grid');
@@ -3189,6 +3387,7 @@ function _pomComplete(){
     gainXP(10);launchConfetti();
     const matObj=D.mats.find(m=>m.n===pomMatActiva);
     if(matObj){matObj.h=+(matObj.h+(pomSettings.W/60/60)).toFixed(2);recalcMatProgress(matObj);}
+    saveState(); // persist hours immediately
     po.brk=true;po.s=pomSettings.B;po.endAt=null;
     toast('🍅 ¡Pomodoro completado! +10 XP');
     // Notification API
@@ -5828,6 +6027,140 @@ function launchConfetti(){
 // THEME (dark / light)
 // ════════════════════════════════════════════════════════
 let isDark=true;
+// ════════════════════════════════════════════════════════
+// ACCENT COLOR SYSTEM
+// ════════════════════════════════════════════════════════
+const ACCENT_PRESETS=[
+  {name:'Amarillo',  hex:'#f5c518', dark:'rgba(245,197,24,.13)',  border:'rgba(245,197,24,.32)'},
+  {name:'Naranja',   hex:'#fb923c', dark:'rgba(251,146,60,.13)',  border:'rgba(251,146,60,.32)'},
+  {name:'Rojo',      hex:'#f87171', dark:'rgba(248,113,113,.13)', border:'rgba(248,113,113,.32)'},
+  {name:'Rosa',      hex:'#f472b6', dark:'rgba(244,114,182,.13)', border:'rgba(244,114,182,.32)'},
+  {name:'Morado',    hex:'#c084fc', dark:'rgba(192,132,252,.13)', border:'rgba(192,132,252,.32)'},
+  {name:'Azul',      hex:'#60a5fa', dark:'rgba(96,165,250,.13)',  border:'rgba(96,165,250,.32)'},
+  {name:'Cian',      hex:'#2dd4bf', dark:'rgba(45,212,191,.13)',  border:'rgba(45,212,191,.32)'},
+  {name:'Verde',     hex:'#4ade80', dark:'rgba(74,222,128,.13)',  border:'rgba(74,222,128,.32)'},
+  {name:'Lima',      hex:'#a3e635', dark:'rgba(163,230,53,.13)',  border:'rgba(163,230,53,.32)'},
+  {name:'Blanco',    hex:'#ece8df', dark:'rgba(236,232,223,.1)',  border:'rgba(236,232,223,.25)'},
+  {name:'Oro',       hex:'#e8b84b', dark:'rgba(232,184,75,.13)',  border:'rgba(232,184,75,.32)'},
+  {name:'Melocotón', hex:'#fdba74', dark:'rgba(253,186,116,.13)', border:'rgba(253,186,116,.32)'},
+];
+
+function _hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return{r,g,b};
+}
+function _isDarkColor(hex){
+  const{r,g,b}=_hexToRgb(hex);
+  return(0.299*r+0.587*g+0.114*b)<140;
+}
+
+function applyAccentColor(hex, id){
+  // Build rgba variants
+  const{r,g,b}=_hexToRgb(hex);
+  const dark=`rgba(${r},${g},${b},.13)`;
+  const border=`rgba(${r},${g},${b},.32)`;
+  const textColor=_isDarkColor(hex)?'#ffffff':'#0d0f14';
+
+  // Inject CSS variables
+  const root=document.documentElement;
+  root.style.setProperty('--y', hex);
+  root.style.setProperty('--yd', dark);
+  root.style.setProperty('--yb', border);
+  root.style.setProperty('--accent-text', textColor);
+
+  // Also fix the text-on-yellow color for buttons etc
+  // We add a <style> override so mbtn color works
+  let overrideEl=document.getElementById('accent-override-style');
+  if(!overrideEl){
+    overrideEl=document.createElement('style');
+    overrideEl.id='accent-override-style';
+    document.head.appendChild(overrideEl);
+  }
+  overrideEl.textContent=`.mbtn{color:${textColor}!important}.pwa-btn-main{color:${textColor}!important}.pwa-btn-main span{color:${textColor}!important}`;
+
+  // Save
+  localStorage.setItem('lumio_accent', JSON.stringify({hex, id}));
+
+  // Update custom swatch + hex label
+  const swatch=document.getElementById('accent-custom-swatch');
+  const hexLbl=document.getElementById('accent-custom-hex');
+  const colorInput=document.getElementById('accent-custom-input');
+  if(swatch)swatch.style.background=hex;
+  if(hexLbl)hexLbl.textContent=hex;
+  if(colorInput)colorInput.value=hex;
+
+  // Update grid selection highlight
+  renderAccentGrid();
+}
+
+function loadAccentColor(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('lumio_accent')||'null');
+    if(saved&&saved.hex){applyAccentColor(saved.hex, saved.id||'custom');}
+  }catch(e){}
+}
+
+function renderAccentGrid(){
+  const grid=document.getElementById('accent-color-grid');
+  if(!grid)return;
+  const saved=JSON.parse(localStorage.getItem('lumio_accent')||'{"hex":"#f5c518","id":"0"}');
+  grid.innerHTML=ACCENT_PRESETS.map((p,i)=>{
+    const isActive=saved.id===String(i)||(!saved.id&&p.hex==='#f5c518')||(saved.id==='custom'&&saved.hex===p.hex);
+    const txtCol=_isDarkColor(p.hex)?'#fff':'#0d0f14';
+    return `<div onclick="applyAccentColor('${p.hex}','${i}')" title="${p.name}" style="
+      aspect-ratio:1;border-radius:50%;background:${p.hex};cursor:pointer;
+      box-shadow:${isActive?`0 0 0 3px var(--bg1),0 0 0 5px ${p.hex}`:'none'};
+      transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;
+      font-size:12px;
+    " onmousedown="this.style.transform='scale(.88)'" onmouseup="this.style.transform='scale(1)'">${isActive?`<span style="color:${txtCol};font-weight:900;font-size:14px">✓</span>`:''}</div>`;
+  }).join('');
+}
+
+function bAjustes(){
+  try{bAjustesAccent();}catch(e){}
+  // populate curso chips
+  try{
+    const cc=document.getElementById('aj-curso-chips');
+    const lbl=document.getElementById('aj-curso-actual');
+    if(cc&&typeof CURSOS!=='undefined'){
+      cc.innerHTML=CURSOS.map(c=>`<div class="chip${D.user.curso===c.id?' on':''}" onclick="D.user.curso='${c.id}';updateCursoLabels();saveState();bAjustes()">${c.ico} ${c.label}</div>`).join('');
+    }
+    if(lbl){const cur=typeof CURSOS!=='undefined'?CURSOS.find(c=>c.id===D.user.curso):null;lbl.textContent=cur?cur.label:D.user.curso||'No definido';}
+  }catch(e){}
+  // populate objetivo chips
+  try{
+    const oc=document.getElementById('aj-obj-chips');
+    if(oc){
+      const opts=[30,45,60,90,120];
+      oc.innerHTML=opts.map(v=>`<div class="chip${D.objetivoDiario===v?' on':''}" onclick="D.objetivoDiario=${v};saveState();bAjustes()">${v} min</div>`).join('');
+    }
+  }catch(e){}
+  // pom settings
+  try{
+    const wi=document.getElementById('pom-work-inp');
+    const bi=document.getElementById('pom-break-inp');
+    if(wi)wi.value=po.work/60||25;
+    if(bi)bi.value=po.break/60||5;
+  }catch(e){}
+  // install btn
+  try{
+    const iw=document.getElementById('aj-install-wrap');
+    if(iw){const installed=localStorage.getItem('lumio_pwa_installed')||window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;iw.style.display=installed?'none':'block';}
+  }catch(e){}
+  // update version label
+  try{const vl=document.getElementById('update-version-lbl');if(vl)vl.textContent=APP_VERSION;}catch(e){}
+}
+function bAjustesAccent(){
+  renderAccentGrid();
+  const saved=JSON.parse(localStorage.getItem('lumio_accent')||'{"hex":"#f5c518"}');
+  const swatch=document.getElementById('accent-custom-swatch');
+  const hexLbl=document.getElementById('accent-custom-hex');
+  const colorInput=document.getElementById('accent-custom-input');
+  if(swatch)swatch.style.background=saved.hex||'#f5c518';
+  if(hexLbl)hexLbl.textContent=saved.hex||'#f5c518';
+  if(colorInput)colorInput.value=saved.hex||'#f5c518';
+}
+
 function toggleTheme(){
   localStorage.setItem('lumio_theme_manual','1'); // user chose manually
   isDark=!isDark;
@@ -6017,65 +6350,172 @@ function obFinish(){
 // ════════════════════════════════════════════════════════
 // TUTORIAL
 // ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// TUTORIAL — Spotlight mode
+// ════════════════════════════════════════════════════════
+let tutStep=0;
+let _tutHL=null; // currently highlighted element
+
 function getTutSteps(){
   const nm=D.user.name||'estudiante';
   return [
-  {ico:'👋',title:`¡Hola, ${nm}!`,
-    msg:'Bienvenido a <b>Lumio</b>, tu app de estudio. Sin anuncios, sin internet, sin registros. Todo en tu móvil. Toca <b>Siguiente</b> para el recorrido.',
-    nav:null,color:'var(--y)',highlight:null},
-  {ico:'🏠',title:'Tu inicio personal',
-    msg:'El botón amarillo arranca el <b>Pomodoro</b> directamente. Debajo ves exámenes próximos, deberes y accesos rápidos.',
-    nav:'home',color:'var(--y)',
-    highlight:'#home-start-btn',
-    tip:'💡 El Pomodoro mantiene la pantalla encendida automáticamente'},
-  {ico:'📝',title:'Apuntes por materia',
-    msg:'Escribe y organiza tus notas. Formato con negritas, títulos y listas. <b>Auto-guardado</b> cada 30 segundos.',
-    nav:'estudiar:apuntes',color:'var(--teal)',
-    tip:'💡 Pulsa "📄→ IA" para resumir tus apuntes al instante'},
-  {ico:'🃏',title:'Flashcards — crea y repasa',
-    msg:'Pulsa <b>+ Nueva</b> y escribe pregunta + respuesta. Desliza derecha si la sabías, izquierda si no. La IA repite las que fallas.',
-    nav:'estudiar:flashcards',color:'#c084fc',
-    tip:'💡 Pulsa "✨ IA" para generar tarjetas de tus apuntes'},
-  {ico:'⏱️',title:'Método Pomodoro',
-    msg:'25 minutos de estudio → 5 de descanso. Cada ciclo suma <b>XP</b> y horas a tu perfil. Elige materia antes de empezar.',
-    nav:'estudiar:pom-screen',color:'var(--orange)',
-    tip:'💡 Tras 4 pomodoros hay un descanso largo de 15 min'},
-  {ico:'🧠',title:'IA integrada — sin internet',
-    msg:'<b>Test IA</b> genera preguntas de tus apuntes. <b>Resumen</b> convierte texto en bullets. <b>Mapa mental</b> extrae conceptos. Todo local.',
-    nav:'estudiar:testia',color:'var(--purple)',
-    tip:'💡 Los errores del test se convierten en flashcards automáticamente'},
-  {ico:'📈',title:'Modo Examen',
-    msg:'Simula un examen real con timer. Elige <b>Flashcards</b>, <b>IA (texto)</b> o <b>Apuntes</b> como fuente de preguntas.',
-    nav:'estudiar:examen',color:'#f87171',
-    tip:'💡 El timer circular se pone rojo en los últimos 5 segundos'},
-  {ico:'📋',title:'Agenda escolar',
-    msg:'Añade deberes con fecha y materia. Planifica exámenes con temas. Lumio te avisa <b>24h antes</b> de cada entrega.',
-    nav:'agenda:agenda',color:'var(--teal)',
-    tip:'💡 La Vista semanal te muestra toda la semana de un vistazo'},
-  {ico:'🏫',title:'Sistema de clases',
-    msg:'Únete con el <b>código de 6 letras</b> de tu profe. Ve el temario, actividades y exámenes publicados. Publica dudas en el mural.',
-    nav:'clase:clase-lista',color:'var(--blue)',
-    tip:'💡 Crea tu propia clase y comparte el enlace por WhatsApp'},
-  {ico:'📚',title:'Edita tus materias',
-    msg:'Pulsa la pestaña <b>✏️ Editar</b> para cambiar las asignaturas que estudias. Puedes añadir y quitar en cualquier momento.',
-    nav:'perfil:materias',color:'var(--y)',
-    tip:'💡 Tus apuntes y flashcards se conservan al cambiar materias'},
-  {ico:'📊',title:'Perfil y progreso',
-    msg:'<b>Heatmap</b> de estudio, <b>Informe semanal</b>, <b>Detector</b> de puntos débiles y <b>Predictor</b> de nota. Todo desde el perfil.',
-    nav:'perfil:heatmap',color:'var(--green)',
-    tip:'💡 El Predictor combina tus notas reales con el dominio de tarjetas'},
-  {ico:'🏅',title:'Ranking con amigos',
-    msg:'Pulsa <b>Compartir mi perfil</b> → manda el enlace a un compañero → aparece en tu ranking automáticamente.',
-    nav:'perfil:ranking',color:'var(--orange)',
-    tip:'💡 El ranking ordena por XP total'},
-  {ico:'🚀',title:`¡Todo listo, ${nm}!`,
-    msg:'Empieza con los apuntes de hoy o crea tus primeras flashcards. <b>¡Mucho ánimo con el curso!</b>',
-    nav:'home',color:'var(--y)',highlight:null},
+  // 0 — Welcome
+  { ico:'👋', color:'var(--y)',
+    title:`¡Hola, ${nm}! Bienvenido a Lumio`,
+    text:'En 2 minutos te enseño todo. Lumio es tu app de estudio: sin anuncios, sin internet, todo en tu móvil.',
+    nav:null, highlight:null,
+    visual:`<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:28px">📚</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Apuntes</div></div>
+      <div style="text-align:center"><div style="font-size:28px">🃏</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Flashcards</div></div>
+      <div style="text-align:center"><div style="font-size:28px">⏱️</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Pomodoro</div></div>
+      <div style="text-align:center"><div style="font-size:28px">🧠</div><div style="font-size:10px;color:var(--t3);margin-top:4px">IA gratis</div></div>
+      <div style="text-align:center"><div style="font-size:28px">📋</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Deberes</div></div>
+      <div style="text-align:center"><div style="font-size:28px">🏫</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Clases</div></div>
+    </div>`,
+    tip:null },
+
+  // 1 — Navigation
+  { ico:'🗂️', color:'var(--blue)',
+    title:'El menú de abajo — navegar por la app',
+    text:'La barra de abajo tiene <b>5 secciones</b>. Pulsa cada icono para ir a esa sección. ¡Pruébalo!',
+    nav:'home', highlight:'#nav',
+    visual:null,
+    tip:'💡 El punto amarillo te indica en qué sección estás' },
+
+  // 2 — Home
+  { ico:'🏠', color:'var(--y)',
+    title:'Inicio — tu panel de control',
+    text:'Aquí ves tu progreso de la semana, la racha de días, los exámenes próximos y el botón para empezar a estudiar.',
+    nav:'home', highlight:'#s-home .xp-wrap',
+    visual:null,
+    tip:'💡 El cuadrado amarillo grande arranca el Pomodoro directamente' },
+
+  // 3 — Estudiar tab
+  { ico:'📚', color:'var(--teal)',
+    title:'Estudiar — todo lo que necesitas',
+    text:'Pulsa <b>Estudiar</b> en el menú. Dentro hay: Apuntes, Flashcards, Pomodoro, Test IA y más. Son las herramientas para estudiar.',
+    nav:'estudiar', highlight:'button[data-section="estudiar"]',
+    visual:null,
+    tip:null },
+
+  // 4 — Apuntes
+  { ico:'📝', color:'var(--teal)',
+    title:'Apuntes — escribe y organiza',
+    text:'Pulsa <b>+ Nuevo apunte</b> y empieza a escribir. Puedes usar negritas, títulos y listas. Se guarda automáticamente.',
+    nav:'estudiar:apuntes', highlight:'#s-apuntes',
+    visual:`<div style="background:var(--bg1);border-radius:10px;padding:12px;border:1px solid var(--bd)">
+      <div style="font-size:12px;font-weight:800;color:var(--t1);margin-bottom:6px">📝 Ejemplo de apunte</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7"><b style="color:var(--t1)">Fotosíntesis</b><br>Las plantas transforman luz solar + CO₂ + agua → glucosa + oxígeno.<br><span style="color:var(--teal)">Ecuación: 6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂</span></div>
+    </div>`,
+    tip:'💡 Pulsa el botón ✨IA para que la IA resuma tus apuntes en segundos' },
+
+  // 5 — Flashcards
+  { ico:'🃏', color:'#c084fc',
+    title:'Flashcards — crea y repasa tarjetas',
+    text:'Pulsa <b>+ Nueva</b>. Escribe la <b>pregunta</b> y la <b>respuesta</b>. Al repasar, desliza a la derecha si la sabías y a la izquierda si no.',
+    nav:'estudiar:flashcards', highlight:'#s-flashcards',
+    visual:`<div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:4px 0">
+      <div style="text-align:center;font-size:11px;color:var(--red);font-weight:700">← No lo sabía</div>
+      <div class="tut-card-demo" style="font-size:12px">¿Qué es una célula?</div>
+      <div style="text-align:center;font-size:11px;color:var(--green);font-weight:700">Lo sabía →</div>
+    </div>`,
+    tip:'💡 Pulsa ✨ IA para generar flashcards de tus apuntes automáticamente' },
+
+  // 6 — Pomodoro
+  { ico:'⏱️', color:'var(--orange)',
+    title:'Pomodoro — estudia sin distracciones',
+    text:'25 minutos de estudio concentrado → 5 de descanso. Elige una <b>materia</b>, pulsa el botón amarillo y empieza. La pantalla no se apagará.',
+    nav:'estudiar:pom-screen', highlight:'#pom-circle-outer',
+    visual:null,
+    tip:'💡 Cada pomodoro completado te da XP y suma horas a tu progreso' },
+
+  // 7 — IA
+  { ico:'🧠', color:'var(--purple)',
+    title:'Inteligencia Artificial — sin internet',
+    text:'La IA de Lumio funciona <b>sin internet</b>. Pega el texto de tu libro en <b>Test IA</b> y genera preguntas al instante. También resume, crea mapas mentales y más.',
+    nav:'estudiar:testia', highlight:'#s-testia',
+    visual:`<div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">🧠 Test IA</div>
+      <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">📄 Resumen</div>
+      <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">🗺️ Mapa mental</div>
+      <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">✍️ Corrector</div>
+    </div>`,
+    tip:null },
+
+  // 8 — Agenda
+  { ico:'📋', color:'var(--orange)',
+    title:'Agenda — deberes y exámenes',
+    text:'Pulsa <b>Agenda</b> en el menú. Añade tus deberes con fecha de entrega y tus exámenes con el temario. Lumio te avisa el día antes.',
+    nav:'agenda', highlight:'button[data-section="agenda"]',
+    visual:null,
+    tip:'💡 Los deberes de hoy aparecen también en el inicio' },
+
+  // 9 — Agenda detail
+  { ico:'🗓️', color:'var(--teal)',
+    title:'Añadir un deber — es muy fácil',
+    text:'Pulsa el botón <b>+ Añadir</b>, escribe la tarea, elige la materia y la fecha. Cuando lo hagas, marca el ✓ y ganas XP.',
+    nav:'agenda:agenda', highlight:'#s-agenda',
+    visual:null,
+    tip:'💡 La Vista semanal te muestra todo de golpe con código de colores' },
+
+  // 10 — Clase
+  { ico:'🏫', color:'var(--blue)',
+    title:'Clases — conéctate con tu profe',
+    text:'Pulsa <b>Clase</b> en el menú. Puedes unirte a la clase de tu profe con un <b>código de 6 letras</b> que te dará. Verás el temario, los deberes y los exámenes que publique.',
+    nav:'clase', highlight:'button[data-section="clase"]',
+    visual:null,
+    tip:'💡 También puedes crear tu propia clase y compartir el código' },
+
+  // 11 — Perfil
+  { ico:'📊', color:'var(--green)',
+    title:'Perfil — tu progreso y estadísticas',
+    text:'Pulsa <b>Perfil</b>. Aquí ves tu heatmap de estudio (como GitHub), el informe semanal, los logros y el ranking con amigos.',
+    nav:'perfil', highlight:'button[data-section="perfil"]',
+    visual:null,
+    tip:'💡 El Detector te dice cuáles son tus puntos débiles en cada materia' },
+
+  // 12 — Materials
+  { ico:'📚', color:'var(--y)',
+    title:'Tus materias — personaliza la app',
+    text:'Ve a Perfil → Materias → ✏️ Editar para añadir o quitar asignaturas. La app se adapta a las que tú tengas.',
+    nav:'perfil:materias', highlight:'#s-materias',
+    visual:null,
+    tip:null },
+
+  // 13 — Done
+  { ico:'🚀', color:'var(--y)',
+    title:`¡Ya lo sabes todo, ${nm}!`,
+    text:'Empieza añadiendo tus primeras <b>flashcards</b> o escribe los <b>apuntes</b> de hoy. Si necesitas ayuda, ve a Perfil → Ajustes → Ver tutorial.',
+    nav:'home', highlight:null,
+    visual:`<div style="display:flex;flex-direction:column;gap:8px">
+      <div onclick="tutFinish();navSection('estudiar');setTimeout(()=>goTo('flashcards'),80)" style="background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🃏</span>
+        <div><div style="font-size:13px;font-weight:800;color:var(--t1)">Crear mis primeras flashcards</div><div style="font-size:11px;color:var(--t3)">Recomendado para empezar</div></div>
+        <span style="margin-left:auto;color:var(--t3)">→</span>
+      </div>
+      <div onclick="tutFinish();navSection('estudiar');setTimeout(()=>goTo('apuntes'),80)" style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">📝</span>
+        <div><div style="font-size:13px;font-weight:800;color:var(--t1)">Escribir mis primeros apuntes</div><div style="font-size:11px;color:var(--t3)">Toma nota de la clase de hoy</div></div>
+        <span style="margin-left:auto;color:var(--t3)">→</span>
+      </div>
+    </div>`,
+    tip:null },
   ];
 }
-const TUT_STEPS=getTutSteps();
 
-let tutStep=0;
+function tutFinish(){
+  const ov=document.getElementById('tutorial-overlay');
+  if(ov){ov.style.display='none';}
+  // Remove all highlights
+  document.querySelectorAll('.tut-highlight,.tut-nav-highlight').forEach(el=>{
+    el.classList.remove('tut-highlight','tut-nav-highlight');
+  });
+  _tutHL=null;
+  document.body.style.overflow='';
+  localStorage.setItem('lumio_seen_tutorial','1');
+  try{navSection('home');}catch(e){}
+}
+
 function forceShowTutorial(){
   localStorage.removeItem('lumio_seen_tutorial');
   tutStep=0;showTutStep();
@@ -6086,70 +6526,106 @@ function startTutorial(){
 }
 
 function showTutStep(){
-  const ov=document.getElementById('tutorial-overlay');if(!ov)return;
-  // Regenerate each time so D.user.name is current
+  const ov=document.getElementById('tutorial-overlay');
+  if(!ov)return;
   const STEPS=getTutSteps();
-  document.querySelectorAll('.tut-highlight').forEach(el=>el.classList.remove('tut-highlight'));
-  if(tutStep>=STEPS.length){
-    ov.style.display='none';ov.innerHTML='';
-    document.body.style.overflow='';
-    localStorage.setItem('lumio_seen_tutorial','1');
-    navSection('home');
-    return;
-  }
-  const s=STEPS[tutStep];
   const total=STEPS.length;
+
+  // Clear previous highlight
+  document.querySelectorAll('.tut-highlight,.tut-nav-highlight').forEach(el=>{
+    el.classList.remove('tut-highlight','tut-nav-highlight');
+  });
+  _tutHL=null;
+
+  if(tutStep>=total){ tutFinish(); return; }
+
+  const s=STEPS[tutStep];
+  const isLast=tutStep===total-1;
+  const progress=Math.round((tutStep+1)/total*100);
+
+  // Show overlay
+  ov.style.display='block';
+  document.body.style.overflow='hidden';
 
   // Navigate to relevant screen
   if(s.nav){
     const parts=s.nav.split(':');
-    navSection(parts[0]);
-    if(parts[1])setTimeout(()=>goTo(parts[1]),80);
+    try{navSection(parts[0]);}catch(e){}
+    if(parts[1])setTimeout(()=>{try{goTo(parts[1]);}catch(e){}},80);
   }
 
-  // Highlight target element after navigation
-  if(s.highlight){
-    setTimeout(()=>{
+  // Highlight element after navigation
+  setTimeout(()=>{
+    if(s.highlight){
       const el=document.querySelector(s.highlight);
-      if(el){el.classList.add('tut-highlight');el.scrollIntoView({behavior:'smooth',block:'center'});}
-    },200);
+      if(el){
+        _tutHL=el;
+        // Use different class for nav items
+        if(el.closest('#nav')||el.id==='nav'){
+          el.classList.add('tut-nav-highlight');
+        } else {
+          el.classList.add('tut-highlight');
+        }
+        el.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    }
+  },180);
+
+  // Build dots
+  const dots=STEPS.map((_,i)=>`<div style="width:${i===tutStep?18:5}px;height:5px;border-radius:999px;background:${i===tutStep?s.color||'var(--y)':'var(--bg3)'};transition:all .3s;flex-shrink:0"></div>`).join('');
+
+  // Fill card
+  const fill=document.getElementById('tut-progress-fill');
+  if(fill){fill.style.width=progress+'%';fill.style.background=s.color||'var(--y)';}
+
+  const icon=document.getElementById('tut-icon');
+  if(icon){icon.textContent=s.ico;icon.style.background=(s.color||'var(--y)')+'22';icon.style.border='1px solid '+(s.color||'var(--y)')+'44';}
+
+  const title=document.getElementById('tut-title');
+  if(title){title.textContent=s.title;}
+
+  const cnt=document.getElementById('tut-step-count');
+  if(cnt){cnt.textContent=`Paso ${tutStep+1} de ${total}`;}
+
+  const text=document.getElementById('tut-text');
+  if(text){text.innerHTML=s.text;}
+
+  const visual=document.getElementById('tut-visual');
+  if(visual){
+    if(s.visual){visual.innerHTML=s.visual;visual.style.display='block';}
+    else{visual.style.display='none';}
   }
 
-  const dots=STEPS.map((_,i)=>`<div style="width:${i===tutStep?20:6}px;height:6px;border-radius:999px;background:${i===tutStep?s.color||'var(--y)':'var(--bg3)'};transition:all .3s"></div>`).join('');
-  const isLast=tutStep===total-1;
-  const progress=Math.round((tutStep+1)/total*100);
+  const tip=document.getElementById('tut-tip');
+  if(tip){
+    if(s.tip){tip.textContent=s.tip;tip.style.display='block';}
+    else{tip.style.display='none';}
+  }
 
-  ov.style.cssText='position:fixed;inset:0;z-index:960;display:flex;align-items:flex-end;justify-content:center;pointer-events:all;padding:0 0 68px';
-  ov.innerHTML=`
-    <div style="background:var(--bg1);border:1px solid var(--bd2);border-radius:22px 22px 16px 16px;padding:0;width:calc(100% - 24px);max-width:400px;display:flex;flex-direction:column;overflow:hidden;animation:tutCardIn .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 40px rgba(0,0,0,.4)">
+  const dotsEl=document.getElementById('tut-dots');
+  if(dotsEl){dotsEl.innerHTML=dots;}
 
-      <!-- Color accent bar + progress -->
-      <div style="height:4px;background:var(--bg2);border-radius:22px 22px 0 0;overflow:hidden">
-        <div style="height:100%;width:${progress}%;background:${s.color||'var(--y)'};transition:width .4s cubic-bezier(.4,0,.2,1)"></div>
-      </div>
+  const btnBack=document.getElementById('tut-btn-back');
+  if(btnBack){btnBack.style.display=tutStep>0?'block':'none';}
 
-      <!-- Content -->
-      <div style="padding:20px 20px 16px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-          <div style="width:52px;height:52px;border-radius:16px;background:${s.color||'var(--y)'}22;border:1px solid ${s.color||'var(--y)'}44;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">${s.ico}</div>
-          <div style="font-size:11px;font-weight:700;color:var(--t3);padding-top:4px">${tutStep+1} / ${total}</div>
-        </div>
-        <div style="font-size:17px;font-weight:900;color:var(--t1);margin-bottom:6px;line-height:1.25">${s.title}</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.65">${s.msg}</div>
-        ${s.tip?`<div style="margin-top:10px;font-size:11px;color:var(--teal);background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:9px;padding:8px 11px;line-height:1.5">${s.tip}</div>`:''}
-      </div>
+  const btnNext=document.getElementById('tut-btn-next');
+  if(btnNext){
+    btnNext.textContent=isLast?'¡Empezar! 🚀':'Siguiente →';
+    btnNext.style.background=s.color||'var(--y)';
+    btnNext.style.color=(s.color&&s.color!=='var(--y)'&&s.color!=='var(--orange)')?'#fff':'#0d0f14';
+  }
 
-      <!-- Dots -->
-      <div style="display:flex;gap:4px;align-items:center;padding:0 20px 14px">${dots}</div>
+  const skip=document.getElementById('tut-skip');
+  if(skip){skip.style.display=isLast?'none':'block';}
 
-      <!-- Buttons -->
-      <div style="display:flex;gap:8px;padding:0 16px 16px">
-        ${tutStep>0?`<button onclick="tutStep--;showTutStep()" style="flex:1;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:var(--t2);cursor:pointer;font-family:var(--font)">← Atrás</button>`:''}
-        <button onclick="tutStep++;showTutStep()" style="flex:2;background:${s.color||'var(--y)'};color:${s.color&&s.color!=='var(--y)'?'#fff':'#0d0f14'};border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
-      </div>
-      <button onclick="tutStep=getTutSteps().length;showTutStep()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font);padding:0 0 14px;text-align:center">Saltar recorrido</button>
-    </div>`;
+  // Re-trigger card animation
+  const card=document.getElementById('tut-card');
+  if(card){
+    card.style.animation='none';
+    requestAnimationFrame(()=>{card.style.animation='';});
+  }
 }
+
 
 // ════════════════════════════════════════════════════════
 // MARKDOWN HELPERS
@@ -8579,12 +9055,16 @@ function getSchoolYear(){
   return startYear+'–'+(startYear+1);
 }
 function updateCursoLabels(){
-  const curso=D.user.curso||'2º ESO';
-  document.querySelectorAll('[data-curso-label]').forEach(el=>{el.textContent=curso;});
+  const yr=_getCursoYear();
+  const curso=D.user.curso||'2eso';
+  const curObj=typeof CURSOS!=='undefined'?CURSOS.find(c=>c.id===curso):null;
+  const curLabel=curObj?curObj.label:curso;
+  document.querySelectorAll('.curso-year-lbl').forEach(el=>el.textContent=yr);
+  document.querySelectorAll('[data-curso-label]').forEach(el=>{el.textContent=curLabel;});
   const acl=document.getElementById('about-curso-label');
-  if(acl)acl.textContent=curso+' · '+getSchoolYear();
+  if(acl)acl.textContent=curLabel+' · '+yr;
   const ms=document.getElementById('mats-subtitle');
-  if(ms)ms.textContent=D.mats.length+' materias · '+curso;
+  if(ms)ms.textContent=D.mats.length+' materias · '+curLabel;
 }
 
 // Change course from Ajustes (without full re-onboarding)
@@ -8964,12 +9444,22 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Si cualquier cosa falla, este timer fuerza la salida a los 4s
   // Safety net: if splash still visible after 5s, force-remove it and boot app
   const splashGuard=setTimeout(()=>{
-    try{ if(typeof window._hideSplashAndStart==='function') window._hideSplashAndStart(); }catch(e){}
-  },3500);
+    try{
+      const sp=document.getElementById('splash');
+      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
+      // Ensure screens are initialized even if normal flow failed
+      try{bHome();}catch(e){}
+      try{navSection('home');}catch(e){}
+      if(!localStorage.getItem('lumio_seen_onboarding')){
+        try{showOnboarding();}catch(e){}
+      }
+    }catch(e){}
+  },5000);
 
   try{
     // Load full persisted state FIRST
     loadState();
+    loadAccentColor();
 
     // Restore theme
     const savedTheme=localStorage.getItem('lumio_theme');
@@ -8987,41 +9477,25 @@ if('serviceWorker' in navigator){
   }).catch(()=>{});
 }
 
-    // ── PWA Install — full-screen, lo primero que ves ──
-    window._pwaPrompt=null;
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-    const isStandalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
-
-    // Mark as installed if already running standalone
-    if(isStandalone){
-      localStorage.setItem('lumio_pwa_installed','1');
-    }
-
-    // Show IMMEDIATELY if not installed
-    (function checkPwaOnLoad(){
-      if(localStorage.getItem('lumio_pwa_installed'))return;
-      if(isStandalone)return;
-      // Small delay so page CSS loads first (1 frame)
-      requestAnimationFrame(()=>{
-        if(isIOS){
-          pwaShow('ios');
-        } else {
-          // For Android/desktop, wait up to 500ms for beforeinstallprompt
-          // If it fires before that we already have the prompt; if not, show anyway
-          setTimeout(()=>pwaShow('android'),500);
-        }
-      });
-    })();
-
+    // ── PWA Install — funciona en Chrome/Edge/Samsung/Android + guía para iOS ──
+    window.window._pwaPrompt=null;
     window.addEventListener('beforeinstallprompt',e=>{
       e.preventDefault();
       window._pwaPrompt=e;
-      // If overlay isn't visible yet, show it now
-      const ov=document.getElementById('pwa-overlay');
-      if(!localStorage.getItem('lumio_pwa_installed')&&ov&&!ov.classList.contains('pwa-visible')){
-        pwaShow('android');
+      // Show our custom overlay after 3s if not already installed
+      if(!localStorage.getItem('lumio_pwa_dismissed')){
+        setTimeout(()=>pwaShow('android'),3000);
       }
     });
+    // Detect already installed
+    if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
+      localStorage.setItem('lumio_pwa_installed','1');
+    }
+    // iOS: show install hint if not installed and not dismissed
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    if(isIOS&&!navigator.standalone&&!localStorage.getItem('lumio_pwa_dismissed')){
+      setTimeout(()=>pwaShow('ios'),4000);
+    }
 
     // Update about creator name
     const ac=document.getElementById('about-creator');if(ac)ac.textContent=D.user.name;
@@ -9049,32 +9523,41 @@ if('serviceWorker' in navigator){
     // Check for imminent exams
     setTimeout(()=>{try{checkImminentExam();}catch(e){}}, 2000);
 
-    setTimeout(()=>{ try{window._hideSplashAndStart();}catch(e){} }, 1200);
+    // Splash → onboarding or app
+    setTimeout(()=>{
+      clearTimeout(splashGuard); // normal flow succeeded — cancel the safety net
+      const sp=document.getElementById('splash');
+      if(sp){sp.classList.add('out');sp.style.opacity='0';}
+      setTimeout(()=>{
+        try{
+          if(!localStorage.getItem('lumio_seen_onboarding')){
+            showOnboarding();
+          }else{
+            // Ensure home screen is visible
+            try{navSection('home');}catch(e){}
+            setTimeout(()=>{try{startTutorial();}catch(e){}},600);
+          }
+        }catch(e2){
+          // Last resort: if onboarding/tutorial fails, at least show home
+          try{navSection('home');}catch(e){}
+        }
+      },600);
+    },1800);
 
   }catch(e){
+    // Si algo falla, el splashGuard sigue activo como último recurso
+    // NO cancelamos splashGuard aquí
     console.error('Lumio init error:',e);
-    setTimeout(()=>{ try{window._hideSplashAndStart();}catch(e2){} },500);
+    // Forzar salida de splash en 500ms
+    setTimeout(()=>{
+      try{
+        const sp=document.getElementById('splash');
+        if(sp){sp.classList.add('out');sp.style.opacity='0';}
+        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
+      }catch(e2){}
+    },500);
   }
 });
-
-// Global — funciona aunque el try/catch del init falle
-window._hideSplashAndStart=function(){
-  const sp=document.getElementById('splash');
-  if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';sp.style.display='none';}
-  const _nav=window['navSection'];
-  const _onb=window['showOnboarding'];
-  const _tut=window['startTutorial'];
-  try{
-    if(!localStorage.getItem('lumio_seen_onboarding')){
-      if(typeof _onb==='function') _onb();
-    }else{
-      if(typeof _nav==='function') _nav('home');
-      setTimeout(()=>{ if(typeof _tut==='function') _tut(); },600);
-    }
-  }catch(e2){
-    if(typeof _nav==='function') try{_nav('home');}catch(e){}
-  }
-};
 
 // ════════════════════════════════════════════════════════
 // BÚSQUEDA GLOBAL
@@ -9384,80 +9867,61 @@ function startExamenClase(claseId){
 // PWA INSTALL — banner universal para todos los navegadores
 // ════════════════════════════════════════════════════════
 function pwaShow(mode){
-  // Never show if already installed or dismissed recently
+  // Don't show if already installed or recently dismissed
   if(localStorage.getItem('lumio_pwa_installed'))return;
-  if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone)return;
   if(localStorage.getItem('lumio_pwa_dismissed'))return;
   const ov=document.getElementById('pwa-overlay');
-  if(!ov)return;
-  const iosBox=document.getElementById('pwa-ios-box');
-  const androidBox=document.getElementById('pwa-android-box');
+  const card=document.getElementById('pwa-card');
+  const iosHint=document.getElementById('pwa-ios-hint');
+  const androidHint=document.getElementById('pwa-android-hint');
   const installBtn=document.getElementById('pwa-install-btn');
+  if(!ov||!card)return;
+  // Configure based on platform
   if(mode==='ios'){
-    // On iOS: hide install button, show iOS steps
     if(installBtn)installBtn.style.display='none';
-    if(iosBox)iosBox.style.display='block';
+    if(iosHint)iosHint.style.display='block';
   }else{
-    // Android/desktop
-    if(installBtn)installBtn.style.display='flex';
-    if(!window._pwaPrompt){
-      // No auto-prompt available — show manual steps
-      setTimeout(()=>{if(!window._pwaPrompt&&androidBox)androidBox.style.display='block';},800);
+    if(installBtn)installBtn.style.display='block';
+    if(androidHint){
+      // Show Android manual hint after 1.5s if no auto-prompt
+      setTimeout(()=>{if(!window._pwaPrompt&&androidHint)androidHint.style.display='block';},1500);
     }
   }
-  // Full screen takeover — show immediately
   ov.style.display='flex';
-  ov.style.opacity='0';
-  // Force reflow then fade in
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    ov.style.opacity='1';
+    if(card)card.style.transform='translateY(0)';
   }));
 }
 function pwaClose(){
   const ov=document.getElementById('pwa-overlay');
-  if(!ov)return;
-  ov.style.opacity='0';
-  ov.style.pointerEvents='none';
-  setTimeout(()=>{
-    ov.style.display='none';
-    ov.classList.remove('pwa-visible');
-    // Make sure the app is showing behind
-    const phone=document.getElementById('phone');
-    if(phone)phone.style.display='';
-    // If splash is gone already, make sure we're on home
-    const sp=document.getElementById('splash');
-    if(sp&&(sp.classList.contains('out')||sp.style.opacity==='0')){
-      try{ bHome(); navSection('home'); }catch(e){}
-    }
-  },450);
+  const card=document.getElementById('pwa-card');
+  if(card)card.style.transform='translateY(100px)';
+  setTimeout(()=>{if(ov)ov.style.display='none';},400);
+  // Dismiss for 7 days
   localStorage.setItem('lumio_pwa_dismissed',Date.now()+'');
+  // Clear dismissal after 7 days so it shows again
+  setTimeout(()=>localStorage.removeItem('lumio_pwa_dismissed'),7*864e5);
 }
 async function pwaInstall(){
-  const btn=document.getElementById('pwa-install-btn');
   if(window._pwaPrompt){
     window._pwaPrompt.prompt();
     const result=await window._pwaPrompt.userChoice;
     if(result.outcome==='accepted'){
       localStorage.setItem('lumio_pwa_installed','1');
-      pwaClose();
       toast('✅ ¡Lumio instalado! Búscalo en tu pantalla de inicio');
     }
     window._pwaPrompt=null;
+    pwaClose();
   }else{
-    // No browser prompt — show manual instructions
-    const androidBox=document.getElementById('pwa-android-box');
-    if(androidBox)androidBox.style.display='block';
-    if(btn){
-      btn.innerHTML='<span>⬆</span><span>Sigue los pasos de arriba</span>';
-      btn.style.background='var(--bg2)';btn.style.color='var(--t1)';
-      btn.style.boxShadow='none';
-    }
+    // Fallback: show manual instructions
+    const androidHint=document.getElementById('pwa-android-hint');
+    if(androidHint)androidHint.style.display='block';
+    const btn=document.getElementById('pwa-install-btn');
+    if(btn){btn.textContent='⬆ Ver instrucciones arriba';btn.style.background='var(--bg2)';btn.style.color='var(--t1)';}
   }
 }
 // Expose for Ajustes install button
-function showInstallPrompt(){
-  pwaShow(typeof isIOS!=='undefined'&&isIOS?'ios':'android');
-}
+function showInstallPrompt(){pwaShow('android');}
 
 // ════════════════════════════════════════════════════════
 // MODO OSCURO AUTOMÁTICO
@@ -9651,7 +10115,6 @@ self.addEventListener('fetch',e=>{
     setTimeout(()=>URL.revokeObjectURL(url),5000);
   }catch(e){}
 })();
-
 // Inicializar notificaciones y URL imports al arrancar
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
