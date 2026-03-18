@@ -43,7 +43,7 @@
   --font:'Geist',Arial,sans-serif;
 }
 html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
-#phone{width:100%;max-width:390px;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+#phone{width:100%;max-width:100%;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 #screens{flex:1;overflow:hidden;position:relative}
 /* NAV */
 #nav{height:68px;background:rgba(11,13,18,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -202,7 +202,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 #mmap-svg{width:100%;border-radius:13px;background:var(--bg1);border:1px solid var(--bd)}
 /* MODALS */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;z-index:900}
-.mobox{width:100%;max-width:390px;margin:0 auto;background:var(--bg1);border:1px solid var(--bd2);border-radius:18px 18px 0 0;padding:22px 18px 34px;display:flex;flex-direction:column;gap:12px;max-height:88vh;overflow-y:auto}
+.mobox{width:100%;max-width:100%;margin:0 auto;background:var(--bg1);border:1px solid var(--bd2);border-radius:18px 18px 0 0;padding:22px 18px 34px;display:flex;flex-direction:column;gap:12px;max-height:88vh;overflow-y:auto}
 /* QUICK NOTES FLOAT */
 /* quick-note-btn moved to fab-bar */
 
@@ -280,9 +280,9 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
   --card-shadow:0 1px 6px rgba(0,0,0,.10);
 }
 /* ONBOARDING */
-#onboarding{position:fixed;inset:0;background:var(--bg);z-index:980;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0;transition:opacity .4s}
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:980;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;gap:0;transition:opacity .4s;overflow-y:auto}
 #onboarding.out{opacity:0;pointer-events:none}
-.ob-step{display:none;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:340px;text-align:center}
+.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100dvh;padding:48px 24px 0}
 .ob-step.active{display:flex}
 .ob-ico{font-size:56px;animation:spul 2s ease-in-out infinite}
 .ob-title{font-size:26px;font-weight:900;color:var(--t1)}
@@ -290,7 +290,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .ob-dots{display:flex;gap:7px;margin-top:6px}
 .ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:background .2s}
 .ob-dot.on{background:var(--y)}
-.ob-mats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.ob-mats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;width:100%}
 .ob-mat{background:var(--bg1);border:2px solid var(--bd);border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;text-align:left}
 .ob-mat.sel{border-color:var(--y);background:var(--yd)}
 .ob-mat-ico{font-size:22px;flex-shrink:0}
@@ -397,7 +397,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .today-card:active{transform:scale(.98)}
 /* THEME TOGGLE */
 /* theme-btn moved to fab-bar */
-@media(min-width:420px){#phone{box-shadow:0 0 100px rgba(0,0,0,.9)}body{background:#04050a}}
+
 
 /* ══ SCREEN TRANSITIONS ══ */
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease;padding-bottom:80px}
@@ -486,7 +486,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 #exam-imminent-overlay.show{display:flex}
 
 /* ══ ONBOARDING TRANSITIONS ══ */
-.ob-step{display:none;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:340px;text-align:center;animation:obSlide .25s ease}
+.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100dvh;padding:48px 24px 0;animation:obSlide .25s ease}
 .ob-step.active{display:flex}
 @keyframes obSlide{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 .ob-step.back-anim{animation:obSlideBack .25s ease}
@@ -520,7 +520,7 @@ button:active{transform:scale(.97)}
 /* Base: el phone ocupa todo el ancho en móviles pequeños */
 #phone{
   width:100%;
-  max-width:430px; /* cap for large phones/tablets */
+  max-width:100%;
   min-height:100dvh;
   margin:0 auto;
 }
@@ -551,11 +551,7 @@ button:active{transform:scale(.97)}
 
 /* Tablets y pantallas grandes (> 430px) — centrar con sombra */
 @media(min-width:430px){
-  body{background:#050607}
-  #phone{
-    box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 24px 80px rgba(0,0,0,.8);
-    min-height:100dvh;
-  }
+  body{background:var(--bg)}
 }
 
 /* Altura: pantallas cortas (iPhone SE, landscape) */
@@ -583,6 +579,26 @@ button:active{transform:scale(.97)}
 
 /* Contenido que puede desbordarse */
 .screen{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* Desktop layout — wider screens get centred content with max readable width */
+@media(min-width:768px){
+  html,body{background:var(--bg)}
+  #phone{max-width:100%}
+  .pw{padding-left:max(24px,calc(50% - 380px));padding-right:max(24px,calc(50% - 380px))}
+  .card{max-width:760px;margin-left:auto;margin-right:auto}
+  #nav{justify-content:center;gap:8px;padding:0 24px}
+  .nb{min-width:72px;font-size:12px}
+  .nb span{font-size:10px}
+  .mobox{border-radius:16px;margin:auto}
+  .mo{align-items:center}
+  #pwa-overlay{padding:40px 24px 60px}
+  #tut-card{left:50%;transform:translateX(-50%);width:480px;max-width:90vw}
+  #toast{max-width:480px}
+}
+@media(min-width:1024px){
+  .pw{padding-left:max(32px,calc(50% - 460px));padding-right:max(32px,calc(50% - 460px))}
+  .card{max-width:900px}
+}
 .pw{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
 
 /* Nav safe area (iPhone con notch/dynamic island) */
@@ -701,10 +717,11 @@ button:active{transform:scale(.97)}
     <div class="ob-title">Tus materias</div>
     <div class="ob-sub">Elige las que estudias. Lumio organizará tus apuntes, flashcards y exámenes <b>por materia</b> — así nunca mezclas Mates con Historia.</div>
     <div class="ob-mats-grid" id="ob-mats-grid"></div>
-    <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
-    <div style="display:flex;gap:8px;width:100%">
+    <div class="ob-dots" style="margin-top:8px"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <!-- Sticky button bar — always visible regardless of scroll -->
+    <div style="position:sticky;bottom:0;left:0;right:0;background:var(--bg);padding:16px 0 max(24px,env(safe-area-inset-bottom));display:flex;gap:8px;width:100%;margin-top:auto">
       <button class="gbtn" onclick="obBack(3)" style="flex:1">← Atrás</button>
-      <button class="mbtn" onclick="obNext(3)" style="flex:2">Continuar →</button>
+      <button class="mbtn" onclick="obNext(3)" style="flex:2;font-size:16px;padding:14px">Continuar →</button>
     </div>
   </div>
 
@@ -3002,11 +3019,11 @@ button:active{transform:scale(.97)}
 @keyframes pwa-pulse{0%,100%{box-shadow:0 0 0 12px rgba(245,197,24,.12),0 0 0 24px rgba(245,197,24,.05),0 16px 48px rgba(245,197,24,.35)}50%{box-shadow:0 0 0 16px rgba(245,197,24,.18),0 0 0 32px rgba(245,197,24,.07),0 16px 56px rgba(245,197,24,.45)}}
 .pwa-title{font-size:42px;font-weight:900;color:var(--t1);letter-spacing:-2px;line-height:1;margin-bottom:6px;text-align:center}
 .pwa-sub{font-size:15px;color:var(--t2);text-align:center;line-height:1.5;margin-bottom:28px;max-width:300px}
-.pwa-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px;margin-bottom:28px}
+.pwa-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:480px;margin-bottom:28px}
 .pwa-feat{background:var(--bg1);border:1px solid var(--bd);border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
 .pwa-feat-icon{font-size:26px;line-height:1}.pwa-feat-name{font-size:11px;font-weight:700;color:var(--t1)}.pwa-feat-desc{font-size:10px;color:var(--t3);line-height:1.3}
 .pwa-btn-main{
-  width:100%;max-width:320px;background:var(--y);color:#0d0f14;border:none;border-radius:16px;
+  width:100%;max-width:480px;background:var(--y);color:#0d0f14;border:none;border-radius:16px;
   padding:18px;font-size:18px;font-weight:900;cursor:pointer;font-family:var(--font);
   box-shadow:0 6px 28px rgba(245,197,24,.45);transition:transform .12s,box-shadow .12s;
   margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;
@@ -3015,7 +3032,7 @@ button:active{transform:scale(.97)}
 .pwa-btn-skip{background:none;border:none;color:var(--t3);font-size:13px;cursor:pointer;font-family:var(--font);padding:8px;text-decoration:underline;text-underline-offset:3px;}
 #pwa-ios-box,#pwa-android-box{
   display:none;background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
-  padding:16px;margin-bottom:14px;text-align:left;width:100%;max-width:320px;
+  padding:16px;margin-bottom:14px;text-align:left;width:100%;max-width:480px;
 }
 #pwa-ios-box .step,#pwa-android-box .step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:8px;}
 #pwa-ios-box .step:last-child,#pwa-android-box .step:last-child{margin-bottom:0}
@@ -3024,7 +3041,7 @@ button:active{transform:scale(.97)}
 
 /* ── Wrong browser warning (iOS + Chrome/Firefox) ── */
 #pwa-wrong-browser{
-  display:none;width:100%;max-width:320px;
+  display:none;width:100%;max-width:480px;
   background:rgba(248,113,113,.1);border:1.5px solid rgba(248,113,113,.4);
   border-radius:14px;padding:16px;margin-bottom:16px;
 }
@@ -3060,7 +3077,7 @@ button:active{transform:scale(.97)}
 
 /* ── QR box ── */
 #pwa-qr-box{
-  display:none;width:100%;max-width:320px;
+  display:none;width:100%;max-width:480px;
   background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;
   padding:16px;margin-bottom:14px;text-align:center;
 }
@@ -9640,7 +9657,7 @@ function showUpdateBanner(remoteVersion){
   if(existing)return; // ya se mostró
   const banner=document.createElement('div');
   banner.id='update-banner';
-  banner.style.cssText=`position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:var(--y);color:#0d0f14;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;font-family:var(--font)`;
+  banner.style.cssText=`position:fixed;top:0;left:0;right:0;width:100%;background:var(--y);color:#0d0f14;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;font-family:var(--font)`;
   banner.innerHTML=`
     <div>
       <div style="font-size:13px;font-weight:800">🚀 Lumio ${remoteVersion} disponible</div>
