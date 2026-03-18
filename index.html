@@ -5,7 +5,25 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Lumio — Tu compañero de estudio</title>
 <meta name="description" content="App de estudio gratuita para el colegio. Flashcards, pomodoro, apuntes, clases y mucho más. Sin anuncios.">
-<meta name="theme-color" content="#f5c518">
+<meta name="theme-color" content="#f5c518" id="theme-color-meta">
+<script>
+// Apply saved accent color IMMEDIATELY before first paint — no yellow flash
+(function(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('lumio_accent')||'null');
+    if(saved&&saved.hex){
+      document.getElementById('theme-color-meta').content=saved.hex;
+      // Also inject CSS variable override so --y is correct from frame 1
+      var s=document.createElement('style');
+      var r,g,b;
+      var hex=saved.hex.replace('#','');
+      r=parseInt(hex.slice(0,2),16);g=parseInt(hex.slice(2,4),16);b=parseInt(hex.slice(4,6),16);
+      s.textContent=':root{--y:'+saved.hex+'!important;--yd:rgba('+r+','+g+','+b+',.13)!important;--yb:rgba('+r+','+g+','+b+',.32)!important}';
+      document.head.appendChild(s);
+    }
+  }catch(e){}
+})();
+</script>
 <!-- PWA / iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -5181,10 +5199,14 @@ async function genFlashcardsIA(){
         txt=await fcExtractTextFromPhoto(_fcPhotoDataUrl);
         if(statusEl)statusEl.textContent='✓ Texto extraído ('+txt.length+' caracteres)';
       }catch(ocrErr){
-        // OCR failed — use local extraction based on what's visible
-        toast('📷 Sin conexión — usando análisis local','');
-        // At minimum use the filename or mat as topic
-        txt=mat;
+        // Show the real error so user knows what happened
+        const errMsg=ocrErr.message||'Error desconocido';
+        toast('❌ '+errMsg.slice(0,80),'error');
+        document.getElementById('fc-gen-loading').style.display='none';
+        document.getElementById('fc-gen-btn').disabled=false;
+        const statusEl=document.getElementById('fc-photo-status');
+        if(statusEl)statusEl.textContent='❌ '+errMsg.slice(0,50);
+        return; // stop — don't generate cards with wrong data
       }
     }
 
@@ -6953,34 +6975,62 @@ function fcClearPhoto(){
 // For real OCR we use the free Tesseract.js (loaded inline)
 // Actually we'll use a clever approach: send to Pollinations with vision
 async function fcExtractTextFromPhoto(dataUrl){
-  // Try to use fetch with Pollinations vision endpoint (supports images)
-  try{
-    const base64 = dataUrl.split(',')[1];
-    const mimeType = dataUrl.split(';')[0].split(':')[1]||'image/jpeg';
-    const res = await fetch('https://text.pollinations.ai/openai', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+  const base64 = dataUrl.split(',')[1];
+  const mimeType = dataUrl.split(';')[0].split(':')[1]||'image/jpeg';
+  const imageContent = {
+    type:'image_url',
+    image_url:{url:`data:${mimeType};base64,${base64}`}
+  };
+  const textContent = {
+    type:'text',
+    text:'Extrae todo el texto escrito en esta imagen de apuntes. Devuelve SOLO el texto extraído, sin comentarios ni formato adicional.'
+  };
+
+  // Endpoint 1: Pollinations openai (GPT-4o vision)
+  const endpoints = [
+    {
+      url:'https://text.pollinations.ai/openai',
       body: JSON.stringify({
         model:'openai',
-        messages:[{
-          role:'user',
-          content:[
-            {type:'text', text:'Extrae todo el texto escrito en esta imagen de apuntes. Devuelve SOLO el texto extraído, tal cual, sin comentarios ni formato adicional.'},
-            {type:'image_url', image_url:{url:`data:${mimeType};base64,${base64}`}}
-          ]
-        }],
+        messages:[{role:'user', content:[textContent, imageContent]}],
         max_tokens:1500
-      })
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content||'';
-    if(text && text.length > 10) return text;
-    throw new Error('No text extracted');
-  }catch(e){
-    // Fallback: prompt user to copy the text manually
-    throw new Error('No se pudo leer el texto de la foto. Copia el texto a mano en el campo de texto.');
+      }),
+      parse: d => d.choices?.[0]?.message?.content||''
+    },
+    // Endpoint 2: Pollinations direct prompt with image (alternate format)
+    {
+      url:'https://text.pollinations.ai/',
+      body: JSON.stringify({
+        messages:[{role:'user', content:[textContent, imageContent]}],
+        model:'openai-large',
+        jsonMode:false
+      }),
+      parse: d => (typeof d==='string'?d:(d.choices?.[0]?.message?.content||d.text||''))
+    }
+  ];
+
+  let lastError = '';
+  for(const ep of endpoints){
+    try{
+      const res = await fetch(ep.url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: ep.body,
+        signal: AbortSignal.timeout(20000) // 20s timeout
+      });
+      if(!res.ok){
+        lastError = 'HTTP '+res.status+' en '+ep.url;
+        continue;
+      }
+      const data = await res.json();
+      const text = ep.parse(data);
+      if(text && text.trim().length > 5) return text.trim();
+      lastError = 'Respuesta vacía de '+ep.url;
+    }catch(e){
+      lastError = e.name==='TimeoutError'?'Tiempo agotado (20s)':e.message;
+    }
   }
+  throw new Error('No se pudo leer la foto. Error: '+lastError+'. Prueba con mejor iluminación o escribe el texto a mano.');
 }
 
 // ════════════════════════════════════════════════════════
