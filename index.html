@@ -504,6 +504,107 @@ button:active{transform:scale(.97)}
 
 /* ══ REPASO RAPIDO ══ */
 .quick-rep-badge{background:var(--y);color:#0d0f14;font-size:9px;font-weight:900;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — adapta a cualquier tamaño de móvil
+   ═══════════════════════════════════════════════ */
+
+/* Base: el phone ocupa todo el ancho en móviles pequeños */
+#phone{
+  width:100%;
+  max-width:430px; /* cap for large phones/tablets */
+  min-height:100dvh;
+  margin:0 auto;
+}
+
+/* Pantallas muy pequeñas (SE 1st gen, Moto E etc — < 360px) */
+@media(max-width:359px){
+  .pt{font-size:20px}
+  .pw{padding:16px 12px 0}
+  .card{padding:12px}
+  .mbtn{padding:11px;font-size:13px}
+  .nb{min-width:44px;padding:4px 6px}
+  .nb span{font-size:8px}
+  .ni{width:18px;height:18px}
+  .mobox{padding:18px 14px 28px}
+  .chip{padding:6px 10px;font-size:11px}
+  #tut-card{left:8px;right:8px;bottom:72px}
+  .pwa-features{gap:6px}
+  .pwa-feat{padding:10px 8px}
+  .pwa-title{font-size:34px}
+}
+
+/* Pantallas normales-pequeñas (360–389px) */
+@media(max-width:389px){
+  .pt{font-size:21px}
+  .pwa-title{font-size:38px}
+  .pwa-logo-ring{width:96px;height:96px;font-size:52px}
+}
+
+/* Tablets y pantallas grandes (> 430px) — centrar con sombra */
+@media(min-width:430px){
+  body{background:#050607}
+  #phone{
+    box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 24px 80px rgba(0,0,0,.8);
+    min-height:100dvh;
+  }
+}
+
+/* Altura: pantallas cortas (iPhone SE, landscape) */
+@media(max-height:667px){
+  .pw{padding-top:14px}
+  .pt{margin-bottom:2px}
+  .ps{margin-bottom:8px}
+  .card{padding:12px;margin-bottom:9px}
+  #nav{height:56px}
+  #tut-card{bottom:64px}
+  .mobox{padding:16px 16px 24px;gap:9px}
+  .pwa-logo-ring{width:84px;height:84px;font-size:46px;margin-bottom:16px}
+  .pwa-features{margin-bottom:18px}
+  .pwa-sub{margin-bottom:18px}
+}
+
+/* Altura muy corta (< 600px — landscape en móvil pequeño) */
+@media(max-height:599px){
+  .pwa-features{display:none}
+  #pwa-ios-box,#pwa-android-box{padding:10px 12px}
+  .pwa-logo-ring{width:64px;height:64px;font-size:36px;border-radius:18px;margin-bottom:12px}
+  .pwa-title{font-size:28px;margin-bottom:4px}
+  .pwa-sub{font-size:13px;margin-bottom:12px}
+}
+
+/* Contenido que puede desbordarse */
+.screen{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.pw{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+
+/* Nav safe area (iPhone con notch/dynamic island) */
+#nav{
+  padding-bottom:max(8px, env(safe-area-inset-bottom));
+  height:auto;
+  min-height:56px;
+}
+
+/* Inputs y textareas no deben desbordarse */
+.inp,.ta{max-width:100%;box-sizing:border-box}
+
+/* Chip rows no desbordan */
+.chip-row{flex-wrap:nowrap;overflow-x:auto}
+.chip-wrap{flex-wrap:wrap}
+
+/* Grids adaptativos */
+.pwa-features{
+  grid-template-columns:repeat(2,1fr);
+}
+@media(max-width:300px){
+  .pwa-features{grid-template-columns:1fr 1fr;gap:6px}
+}
+
+/* Mobox nunca más alto que la pantalla */
+.mobox{max-height:min(88vh, 600px);overflow-y:auto}
+
+/* Texto nunca desborda */
+.card *{word-break:break-word}
+
 </style>
 <!-- UPDATE INTERCEPTOR: en el <head>, ANTES de renderizar el body.
      Así document.open() no causa pantalla negra porque nada se ha pintado aún. -->
@@ -2643,19 +2744,20 @@ button:active{transform:scale(.97)}
 
 <!-- MODAL CHECK-IN ÁNIMO -->
 <div class="mo" id="checkin-mo" style="display:none"><div class="mobox" style="text-align:center">
-  <div style="font-size:28px;font-weight:800;color:var(--t1);margin-bottom:4px">¿Cómo estás hoy?</div>
-  <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Cuéntame antes de empezar</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div style="font-size:20px;font-weight:800;color:var(--t1)">¿Cómo estás hoy?</div>
+    <button onclick="clsMo('checkin');tgPom()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;line-height:1;padding:0 2px">✕</button>
+  </div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:16px">Opcional — pulsa ✕ para saltarlo</div>
   <div style="display:flex;justify-content:space-around;margin-bottom:14px">
     <div onclick="selAnimo(this,'😴',20)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="cansado"><div style="font-size:28px">😴</div><div style="font-size:10px;color:var(--t2);font-weight:700">Cansado</div></div>
     <div onclick="selAnimo(this,'😐',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="normal"><div style="font-size:28px">😐</div><div style="font-size:10px;color:var(--t2);font-weight:700">Normal</div></div>
     <div onclick="selAnimo(this,'😊',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="bien"><div style="font-size:28px">😊</div><div style="font-size:10px;color:var(--t2);font-weight:700">Bien</div></div>
     <div onclick="selAnimo(this,'🔥',25)" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:12px;border:1px solid var(--bd);transition:all .15s" class="animo-opt" data-a="motivado"><div style="font-size:28px">🔥</div><div style="font-size:10px;color:var(--t2);font-weight:700">Motivado</div></div>
   </div>
-  <div id="checkin-sugerencia" style="font-size:12px;color:var(--teal);min-height:18px;margin-bottom:12px"></div>
-  <div style="display:flex;gap:8px">
-    <button class="gbtn" style="flex:1" onclick="clsMo('checkin');confirmPomStart()">Saltar</button>
-    <button class="mbtn" style="flex:2" id="checkin-ok-btn" onclick="confirmCheckinAndStart()">▶ Empezar</button>
-  </div>
+  <div id="checkin-sugerencia" style="font-size:12px;color:var(--teal);min-height:14px;margin-bottom:10px"></div>
+  <button class="mbtn" id="checkin-ok-btn" onclick="confirmCheckinAndStart()" style="width:100%;margin-bottom:8px">▶ Empezar Pomodoro</button>
+  <button onclick="clsMo('checkin');tgPom()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:var(--font);text-decoration:underline;text-underline-offset:2px">Saltar y empezar sin registrar ánimo</button>
 </div></div>
 
 <!-- MODAL PAUSA ACTIVA -->
@@ -3303,7 +3405,7 @@ function confirmPomStart(){
     animoSel=null;
     document.querySelectorAll('.animo-opt').forEach(e=>{e.style.background='';e.style.borderColor='var(--bd)';});
     document.getElementById('checkin-sugerencia').textContent='';
-    document.getElementById('checkin-ok-btn').disabled=true;
+    document.getElementById('checkin-ok-btn').removeAttribute('disabled');
     document.getElementById('checkin-mo').style.display='flex';
     return;
   }
