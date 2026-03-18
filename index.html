@@ -96,7 +96,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 .fade-in{animation:fi .25s ease}.screen{animation:fi .2s ease}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 /* TOAST */
-#toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg2);border:1px solid var(--bd2);border-radius:999px;padding:9px 20px;font-size:13px;font-weight:700;color:var(--t1);z-index:800;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+#toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg1);border:1px solid var(--bd2);border-radius:999px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--t1);z-index:9800;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 /* FOCUS MODE */
 #focus-mode{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:990}
@@ -306,6 +306,14 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 #sub-nav::-webkit-scrollbar{display:none}
 #sub-nav.show{display:flex}
 .snb{padding:7px 14px;border-radius:999px;border:1px solid var(--bd);background:transparent;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.snb:active{transform:scale(.95)}
+/* Estudiar landing cards */
+.est-card{background:var(--bg1);border:1px solid var(--bd);border-radius:14px;padding:14px 12px;cursor:pointer;transition:transform .12s,border-color .15s;position:relative;overflow:hidden}
+.est-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ec,var(--y));border-radius:14px 14px 0 0}
+.est-card:active{transform:scale(.96)}
+.est-card-ico{font-size:26px;line-height:1;margin-bottom:7px}
+.est-card-name{font-size:13px;font-weight:800;color:var(--t1);margin-bottom:3px}
+.est-card-desc{font-size:11px;color:var(--t3);line-height:1.4}
 .snb.active{background:var(--yd);border-color:var(--yb);color:var(--y)}
 /* CONFETTI */
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:970;display:none}
@@ -678,7 +686,7 @@ button:active{transform:scale(.97)}
   <div class="ob-step" id="ob-2">
     <div class="ob-ico">🎓</div>
     <div class="ob-title">¿En qué curso estás?</div>
-    <div class="ob-sub">Lumio adaptará las materias y el contenido a tu nivel.</div>
+    <div class="ob-sub">Lumio cargará automáticamente las asignaturas de tu curso. Podrás añadir o quitar las que no tengas.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%" id="ob-curso-grid"></div>
     <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
     <div style="display:flex;gap:8px;width:100%">
@@ -691,7 +699,7 @@ button:active{transform:scale(.97)}
   <div class="ob-step" id="ob-3">
     <div class="ob-ico">📚</div>
     <div class="ob-title">Tus materias</div>
-    <div class="ob-sub">Selecciona las que estudias este curso. Puedes cambiarlas después.</div>
+    <div class="ob-sub">Elige las que estudias. Lumio organizará tus apuntes, flashcards y exámenes <b>por materia</b> — así nunca mezclas Mates con Historia.</div>
     <div class="ob-mats-grid" id="ob-mats-grid"></div>
     <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
     <div style="display:flex;gap:8px;width:100%">
@@ -703,8 +711,8 @@ button:active{transform:scale(.97)}
   <!-- Step 4: Horario -->
   <div class="ob-step" id="ob-4">
     <div class="ob-ico">⏰</div>
-    <div class="ob-title">¿Cuándo estudias?</div>
-    <div class="ob-sub">Lumio organizará tus recordatorios para esos momentos.</div>
+    <div class="ob-title">¿Cuándo sueles estudiar?</div>
+    <div class="ob-sub">Te enviaremos un recordatorio diario a esa hora para que no te olvides. Puedes cambiarlo después en Ajustes.</div>
     <div class="ob-time-grid">
       <div class="ob-time sel" data-t="manana" onclick="selTime(this)"><div class="ob-time-ico">🌅</div><div class="ob-time-lbl">Mañana</div><div class="ob-time-sub">7:00 – 12:00</div></div>
       <div class="ob-time" data-t="tarde" onclick="selTime(this)"><div class="ob-time-ico">☀️</div><div class="ob-time-lbl">Tarde</div><div class="ob-time-sub">15:00 – 19:00</div></div>
@@ -880,17 +888,15 @@ button:active{transform:scale(.97)}
   <div id="h-next-class" style="display:none;margin-bottom:4px"></div>
 
   <!-- Start here (first time only) -->
-  <div id="h-start-hint" style="display:none;background:rgba(245,197,24,.06);border:1.5px dashed rgba(245,197,24,.35);border-radius:14px;padding:16px;margin-bottom:16px">
-    <div style="font-size:14px;font-weight:800;color:var(--y);margin-bottom:8px">👆 ¿Por dónde empezar?</div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:12px">
-      <b style="color:var(--t1)">1.</b> Ve a <b style="color:var(--teal)">Estudiar → Apuntes</b> y escribe los apuntes de hoy<br>
-      <b style="color:var(--t1)">2.</b> O crea tus primeras <b style="color:var(--purple)">Flashcards</b> para repasar<br>
-      <b style="color:var(--t1)">3.</b> Pulsa el botón amarillo para el <b style="color:var(--orange)">Pomodoro</b>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="navSection('estudiar');setTimeout(()=>goTo('apuntes'),80)" style="flex:1;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">📝 Apuntes</button>
-      <button onclick="navSection('estudiar');setTimeout(()=>goTo('flashcards'),80)" style="flex:1;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--purple);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">🃏 Flashcards</button>
-      <button onclick="forceShowTutorial()" style="flex:1;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.25);color:var(--y);border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">🎓 Tutorial</button>
+  <!-- GUÍA DE INICIO — desaparece al completar los 3 pasos -->
+  <div id="h-start-hint" style="display:none;margin-bottom:18px">
+    <div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(45,212,191,.06));border:1.5px solid rgba(245,197,24,.25);border-radius:16px;padding:16px 16px 14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--y),var(--teal));border-radius:16px 16px 0 0" id="h-hint-prog-bar"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:900;color:var(--t1)">🚀 Primeros pasos</div>
+        <div style="font-size:10px;font-weight:700;color:var(--t3)" id="h-hint-prog-txt">0 de 3</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px" id="h-hint-steps"></div>
     </div>
   </div>
 
@@ -1230,6 +1236,112 @@ button:active{transform:scale(.97)}
 </div></div>
 
 
+<!-- ══ ESTUDIAR LANDING MENU ══ -->
+<div class="screen" id="s-estudiar-menu"><div style="padding:18px 16px 24px;overflow-y:auto">
+  <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:4px">Estudiar</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:20px">¿Qué quieres hacer hoy?</div>
+
+  <!-- ESCRIBIR -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--teal);border-radius:2px;display:inline-block"></span>Escribir y organizar</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('apuntes')" style="--ec:#2dd4bf">
+      <div class="est-card-ico">📝</div>
+      <div class="est-card-name">Apuntes</div>
+      <div class="est-card-desc">Escribe y organiza tus notas por materia</div>
+    </div>
+    <div class="est-card" onclick="goTo('esquemas')" style="--ec:#60a5fa">
+      <div class="est-card-ico">🗂️</div>
+      <div class="est-card-name">Esquemas</div>
+      <div class="est-card-desc">Convierte texto en un esquema visual</div>
+    </div>
+  </div>
+
+  <!-- MEMORIZAR -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--purple);border-radius:2px;display:inline-block"></span>Memorizar</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('flashcards')" style="--ec:#c084fc">
+      <div class="est-card-ico">🃏</div>
+      <div class="est-card-name">Flashcards</div>
+      <div class="est-card-desc">Tarjetas pregunta-respuesta con repaso inteligente</div>
+    </div>
+    <div class="est-card" onclick="goTo('dictado')" style="--ec:#f472b6">
+      <div class="est-card-ico">🎙️</div>
+      <div class="est-card-name">Dictado</div>
+      <div class="est-card-desc">Escucha la pregunta y di la respuesta en voz alta</div>
+    </div>
+    <div class="est-card" onclick="goTo('mnemonics')" style="--ec:#fb923c">
+      <div class="est-card-ico">🧠</div>
+      <div class="est-card-name">Mnemonics</div>
+      <div class="est-card-desc">Reglas y trucos para recordar listas y fórmulas</div>
+    </div>
+  </div>
+
+  <!-- PRACTICAR -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--orange);border-radius:2px;display:inline-block"></span>Practicar</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('pom-screen')" style="--ec:#fb923c">
+      <div class="est-card-ico">⏱️</div>
+      <div class="est-card-name">Pomodoro</div>
+      <div class="est-card-desc">25 min de estudio enfocado sin distracciones</div>
+    </div>
+    <div class="est-card" onclick="goTo('testia')" style="--ec:#4ade80">
+      <div class="est-card-ico">🧠</div>
+      <div class="est-card-name">Test IA</div>
+      <div class="est-card-desc">Preguntas generadas de tus apuntes al instante</div>
+    </div>
+    <div class="est-card" onclick="goTo('examen')" style="--ec:#f87171">
+      <div class="est-card-ico">📈</div>
+      <div class="est-card-name">Modo Examen</div>
+      <div class="est-card-desc">Simula un examen real con contador de tiempo</div>
+    </div>
+    <div class="est-card" onclick="goTo('feynman')" style="--ec:#2dd4bf">
+      <div class="est-card-ico">🧑‍🏫</div>
+      <div class="est-card-name">Técnica Feynman</div>
+      <div class="est-card-desc">Explica el tema y la IA evalúa si lo entiendes</div>
+    </div>
+  </div>
+
+  <!-- ANALIZAR -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--blue);border-radius:2px;display:inline-block"></span>Analizar y resumir</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+    <div class="est-card" onclick="goTo('resumenia')" style="--ec:#60a5fa">
+      <div class="est-card-ico">📄</div>
+      <div class="est-card-name">Resumen IA</div>
+      <div class="est-card-desc">Pega texto y obtén los puntos clave en bullets</div>
+    </div>
+    <div class="est-card" onclick="goTo('mapa')" style="--ec:#a3e635">
+      <div class="est-card-ico">🗺️</div>
+      <div class="est-card-name">Mapa mental</div>
+      <div class="est-card-desc">Conceptos clave organizados visualmente</div>
+    </div>
+    <div class="est-card" onclick="goTo('lectura')" style="--ec:#e879f9">
+      <div class="est-card-ico">🔍</div>
+      <div class="est-card-name">Lectura activa</div>
+      <div class="est-card-desc">Resalta lo importante y genera preguntas</div>
+    </div>
+    <div class="est-card" onclick="goTo('simplificador')" style="--ec:#fb923c">
+      <div class="est-card-ico">📖</div>
+      <div class="est-card-name">Simplificador</div>
+      <div class="est-card-desc">Convierte textos difíciles en lenguaje sencillo</div>
+    </div>
+    <div class="est-card" onclick="goTo('corrector')" style="--ec:#f472b6">
+      <div class="est-card-ico">✍️</div>
+      <div class="est-card-name">Corrector</div>
+      <div class="est-card-desc">Corrige y mejora tus redacciones con IA</div>
+    </div>
+    <div class="est-card" onclick="goTo('comparador')" style="--ec:#9ca3af">
+      <div class="est-card-ico">⚖️</div>
+      <div class="est-card-name">Comparador</div>
+      <div class="est-card-desc">Compara dos versiones de un texto o redacción</div>
+    </div>
+    <div class="est-card" onclick="goTo('resaltador')" style="--ec:#f5c518">
+      <div class="est-card-ico">✨</div>
+      <div class="est-card-name">Resaltador</div>
+      <div class="est-card-desc">Marca automáticamente los conceptos clave</div>
+    </div>
+  </div>
+</div></div>
+
 <div class="screen" id="s-apuntes">
 <div id="apuntes-list-view">
   <div class="pw">
@@ -1340,19 +1452,27 @@ button:active{transform:scale(.97)}
     </div>
 
     <!-- Empty state -->
-    <div id="fc-empty" style="display:none;text-align:center;padding:44px 20px">
-      <div style="font-size:56px;margin-bottom:12px">🃏</div>
-      <div style="font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px">Sin tarjetas todavía</div>
-      <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px">Crea tus propias flashcards<br>o déjale a la IA que las genere por ti</div>
-      <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto">
-        <button class="mbtn" onclick="showAddCard()">+ Crear flashcard</button>
-        <button class="gbtn" onclick="showGenFC()">✨ Generar con IA</button>
+    <div id="fc-empty" style="display:none;text-align:center;padding:32px 20px">
+      <div style="font-size:56px;margin-bottom:14px">🃏</div>
+      <div style="font-size:18px;font-weight:900;color:var(--t1);margin-bottom:6px">Empieza aquí</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px;max-width:270px;margin-left:auto;margin-right:auto">Las flashcards son la forma más efectiva de memorizar. Crea una tú o deja que la <b style="color:var(--t1)">IA las genere</b> de tus apuntes.</div>
+      <div style="background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:12px;padding:10px 14px;margin-bottom:18px;text-align:left;max-width:270px;margin-left:auto;margin-right:auto">
+        <div style="font-size:11px;font-weight:800;color:var(--y);margin-bottom:6px">⚡ La forma más rápida:</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">1. Pulsa <b style="color:var(--t1)">✨ IA</b> arriba a la derecha<br>2. Pega texto de tus apuntes<br>3. La IA genera 10 tarjetas al instante</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;max-width:250px;margin:0 auto">
+        <button class="mbtn" onclick="showAddCard()" style="padding:14px;font-size:14px">✏️ Crear mi primera tarjeta</button>
+        <button class="gbtn" onclick="showGenFC()" style="padding:12px;font-size:13px;font-weight:700">✨ Generar con IA</button>
       </div>
     </div>
 
+    <!-- Search always visible -->
+    <div style="position:relative;margin-bottom:10px">
+      <input class="inp" id="fc-search" placeholder="🔍 Buscar tarjeta..." oninput="bFC()" style="padding-left:38px">
+      <div style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🔍</div>
+    </div>
     <!-- Filter chips -->
     <div id="fc-filters" style="display:none">
-      <input class="inp" id="fc-search" placeholder="🔍 Buscar tarjeta..." oninput="bFC()" style="margin-bottom:10px">
       <div class="chip-row" id="fc-ch"></div>
       <div style="display:flex;gap:5px;margin-bottom:12px" id="fc-lvl"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -1626,8 +1746,11 @@ button:active{transform:scale(.97)}
 <div class="screen" id="s-examen">
   <!-- SETUP -->
   <div id="ex-setup" style="height:100%;overflow-y:auto"><div style="padding:20px 16px;display:flex;flex-direction:column;gap:12px">
-    <div class="pt" style="margin-bottom:0">Modo <em>Examen</em> 📈</div>
-    <div class="ps">Simula un examen real con tiempo límite</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:0">
+      <button onclick="goTo('estudiar-menu')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);padding:2px;line-height:1;flex-shrink:0">&#8592;</button>
+      <div class="pt" style="margin-bottom:0">Modo <em>Examen</em> 📈</div>
+    </div>
+    <div class="ps" style="margin-left:30px">Simula un examen real con tiempo límite</div>
 
     <!-- Fuente de preguntas -->
     <div><div class="sl">Fuente de preguntas</div>
@@ -2282,6 +2405,7 @@ button:active{transform:scale(.97)}
   <div class="pt">Heat<em>map</em> 🔥</div>
   <div class="ps">Tus días de estudio del año</div>
   <div id="heatmap-wrap" style="overflow-x:auto;padding-bottom:8px"></div>
+  <div id="heatmap-stats" class="card" style="margin-top:12px;padding:8px 12px"></div>
   <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--t3)">
     <span>Menos</span>
     <div style="width:12px;height:12px;border-radius:2px;background:var(--bg2)"></div>
@@ -3037,6 +3161,12 @@ const D={
 };
 
 // ════════════════════════════════════════════════════════
+// Local ISO date (YYYY-MM-DD) — avoids UTC offset bugs
+function _localISO(d){
+  d=d||new Date();
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
 // PERSISTENCE — auto-save todo el estado D
 // ════════════════════════════════════════════════════════
 function saveState(){
@@ -3098,6 +3228,11 @@ function loadState(){
     if(saved.historial)D.historial=saved.historial;
     if(saved.horario)D.horario=saved.horario;
     if(saved.objetivoDiario)D.objetivoDiario=saved.objetivoDiario;
+    // Recalculate total hours from historial (source of truth)
+    if(D.historial&&D.historial.length){
+      const totalMins=D.historial.reduce((s,h)=>s+(h.mins||0),0);
+      D.user.hours=+(totalMins/60).toFixed(2);
+    }
   }catch(e){}
 }
 
@@ -3205,8 +3340,9 @@ const RETOS=[
 const SECTIONS={
   home:{screens:['home'],labels:[],single:true},
   estudiar:{
-    screens:['apuntes','flashcards','pom-screen','testia','examen','resumenia','corrector','dictado','esquemas','mapa','feynman','lectura','comparador','mnemonics','resaltador','simplificador'],
-    labels:['📝 Apuntes','🃏 Flashcards','⏱️ Pomodoro','🧠 Test IA','📈 Examen','📄 Resumen IA','✍️ Corrector','🎙️ Dictado','🗂️ Esquemas','🗺️ Mapa','🧑‍🏫 Feynman','🔍 Lectura activa','⚖️ Comparador','🧠 Mnemonics','✨ Resaltador','📖 Simplificar'],
+    screens:['estudiar-menu','apuntes','flashcards','pom-screen','testia','examen','resumenia','corrector','dictado','esquemas','mapa','feynman','lectura','comparador','mnemonics','resaltador','simplificador'],
+    labels:['🏠 Menú','📝 Apuntes','🃏 Flashcards','⏱️ Pomodoro','🧠 Test IA','📈 Examen','📄 Resumen IA','✍️ Corrector','🎙️ Dictado','🗂️ Esquemas','🗺️ Mapa','🧑‍🏫 Feynman','🔍 Lectura activa','⚖️ Comparador','🧠 Mnemonics','✨ Resaltador','📖 Simplificar'],
+    landingScreen:'estudiar-menu',
   },
   clase:{
     screens:['clase-lista','clase-detalle','mural','anuncios','fc-clase'],
@@ -3237,7 +3373,19 @@ function navSection(sec){
     goTo(s.screens[0]);
   }else{
     subNav.classList.add('show');
-    subNav.innerHTML=s.screens.map((scr,i)=>`<button class="snb" data-scr="${scr}" onclick="goTo('${scr}')">${s.labels[i]}</button>`).join('');
+    // For estudiar: show grouped visual menu instead of plain tabs
+const _SCREEN_DESCS={"apuntes": "Escribe y organiza", "flashcards": "Memoriza con tarjetas", "pom-screen": "Estudia 25 min", "testia": "Preguntas de tus apuntes", "examen": "Simula un examen real", "resumenia": "Texto → bullets clave", "corrector": "Mejora tu redacción", "dictado": "Escucha y responde", "esquemas": "Texto → esquema visual", "mapa": "Conceptos conectados", "feynman": "¿Lo entiendes de verdad?", "lectura": "Lee y comprende mejor", "comparador": "Compara dos redacciones", "mnemonics": "Reglas para memorizar", "resaltador": "Marca lo importante", "simplificador": "Textos difíciles → fácil"};
+    if(sec==='estudiar'){
+      // Show sub-nav but hide the menu item (index 0)
+      const visible=s.screens.slice(1);
+      const visLabels=s.labels.slice(1);
+      subNav.innerHTML=visible.map((scr,i)=>{
+        const desc=_SCREEN_DESCS[scr]||'';
+        return `<button class="snb" data-scr="${scr}" onclick="goTo('${scr}')" title="${desc}">${visLabels[i]}</button>`;
+      }).join('');
+    } else {
+      subNav.innerHTML=s.screens.map((scr,i)=>`<button class="snb" data-scr="${scr}" onclick="goTo('${scr}')">${s.labels[i]}</button>`).join('');
+    }
     const inSec=s.screens.includes(currentScreen);
     goTo(inSec?currentScreen:s.screens[0]);
   }
@@ -3248,7 +3396,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
+  const bldrs={home:bHome,'estudiar-menu':function(){},'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
   const fabBar=document.getElementById('fab-bar');if(fabBar)fabBar.classList.toggle('hidden-fab',id==='chat');
 }
@@ -3272,15 +3420,40 @@ function bHome(){
   document.getElementById('pc-p').textContent=pct+'%';
   setTimeout(()=>{const el=document.getElementById('pc-f');if(el)el.style.width=pct+'%';},350);
   document.getElementById('h-fc').textContent=D.cards.length?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
-  // Show "start here" hint for brand-new users
+  // Guided first-steps checklist
   try{
     const sh=document.getElementById('h-start-hint');
-    if(sh){
-      const noCards=D.cards.length===0;
-      const noTutorial=!localStorage.getItem('lumio_seen_tutorial');
+    const stepsEl=document.getElementById('h-hint-steps');
+    const progTxt=document.getElementById('h-hint-prog-txt');
+    const progBar=document.getElementById('h-hint-prog-bar');
+    if(sh&&stepsEl){
       let noNotes=true;
       try{noNotes=(JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]')).length===0;}catch(e){}
-      sh.style.display=(noCards&&noNotes&&noTutorial)?'block':'none';
+      const hasCards=D.cards.length>0;
+      const hasPom=D.user.pomodorosDone>0;
+      const hasNotes=!noNotes;
+      const steps=[
+        {done:hasNotes||hasCards, ico:'📝', label:'Crea tus primeros apuntes o flashcards', sub:'Escribe lo que estudias para poder repasarlo', action:"navSection('estudiar');setTimeout(()=>goTo('apuntes'),80)", btn:'Crear apunte'},
+        {done:hasCards, ico:'🃏', label:'Añade tu primera flashcard', sub:'Escribe pregunta y respuesta — la IA las genera sola', action:"navSection('estudiar');setTimeout(()=>goTo('flashcards'),80)", btn:'Crear tarjeta'},
+        {done:hasPom, ico:'⏱️', label:'Haz tu primer Pomodoro de 25 min', sub:'Elige materia y empieza — la pantalla no se apagará', action:"showPomPre()", btn:'Empezar ya'},
+      ];
+      const doneCount=steps.filter(s=>s.done).length;
+      // Hide checklist once all done
+      if(doneCount===3){sh.style.display='none';}
+      else{
+        sh.style.display='block';
+        if(progTxt)progTxt.textContent=doneCount+' de 3 completados';
+        if(progBar)progBar.style.background=`linear-gradient(90deg,var(--y) ${doneCount/3*100}%,rgba(255,255,255,.06) ${doneCount/3*100}%)`;
+        stepsEl.innerHTML=steps.map(s=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${s.done?'rgba(74,222,128,.06)':'var(--bg1)'};border:1px solid ${s.done?'rgba(74,222,128,.2)':'var(--bd)'};border-radius:12px;cursor:${s.done?'default':'pointer'};transition:all .15s" onclick="${s.done?'':s.action}">
+            <div style="width:28px;height:28px;border-radius:50%;background:${s.done?'rgba(74,222,128,.2)':'var(--yd)'};border:1.5px solid ${s.done?'rgba(74,222,128,.4)':'var(--yb)'};display:flex;align-items:center;justify-content:center;font-size:${s.done?'14px':'13px'};flex-shrink:0">${s.done?'✓':s.ico}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:700;color:${s.done?'var(--t3)':'var(--t1)'};${s.done?'text-decoration:line-through':''}">${s.label}</div>
+              ${!s.done?`<div style="font-size:10px;color:var(--t3);margin-top:1px">${s.sub}</div>`:''}
+            </div>
+            ${!s.done?`<div style="font-size:11px;font-weight:800;color:var(--y);white-space:nowrap;flex-shrink:0">${s.btn} →</div>`:''}
+          </div>`).join('');
+      }
     }
   }catch(e){}
   const strkEl=document.getElementById('h-streak');if(strkEl)strkEl.textContent=D.user.streak||0;
@@ -3392,7 +3565,14 @@ let focusActive=false;
 function showPomPre(){
   const chips=document.getElementById('pom-pre-chips');
   if(!chips)return;
-  chips.innerHTML=D.mats.map(m=>`<div class="chip${m.n===pomMatActiva?' on':''}" onclick="pomMatActiva='${m.n}';this.closest('#pom-pre-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${getMatIcon(m.e,16)} ${m.n.split(' ')[0]}</div>`).join('');
+  // Restore last used materia from localStorage
+  const lastMat=localStorage.getItem('lumio_last_pom_mat');
+  if(lastMat&&D.mats.find(m=>m.n===lastMat))pomMatActiva=lastMat;
+  else if(!pomMatActiva||!D.mats.find(m=>m.n===pomMatActiva))pomMatActiva=D.mats[0]?.n||'';
+  chips.innerHTML=D.mats.map(m=>`<div class="chip${m.n===pomMatActiva?' on':''}" onclick="pomMatActiva='${m.n}';localStorage.setItem('lumio_last_pom_mat','${m.n}');this.closest('#pom-pre-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${getMatIcon(m.e,16)} ${m.n.split(' ')[0]}</div>`).join('');
+  // If already has materia selected, show label
+  const matLbl=document.getElementById('pom-pre-mat-lbl');
+  if(matLbl)matLbl.textContent=pomMatActiva?'Última: '+pomMatActiva:'';
   document.getElementById('pom-pre-mo').classList.add('show');
 }
 function confirmPomStart(){
@@ -3499,9 +3679,20 @@ function _pomComplete(){
     gainXP(10);launchConfetti();
     const matObj=D.mats.find(m=>m.n===pomMatActiva);
     if(matObj){matObj.h=+(matObj.h+(pomSettings.W/60/60)).toFixed(2);recalcMatProgress(matObj);}
+    if(pomMatActiva)localStorage.setItem('lumio_last_pom_mat',pomMatActiva);
     saveState(); // persist hours immediately
     po.brk=true;po.s=pomSettings.B;po.endAt=null;
-    toast('🍅 ¡Pomodoro completado! +10 XP');
+    toast('🍅 ¡Pomodoro completado! +10 XP','success');
+    // Offer notification on first pomodoro
+    if(D.user.pomodorosDone===1&&!localStorage.getItem('lumio_notif_asked')){
+      localStorage.setItem('lumio_notif_asked','1');
+      setTimeout(()=>{
+        if('Notification' in window&&Notification.permission==='default'){
+          const yn=confirm('🔔 ¿Quieres recibir un recordatorio diario para estudiar?\nPuedes configurar la hora en Perfil → Ajustes → Avisos.');
+          if(yn)Notification.requestPermission().then(p=>{if(p==='granted')toast('✅ Notificaciones activadas','success');});
+        }
+      },2000);
+    }
     // Notification API
     _pomNotify('🍅 ¡Pomodoro completado!','Descansa '+(pomSettings.B/60)+'min. Te lo has ganado.');
     setTimeout(()=>{const rnd=Math.floor(Math.random()*PAUSAS.length);startPausa(rnd);},600);
@@ -3742,8 +3933,15 @@ function updatePomSettings(){
 }
 function addHistorial(mins){
   const now=new Date();
-  D.historial.unshift({fecha:now.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}),hora:now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),mins:Math.round(mins),mat:pomMatActiva||'Estudio'});
-  if(D.historial.length>30)D.historial.pop();
+  const iso=_localISO(now); // local date, avoids UTC timezone offset bugs
+  const fechaLabel=now.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});
+  const hora=now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  // Merge into existing entry for same day+mat to avoid duplicates
+  const existing=D.historial.find(h=>h.d===iso&&h.mat===(pomMatActiva||'Estudio'));
+  if(existing){existing.mins+=Math.round(mins);}
+  else{D.historial.unshift({d:iso,fecha:fechaLabel,hora,mins:Math.round(mins),mat:pomMatActiva||'Estudio'});}
+  if(D.historial.length>365)D.historial.splice(365); // keep a full year
+  saveState();
 }
 
 // ════════════════════════════════════════════════════════
@@ -4673,7 +4871,7 @@ function saveCard(){
 function deleteCard(id){
   if(!confirm('¿Eliminar esta tarjeta?'))return;
   D.cards=D.cards.filter(c=>c.id!==id);
-  bFC();saveState();toast('🗑 Tarjeta eliminada');
+  bFC();saveState();toast('🗑 Tarjeta eliminada','success');
 }
 
 // ── GENERAR CON IA ──
@@ -4722,7 +4920,7 @@ Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 fras
 // ── REPASAR ──
 function stRep(){
   rC=fFlt==='Todas'?[...D.cards]:D.cards.filter(c=>c.m===fFlt);
-  if(!rC.length){toast('⚠️ Sin tarjetas para repasar');return;}
+  if(!rC.length){toast('⚠️ Sin tarjetas para repasar','error');return;}
   rI=0;isF=false;
   document.getElementById('fc-lv').style.display='none';
   document.getElementById('fc-dv').style.display='none';
@@ -5802,7 +6000,7 @@ async function startExamen(){
 
   // Modo flashcards
   let pool=ex.mat==='Todas'?[...D.cards]:D.cards.filter(c=>c.m===ex.mat);
-  if(!pool.length){toast('⚠️ Sin tarjetas. Crea flashcards o usa el modo IA ✨');return;}
+  if(!pool.length){toast('⚠️ Sin tarjetas. Crea flashcards o usa el modo IA ✨','error');return;}
   pool=pool.sort(()=>Math.random()-.5).slice(0,Math.min(ex.n,pool.length));
   ex.cards=pool;ex.idx=0;ex.ans={};ex.cLetters=[];ex.score=0;ex.errCards=[];
   launchExamen();
@@ -5972,13 +6170,47 @@ function bLogros(){
   document.getElementById('logros-xp-info').innerHTML=`<div style="font-size:13px;font-weight:700;color:var(--t1)">Nivel ${lvl+1} · ${XP_NAMES[lvl]}</div><div style="font-size:11px;color:var(--t2);margin-top:3px">${xp} XP totales</div><div style="font-size:11px;color:var(--t2);margin-top:2px">🍅 ${D.user.pomodorosDone} pomodoros · 🃏 ${D.user.cardsRevised} tarjetas</div>`;
   const mc={Oro:'#f5c518',Plata:'#9ca3af',Bronce:'#cd7f32'};
   const mcols=['#f5c518','#4ade80','#60a5fa','#fb923c','#f472b6','#c084fc','#2dd4bf','#e879f9'];
-  document.getElementById('logros-grid').innerHTML=LOGROS_DEF.map((l,i)=>{const u=l.cond();return`<div style="background:var(--bg1);border:1px solid ${u?mcols[i%mcols.length]+'55':'var(--bd)'};border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;position:relative">
-    ${u?`<div style="position:absolute;top:7px;right:7px;background:${mcols[i%mcols.length]};color:#0d0f14;font-size:8px;font-weight:900;padding:2px 6px;border-radius:999px">+${l.xp}XP</div>`:''}
-    <div style="font-size:28px;${u?'':'filter:grayscale(1);opacity:.3'}">${l.ico}</div>
-    <div style="font-size:11px;font-weight:700;color:${u?'var(--t1)':'var(--t3)'}">${l.nm}</div>
-    <div style="font-size:10px;color:${u?'var(--t2)':'var(--t3)'};line-height:1.3">${l.desc}</div>
-    <div style="font-size:10px;font-weight:700;color:${u?mcols[i%mcols.length]:'var(--t3)'}">${u?'✓ Desbloqueado':'🔒 Bloqueado'}</div>
-  </div>`;}).join('');
+  // Build hints for locked achievements
+  const hoursTotal=D.user.hours||0;
+  const pomsDone=D.user.pomodorosDone||0;
+  const cardsRevised=D.user.cardsRevised||0;
+  const cardsCount=D.cards.length||0;
+  const streakDays=D.user.streak||0;
+  function _logroHint(l){
+    const nm=l.nm.toLowerCase();
+    if(nm.includes('10h'))return`Llevas ${hoursTotal.toFixed(1)}h de ${10}h`;
+    if(nm.includes('5h'))return`Llevas ${hoursTotal.toFixed(1)}h de 5h`;
+    if(nm.includes('50h'))return`Llevas ${hoursTotal.toFixed(1)}h de 50h`;
+    if(nm.includes('pomodoro')||nm.includes('🍅')){
+      const n=parseInt(nm.match(/\d+/)?.[0])||5;
+      return`${pomsDone} de ${n} completados`;
+    }
+    if(nm.includes('tarjeta')||nm.includes('flashcard')){
+      const n=parseInt(nm.match(/\d+/)?.[0])||10;
+      return`${cardsRevised} de ${n} repasadas`;
+    }
+    if(nm.includes('racha')||nm.includes('días')){
+      const n=parseInt(nm.match(/\d+/)?.[0])||7;
+      return`${streakDays} de ${n} días`;
+    }
+    if(nm.includes('crea'))return`${cardsCount} tarjetas creadas`;
+    return'Sigue estudiando';
+  }
+  document.getElementById('logros-grid').innerHTML=LOGROS_DEF.map((l,i)=>{
+    const u=l.cond();
+    const col=mcols[i%mcols.length];
+    const hint=!u?_logroHint(l):'';
+    return`<div style="background:var(--bg1);border:1px solid ${u?col+'55':'var(--bd)'};border-radius:13px;padding:13px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;position:relative;transition:border-color .2s">
+      ${u?`<div style="position:absolute;top:7px;right:7px;background:${col};color:#0d0f14;font-size:8px;font-weight:900;padding:2px 6px;border-radius:999px">+${l.xp}XP</div>`:''}
+      <div style="font-size:26px;${u?'':'filter:grayscale(1);opacity:.25'};transition:all .3s">${l.ico}</div>
+      <div style="font-size:11px;font-weight:700;color:${u?'var(--t1)':'var(--t2)'}">${l.nm}</div>
+      <div style="font-size:10px;color:${u?'var(--t2)':'var(--t3)'};line-height:1.3">${l.desc}</div>
+      ${u
+        ?`<div style="font-size:10px;font-weight:800;color:${col}">✓ Desbloqueado</div>`
+        :`<div style="font-size:10px;color:var(--t3);background:var(--bg2);border-radius:999px;padding:2px 8px;margin-top:2px">🔒 ${hint}</div>`
+      }
+    </div>`;
+  }).join('');
   // retos
   document.getElementById('retos-list').innerHTML=RETOS.map(r=>{const p=r.prog();const done=p>=1;return`<div style="background:var(--bg1);border:1px solid ${done?'rgba(74,222,128,.3)':'var(--bd)'};border-radius:12px;padding:12px;margin-bottom:8px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
@@ -6048,7 +6280,12 @@ function bCal(){
   const monthName=now.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
   const studyDays=new Set();
   D.week.forEach((d,i)=>{if(d.m>0){const dayDate=new Date();dayDate.setDate(dayDate.getDate()-(todayIdx-i));studyDays.add(dayDate.getDate());}});
-  D.historial.forEach(s=>{const d=parseInt(s.fecha);if(!isNaN(d))studyDays.add(d);});
+  D.historial.forEach(s=>{
+    // New format: s.d = "2025-03-18"
+    if(s.d){const dd=new Date(s.d);if(!isNaN(dd))studyDays.add(dd.getDate());}
+    // Legacy: try to parse day number from old locale string
+    else if(s.fecha){const n=parseInt(s.fecha.match(/\d+/)?.[0]);if(!isNaN(n)&&n>0&&n<=31)studyDays.add(n);}
+  });
   let html=`<div class="card"><div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;text-transform:capitalize">${monthName}</div>
     <div class="cal-header">${['L','M','X','J','V','S','D'].map(d=>`<span>${d}</span>`).join('')}</div>
     <div class="cal-grid">`;
@@ -6067,11 +6304,14 @@ function bCal(){
     <div><div style="font-size:22px;font-weight:900;color:var(--green)">${D.user.streak}</div><div style="font-size:11px;color:var(--t2)">días racha</div></div>
   </div></div>`;
   document.getElementById('cal-wrap').innerHTML=html;
-  document.getElementById('historial-list').innerHTML=D.historial.length?D.historial.slice(0,10).map(s=>`<div style="background:var(--bg1);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px">
-    <div style="width:36px;height:36px;border-radius:9px;background:var(--yd);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🍅</div>
-    <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${s.mat}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${s.fecha} · ${s.hora}</div></div>
-    <div style="font-size:14px;font-weight:700;color:var(--y)">${s.mins}m</div>
-  </div>`).join(''):'<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Completa tu primer Pomodoro para ver el historial</div>';
+  document.getElementById('historial-list').innerHTML=D.historial.length?D.historial.slice(0,20).map(s=>{
+    const dateLabel=s.d?new Date(s.d).toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}):s.fecha;
+    return`<div style="background:var(--bg1);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px">
+      <div style="width:36px;height:36px;border-radius:9px;background:var(--yd);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🍅</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${s.mat||'Estudio'}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${dateLabel}${s.hora?' · '+s.hora:''}</div></div>
+      <div style="font-size:14px;font-weight:700;color:var(--y)">${s.mins}m</div>
+    </div>`;
+  }).join(''):'<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Completa tu primer Pomodoro para ver el historial</div>';
 }
 
 function clearApunte(){if(!confirm('¿Borrar todos los apuntes de '+apuMat+'?'))return;apuntesDB[apuMat]='';localStorage.setItem('lumio_apuntes',JSON.stringify(apuntesDB));renderApunte();toast('🗑️ Apuntes borrados');}
@@ -8811,12 +9051,12 @@ function notaPickMat(mat,el){notasMat=mat;document.querySelectorAll('#notas-mats
 function addNota(){
   const nombre=(document.getElementById('nota-nombre')?.value||'').trim();
   const valor=parseFloat(document.getElementById('nota-valor')?.value||'');
-  if(!nombre||isNaN(valor)||valor<0||valor>10){toast('⚠️ Introduce un nombre y una nota válida (0-10)');return;}
+  if(!nombre||isNaN(valor)||valor<0||valor>10){toast('⚠️ Introduce un nombre y una nota válida (0-10)','error');return;}
   const db=getNotasDB();if(!db[notasMat])db[notasMat]=[];
   const tipo=document.getElementById('nota-tipo')?.value||'Examen';
   db[notasMat].push({id:'n'+Date.now(),nombre,valor,tipo,fecha:new Date().toLocaleDateString('es-ES')});
   saveNotasDB(db);document.getElementById('nota-nombre').value='';document.getElementById('nota-valor').value='';const nt=document.getElementById('nota-tipo');if(nt)nt.selectedIndex=0;
-  renderNotas();toast('✅ Nota guardada');gainXP(1);
+  renderNotas();toast('✅ Nota guardada','success');gainXP(1);
 }
 function renderNotas(){
   const db=getNotasDB();const notas=db[notasMat]||[];
@@ -8858,9 +9098,25 @@ function bHeatmap(){
   const el=document.getElementById('heatmap-wrap');if(!el)return;
   const hist=D.historial||[];
   // Build map: date -> minutes
-  const map={};hist.forEach(h=>{if(h.d)map[h.d]=(map[h.d]||0)+(h.m||0);});
-  // 52 weeks
-  const today=new Date();const start=new Date(today);start.setDate(today.getDate()-363);
+  const map={};
+  hist.forEach(h=>{
+    // Support both new format (h.d = ISO date) and old format (h.fecha)
+    let key=h.d;
+    if(!key&&h.fecha){
+      // Try to parse old locale date "mar, 18 mar" — use creation order as fallback
+      // For legacy entries without ISO date, skip (can't reliably recover)
+    }
+    if(key)map[key]=(map[key]||0)+(h.mins||h.m||0);
+  });
+  // 52 weeks — end at the END of the current week (Sunday), like GitHub
+  const today=new Date();
+  const todayISO=_localISO(today);
+  // Find the Sunday that ends this week (0=Sun in JS getDay)
+  const dayOfWeek=today.getDay(); // 0=Sun,1=Mon,...,6=Sat
+  const daysUntilSunday=dayOfWeek===0?0:7-dayOfWeek;
+  const weekEnd=new Date(today);weekEnd.setDate(today.getDate()+daysUntilSunday);
+  // Start is 52 weeks back from weekEnd
+  const start=new Date(weekEnd);start.setDate(weekEnd.getDate()-363);
   const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   let svg=`<svg viewBox="0 0 742 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:400px">`;
   // Month labels
@@ -8873,17 +9129,34 @@ function bHeatmap(){
   for(let w=0;w<52;w++){
     for(let d=0;d<7;d++){
       const date=new Date(start.getTime()+(w*7+d)*864e5);
-      const dateStr=date.toISOString().slice(0,10);
+      const dateStr=_localISO(date);
+      const isFuture=date>today;
       const mins=map[dateStr]||0;
-      const color=mins===0?'var(--bg2)':mins<30?'rgba(245,197,24,.3)':mins<60?'rgba(245,197,24,.6)':'#f5c518';
-      const isToday=dateStr===today.toISOString().slice(0,10);
-      svg+=`<rect x="${w*14+1}" y="${d*14+14}" width="11" height="11" rx="2" fill="${color}" stroke="${isToday?'var(--y)':'none'}" stroke-width="1">
-        <title>${dateStr}: ${mins} min</title></rect>`;
+      const color=isFuture?'transparent':mins===0?'var(--bg2)':mins<30?'rgba(245,197,24,.3)':mins<60?'rgba(245,197,24,.6)':'#f5c518';
+      const isToday=dateStr===todayISO;
+      const todayStroke=isToday&&mins===0?'rgba(245,197,24,.5)':'none';
+      const todayFill=isToday&&mins===0?'rgba(245,197,24,.08)':color;
+      if(isFuture){svg+=`<rect x="${w*14+1}" y="${d*14+14}" width="11" height="11" rx="2" fill="none"/>`;continue;}
+      svg+=`<rect x="${w*14+1}" y="${d*14+14}" width="11" height="11" rx="2" fill="${todayFill}" stroke="${todayStroke}" stroke-width="1.5">
+        <title>${dateStr}: ${mins>0?mins+'min':'Sin estudio'}</title></rect>`;
     }
   }
   svg+='</svg>';
   el.innerHTML=svg;
+
+  // Stats summary
+  const totalDays=Object.keys(map).length;
+  const totalMins=Object.values(map).reduce((s,m)=>s+m,0);
+  const totalHours=(totalMins/60).toFixed(1);
+  const statsEl=document.getElementById('heatmap-stats');
+  if(statsEl)statsEl.innerHTML=`
+    <div style="display:flex;justify-content:space-around;text-align:center;padding:4px 0">
+      <div><div style="font-size:22px;font-weight:900;color:var(--y)">${totalDays}</div><div style="font-size:11px;color:var(--t2)">días estudiados</div></div>
+      <div><div style="font-size:22px;font-weight:900;color:var(--teal)">${totalHours}h</div><div style="font-size:11px;color:var(--t2)">en total</div></div>
+      <div><div style="font-size:22px;font-weight:900;color:var(--orange)">${D.user.streak||0}</div><div style="font-size:11px;color:var(--t2)">días racha</div></div>
+    </div>`;
 }
+
 
 // ════════════════════════════════════════════════════════
 // INFORME SEMANAL
@@ -9565,7 +9838,14 @@ function checkImminentExam(){
 }
 
 let tt;
-function toast(msg){const el=document.getElementById('toast');if(el){el.textContent=msg;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2800);}}
+function toast(msg,type){
+  const el=document.getElementById('toast');if(!el)return;
+  el.textContent=msg;
+  el.style.borderColor=type==='error'?'rgba(248,113,113,.4)':type==='success'?'rgba(74,222,128,.3)':'var(--bd2)';
+  el.style.color=type==='error'?'#f87171':type==='success'?'var(--green)':'var(--t1)';
+  el.classList.add('on');clearTimeout(tt);
+  tt=setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{el.style.borderColor='';el.style.color='';},300);},2800);
+}
 
 // ════════════════════════════════════════════════════════
 // INIT
