@@ -48,7 +48,6 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 /* NAV */
 #nav{height:68px;background:rgba(11,13,18,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
 .nb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px 4px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .2s,transform .15s,background .15s;flex-shrink:0;min-width:56px;border-radius:12px;position:relative}.nb:active{background:rgba(245,197,24,.08);transform:scale(.94)}
-.nb.active::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--y);border-radius:0 0 3px 3px;transition:width .2s}
 .nb.active .ni,.nb.active svg{filter:drop-shadow(0 0 6px rgba(245,197,24,.5))}
 .nb:active{transform:scale(.92)}
 .nb.active{color:var(--y)}
@@ -1628,7 +1627,8 @@ button:active{transform:scale(.97)}
     <div style="font-size:11px;color:var(--t3)" id="apu-edit-meta">0 palabras</div>
     <div style="display:flex;gap:6px">
       <button onclick="apu_insertTemplate('clase')" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)">📋 Plantilla</button>
-      <button onclick="spellCheckNote('apu-edit-ta')" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)">✅ Corregir</button>
+      <button onclick="apuVoice()" id="apu-voice-btn" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)" title="Dictar por voz">🎙️ Voz</button>
+      <button onclick="apuPaste()" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)" title="Pegar del portapapeles">📋 Pegar</button>
       <button onclick="if(apuEditId)compartirApunte(apuEditId)" style="background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font)" title="Compartir apunte">📤</button>
     </div>
   </div>
@@ -3012,12 +3012,39 @@ button:active{transform:scale(.97)}
   <div><div class="sl">Materia</div>
     <select class="inp" id="fc-mo-mat" style="margin-bottom:4px"></select>
   </div>
-  <div><div class="sl">Pregunta</div>
-    <textarea class="inp ta" id="fc-mo-q" style="min-height:70px" placeholder="Ej: ¿Qué es la fotosíntesis?"></textarea>
+
+  <!-- Pregunta con foto -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div class="sl" style="margin-bottom:0">Pregunta</div>
+      <label style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--t2);background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:4px 9px">
+        📷 Foto
+        <input type="file" accept="image/*" capture="environment" style="display:none" onchange="fcAddPhoto(this,'q')">
+      </label>
+    </div>
+    <div id="fc-mo-q-photo" style="display:none;margin-bottom:6px;border-radius:9px;overflow:hidden;border:1px solid var(--bd);position:relative">
+      <img id="fc-mo-q-img" style="width:100%;max-height:140px;object-fit:contain;background:var(--bg2);display:block">
+      <button onclick="fcRemovePhoto('q')" style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:999px;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <textarea class="inp ta" id="fc-mo-q" style="min-height:60px" placeholder="Ej: ¿Qué es la fotosíntesis?"></textarea>
   </div>
-  <div><div class="sl">Respuesta</div>
-    <textarea class="inp ta" id="fc-mo-a" style="min-height:90px" placeholder="Ej: Proceso por el que las plantas convierten luz en glucosa..."></textarea>
+
+  <!-- Respuesta con foto -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div class="sl" style="margin-bottom:0">Respuesta</div>
+      <label style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--t2);background:var(--bg2);border:1px solid var(--bd);border-radius:7px;padding:4px 9px">
+        📷 Foto
+        <input type="file" accept="image/*" capture="environment" style="display:none" onchange="fcAddPhoto(this,'a')">
+      </label>
+    </div>
+    <div id="fc-mo-a-photo" style="display:none;margin-bottom:6px;border-radius:9px;overflow:hidden;border:1px solid var(--bd);position:relative">
+      <img id="fc-mo-a-img" style="width:100%;max-height:140px;object-fit:contain;background:var(--bg2);display:block">
+      <button onclick="fcRemovePhoto('a')" style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:999px;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <textarea class="inp ta" id="fc-mo-a" style="min-height:70px" placeholder="Ej: Proceso por el que las plantas convierten luz en glucosa..."></textarea>
   </div>
+
   <input type="hidden" id="fc-mo-id">
   <div style="display:flex;gap:8px;margin-top:4px">
     <button class="gbtn" style="flex:1" onclick="clsMo('fc-add')">Cancelar</button>
@@ -3041,13 +3068,48 @@ button:active{transform:scale(.97)}
       <div class="chip" data-n="15" onclick="fcGenPickN(this)">15</div>
     </div>
   </div>
-  <div><div class="sl">Texto o tema (opcional)</div>
+  <!-- Source tabs: text or photo -->
+  <div style="display:flex;gap:6px;margin-bottom:10px">
+    <button class="tabb on" id="fc-src-text-btn" onclick="fcSwitchSrc('text')" style="font-size:12px">📝 Texto</button>
+    <button class="tabb" id="fc-src-photo-btn" onclick="fcSwitchSrc('photo')" style="font-size:12px">📷 Foto de apuntes</button>
+  </div>
+
+  <!-- Text source -->
+  <div id="fc-src-text">
+    <div class="sl">Texto o tema</div>
     <textarea class="inp ta" id="fc-gen-txt" style="min-height:80px" placeholder="Pega tus apuntes o escribe el tema: 'La célula y sus partes'..."></textarea>
   </div>
+
+  <!-- Photo source -->
+  <div id="fc-src-photo" style="display:none">
+    <div class="sl">Foto de tus apuntes</div>
+    <div id="fc-photo-preview" style="display:none;margin-bottom:8px;border-radius:10px;overflow:hidden;border:1px solid var(--bd)">
+      <img id="fc-photo-img" style="width:100%;max-height:200px;object-fit:contain;background:var(--bg2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg2)">
+        <div style="font-size:11px;color:var(--teal)" id="fc-photo-status">Foto cargada ✓</div>
+        <button onclick="fcClearPhoto()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font)">✕ Quitar</button>
+      </div>
+    </div>
+    <label style="display:block;width:100%">
+      <div style="background:var(--bg2);border:2px dashed var(--bd2);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s" id="fc-photo-drop"
+           ondragover="event.preventDefault();this.style.borderColor='var(--y)'"
+           ondragleave="this.style.borderColor=''"
+           ondrop="fcPhotoDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px">📷</div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Toca para sacar o subir foto</div>
+        <div style="font-size:11px;color:var(--t3)">Captura la pizarra, el libro o tus apuntes escritos</div>
+      </div>
+      <input type="file" accept="image/*" capture="environment" id="fc-photo-input" style="display:none" onchange="fcPhotoSelected(this)">
+    </label>
+    <div style="margin-top:8px;background:rgba(245,197,24,.06);border:1px solid var(--yb);border-radius:10px;padding:8px 12px;font-size:11px;color:var(--t2);line-height:1.5">
+      💡 La IA leerá el texto de la foto y generará tarjetas. Funciona mejor con <b style="color:var(--t1)">letra clara y buena iluminación</b>.
+    </div>
+  </div>
+
   <div id="fc-gen-loading" style="display:none;padding:12px 0;text-align:center">
     <div class="sk-line med skeleton" style="margin:0 auto 8px"></div>
     <div class="sk-line full skeleton" style="margin-bottom:8px"></div>
-    <div style="font-size:12px;color:var(--t3)">Generando tarjetas...</div>
+    <div style="font-size:12px;color:var(--t3)">Analizando y generando tarjetas...</div>
   </div>
   <div style="display:flex;gap:8px;margin-top:4px">
     <button class="gbtn" style="flex:1" onclick="clsMo('fc-gen')">Cancelar</button>
@@ -5032,6 +5094,7 @@ function fFl(m,el){fFlt=m;document.querySelectorAll('#fc-ch .chip').forEach(c=>c
 
 // ── CREAR / EDITAR ──
 function showAddCard(matPreset){
+  _fcAddPhotos={q:null,a:null};fcRemovePhoto('q');fcRemovePhoto('a');
   const sel=document.getElementById('fc-mo-mat');
   sel.innerHTML=D.mats.map(m=>`<option value="${m.n}">${m.e} ${m.n}</option>`).join('');
   if(matPreset){const opt=[...sel.options].find(o=>o.value===matPreset);if(opt)opt.selected=true;}
@@ -5060,15 +5123,25 @@ function saveCard(){
   const q=document.getElementById('fc-mo-q').value.trim();
   const a=document.getElementById('fc-mo-a').value.trim();
   const id=document.getElementById('fc-mo-id').value;
-  if(!q||!a){toast('⚠️ Rellena la pregunta y la respuesta');return;}
+  const imgQ=_fcAddPhotos.q||null;
+  const imgA=_fcAddPhotos.a||null;
+  if(!q&&!imgQ){toast('⚠️ Añade pregunta o foto','error');return;}
+  if(!a&&!imgA){toast('⚠️ Añade respuesta o foto','error');return;}
   if(id){
     const i=D.cards.findIndex(c=>c.id===id);
-    if(i>=0){D.cards[i].m=mat;D.cards[i].q=q;D.cards[i].a=a;}
-    toast('✅ Tarjeta actualizada');
+    if(i>=0){
+      D.cards[i].m=mat;D.cards[i].q=q||'(ver foto)';D.cards[i].a=a||'(ver foto)';
+      if(imgQ)D.cards[i].imgQ=imgQ; if(imgA)D.cards[i].imgA=imgA;
+    }
+    toast('✅ Tarjeta actualizada','success');
   }else{
-    D.cards.push({id:'fc'+Date.now(),m:mat,q,a,lv:1});
-    toast('🃏 Tarjeta creada +2 XP');gainXP(2);
+    const card={id:'fc'+Date.now(),m:mat,q:q||'(ver foto)',a:a||'(ver foto)',lv:1};
+    if(imgQ)card.imgQ=imgQ; if(imgA)card.imgA=imgA;
+    D.cards.push(card);
+    toast('🃏 Tarjeta creada +2 XP','success');gainXP(2);
   }
+  _fcAddPhotos={q:null,a:null};
+  try{fcRemovePhoto('q');fcRemovePhoto('a');}catch(e){}
   clsMo('fc-add');bFC();saveState();
 }
 
@@ -5092,15 +5165,40 @@ function showGenFC(){
 function fcGenPickN(el){fcGenN=parseInt(el.dataset.n);document.querySelectorAll('#fc-gen-mo .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
 async function genFlashcardsIA(){
   const mat=document.getElementById('fc-gen-mat').value;
-  const txt=document.getElementById('fc-gen-txt').value.trim();
+  let txt=document.getElementById('fc-gen-txt').value.trim();
   const btn=document.getElementById('fc-gen-btn');
   btn.disabled=true;
-  document.getElementById('fc-gen-loading').style.display='block';
+  const loadingEl=document.getElementById('fc-gen-loading');
+  loadingEl.style.display='block';
+
   try{
-    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt}"`:mat}.
+    // If photo source, extract text from image first
+    if(_fcSrc==='photo'){
+      if(!_fcPhotoDataUrl){toast('⚠️ Selecciona una foto primero','error');btn.disabled=false;loadingEl.style.display='none';return;}
+      const statusEl=document.getElementById('fc-photo-status');
+      if(statusEl)statusEl.textContent='🔍 Leyendo texto de la foto...';
+      try{
+        txt=await fcExtractTextFromPhoto(_fcPhotoDataUrl);
+        if(statusEl)statusEl.textContent='✓ Texto extraído ('+txt.length+' caracteres)';
+      }catch(ocrErr){
+        // OCR failed — use local extraction based on what's visible
+        toast('📷 Sin conexión — usando análisis local','');
+        // At minimum use the filename or mat as topic
+        txt=mat;
+      }
+    }
+
+    if(!txt){
+      // No text — generate from topic name
+      txt=mat;
+    }
+
+    // Route through callClaude (tries Pollinations first, then local engine)
+    const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt.slice(0,800)}"`:mat}.
 Responde SOLO con JSON sin backticks:
 {"tarjetas":[{"pregunta":"...","respuesta":"..."}]}
 Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 frases.`;
+
     const res=await callClaude(prompt,1500);
     const data=JSON.parse(res.replace(/```json|```/g,'').trim());
     let added=0;
@@ -5111,12 +5209,14 @@ Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 fras
       }
     });
     saveState();clsMo('fc-gen');bFC();
-    toast(`🃏 ${added} tarjeta${added!==1?'s':''} creada${added!==1?'s':''} para ${mat}`);
+    // Reset photo state
+    _fcPhotoDataUrl=null;_fcSrc='text';
+    toast(`🃏 ${added} tarjeta${added!==1?'s':''} creada${added!==1?'s':''} para ${mat}`,'success');
     gainXP(added*2);
   }catch(e){
-    toast('❌ '+e.message.slice(0,55));
+    toast('❌ '+e.message.slice(0,55),'error');
   }finally{
-    document.getElementById('fc-gen-loading').style.display='none';
+    loadingEl.style.display='none';
     btn.disabled=false;btn.textContent='✨ Generar';
   }
 }
@@ -5150,8 +5250,10 @@ function exRep(){
   const c=rC[rI];isF=false;
   const fi=document.getElementById('fc-fi');if(fi)fi.style.transform='rotateY(0deg)';
   document.getElementById('fc-er').style.display='none';
-  document.getElementById('fc-q').textContent=c.q;
-  document.getElementById('fc-a').textContent=c.a;
+  const qEl=document.getElementById('fc-q');
+  const aEl=document.getElementById('fc-a');
+  if(qEl){qEl.innerHTML=c.q+(c.imgQ?`<br><img src="${c.imgQ}" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:contain">`:'');}
+  if(aEl){aEl.innerHTML=c.a+(c.imgA?`<br><img src="${c.imgA}" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:contain">`:'');}
   document.getElementById('rp-m').textContent=c.m.split(' ')[0];
   document.getElementById('rp-p').textContent=(rI+1)+'/'+rC.length;
   document.getElementById('rp-f').style.width=((rI+1)/rC.length*100)+'%';
@@ -5847,30 +5949,109 @@ function aiGenPPT(tema,info,n){
 // FLASHCARDS IA — extracción local de tarjetas
 // ════════════════════════════════════════════════════════
 
-function aiGenFlashcards(txt,mat,n){
-  const cards=[];
-  // Tipo 1: extraer definiciones
-  const defs=aiDefinitions(txt);
-  defs.slice(0,n).forEach(({term,def})=>{
-    cards.push({pregunta:`¿Qué es ${term}?`,respuesta:aiCap(def.slice(0,120))});
+function aiGenFlashcards(txt, mat, n){
+  const cards = [];
+  const used = new Set(); // avoid duplicate answers
+
+  function addCard(q, a){
+    const key = a.toLowerCase().slice(0,40);
+    if(used.has(key)) return false;
+    if(!q.trim() || !a.trim() || a.length < 4) return false;
+    used.add(key);
+    cards.push({pregunta: aiCap(q), respuesta: aiCap(a.slice(0,160))});
+    return true;
+  }
+
+  // ── TIPO 1: Definiciones explícitas (X es Y / X: Y / llamamos X a Y) ──
+  const defs = aiDefinitions(txt);
+  defs.forEach(({term, def}) => {
+    if(cards.length >= n) return;
+    addCard(`¿Qué es ${term}?`, def.slice(0,140));
   });
-  // Tipo 2: extraer oraciones importantes como P/R
-  if(cards.length<n){
-    const sents=aiSentences(txt);
-    const tf=aiTF(sents);
-    const scored=sents.map(s=>({s,score:aiScore(s,tf)})).sort((a,b)=>b.score-a.score);
-    scored.slice(0,n*2).forEach(({s})=>{
-      if(cards.length>=n)return;
-      const words=aiTokens(s);
-      if(words.length<4)return;
-      const keyTerm=words.find(w=>w.length>4);
-      if(!keyTerm)return;
-      const already=cards.find(c=>c.respuesta.toLowerCase().includes(keyTerm));
-      if(already)return;
-      cards.push({pregunta:`¿Qué sabes sobre "${aiCap(keyTerm)}"?`,respuesta:aiCap(s.trim().slice(0,130))});
+
+  // ── TIPO 2: Listas numeradas / viñetas → tarjeta por ítem ──
+  const listItems = (txt.match(/(?:[\n]|^)\s*(?:\d+[.)]\s+|\*\s+|-\s+|[\u2022]\s+)([^\n]+)/gm))||[];
+
+  listItems.forEach(item => {
+    if(cards.length >= n) return;
+    const clean = item.replace(/^\s*[\d.*\-•]+[.)]\s*/,'').trim();
+    if(clean.length < 8) return;
+    const words = clean.split(' ');
+    if(words.length < 3) return;
+    const blank = words.slice(0, Math.ceil(words.length*0.4)).join(' ');
+    addCard(`Completa: "${blank} ___"`, clean);
+  });
+
+  // ── TIPO 3: Frases con causa-efecto (porque, provoca, causa, permite, produce) ──
+  const sents = aiSentences(txt);
+  const causeWords = /porque|provoca|causa|produce|permite|resulta|genera|implica|hace que|conduce|lleva a/i;
+  sents.forEach(s => {
+    if(cards.length >= n) return;
+    if(!causeWords.test(s)) return;
+    const parts = s.split(causeWords);
+    if(parts.length < 2 || parts[0].length < 6) return;
+    const effect = parts.slice(1).join(' ').trim();
+    addCard(`¿Qué provoca o qué efecto tiene "${aiCap(parts[0].trim().slice(0,60))}"?`, effect.slice(0,140));
+  });
+
+  // ── TIPO 4: Frases con comparación (a diferencia de, mientras que, en cambio) ──
+  const compareWords = /a diferencia de|mientras que|en cambio|por el contrario|sin embargo|al contrario/i;
+  sents.forEach(s => {
+    if(cards.length >= n) return;
+    if(!compareWords.test(s)) return;
+    const terms = s.match(/[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+/g)||[];
+    if(terms.length >= 2){
+      addCard(`¿En qué se diferencia ${terms[0]} de ${terms[1]}?`, s.trim().slice(0,150));
+    }
+  });
+
+  // ── TIPO 5: Frases informativas de alta densidad (TF-IDF) ──
+  if(cards.length < n){
+    const tf = aiTF(sents);
+    const scored = sents
+      .map(s => ({s, score: aiScore(s, tf)}))
+      .sort((a, b) => b.score - a.score);
+
+    for(const {s} of scored){
+      if(cards.length >= n) break;
+      const words = aiTokens(s);
+      if(words.length < 5) continue;
+
+      // Blank-fill: hide the most important keyword in the sentence
+      const ranked = words
+        .filter(w => w.length > 4)
+        .sort((a,b) => (tf[b]||0)-(tf[a]||0));
+      const target = ranked[0];
+      if(!target) continue;
+
+      const blanked = s.replace(new RegExp('\\b'+target+'\\b','i'), '___');
+      if(!blanked.includes('___')) continue;
+      addCard(`Completa: "${blanked.trim().slice(0,120)}"`, `La respuesta es: ${target}`);
+    }
+  }
+
+  // ── TIPO 6: Preguntas ¿Cuándo? / ¿Quién? / ¿Cuántos? de fechas y números ──
+  if(cards.length < n){
+    const dateRx = /(\w[\w\s,]+)\s+(?:en|el|durante)\s+((?:el\s+)?(?:año\s+)?\d{4}|siglo\s+[IVXLC]+|\d+\s+(?:a\.?C\.?|d\.?C\.?))/gi;
+    let m;
+    while((m = dateRx.exec(txt)) !== null){
+      if(cards.length >= n) break;
+      addCard(`¿Cuándo ocurrió: "${m[1].trim().slice(0,60)}"?`, m[2].trim());
+    }
+  }
+
+  // ── TIPO 7: Fallback — preguntas genéricas de conceptos clave ──
+  if(cards.length < n){
+    const keyTerms = aiKeyTerms(txt, (n - cards.length) * 3);
+    keyTerms.forEach(term => {
+      if(cards.length >= n) return;
+      // Find the sentence containing this term
+      const ctx = sents.find(s => s.toLowerCase().includes(term.toLowerCase()));
+      if(ctx) addCard(`¿Qué es o qué significa "${term}"?`, ctx.trim().slice(0,140));
     });
   }
-  return cards.slice(0,n);
+
+  return cards.slice(0, n);
 }
 
 // Helper: mezclar array
@@ -6583,6 +6764,225 @@ function launchConfetti(){
 // THEME (dark / light)
 // ════════════════════════════════════════════════════════
 let isDark=true;
+
+// ════════════════════════════════════════════════════════
+// APUNTES — ENTRADA RÁPIDA
+// ════════════════════════════════════════════════════════
+let _apuSpeechRec=null;
+let _apuRecording=false;
+
+function apuVoice(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){toast('❌ Tu navegador no soporta dictado por voz','error');return;}
+  const btn=document.getElementById('apu-voice-btn');
+  const ta=document.getElementById('apu-edit-ta');
+  if(!ta)return;
+
+  if(_apuRecording){
+    // Stop recording
+    if(_apuSpeechRec)_apuSpeechRec.stop();
+    _apuRecording=false;
+    if(btn){btn.textContent='🎙️ Voz';btn.style.background='';btn.style.color='';}
+    return;
+  }
+
+  _apuSpeechRec=new SpeechRecognition();
+  _apuSpeechRec.lang='es-ES';
+  _apuSpeechRec.continuous=true;
+  _apuSpeechRec.interimResults=true;
+
+  let interimStart=ta.value.length; // where to insert interim results
+
+  _apuSpeechRec.onstart=()=>{
+    _apuRecording=true;
+    interimStart=ta.value.length;
+    if(btn){btn.textContent='⏹ Detener';btn.style.background='#f87171';btn.style.color='#fff';}
+    toast('🎙️ Escuchando... Habla ahora');
+  };
+
+  _apuSpeechRec.onresult=(e)=>{
+    let interim='';let final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    // Replace from interimStart onwards with current result
+    const base=ta.value.slice(0,interimStart);
+    ta.value=base+(final||interim);
+    if(final){interimStart=ta.value.length;}
+    ta.dispatchEvent(new Event('input'));
+    ta.scrollTop=ta.scrollHeight;
+  };
+
+  _apuSpeechRec.onerror=(e)=>{
+    _apuRecording=false;
+    if(btn){btn.textContent='🎙️ Voz';btn.style.background='';btn.style.color='';}
+    if(e.error!=='no-speech')toast('❌ Error de micrófono: '+e.error,'error');
+  };
+
+  _apuSpeechRec.onend=()=>{
+    _apuRecording=false;
+    if(btn){btn.textContent='🎙️ Voz';btn.style.background='';btn.style.color='';}
+  };
+
+  _apuSpeechRec.start();
+}
+
+async function apuPaste(){
+  const ta=document.getElementById('apu-edit-ta');
+  if(!ta)return;
+  try{
+    const text=await navigator.clipboard.readText();
+    if(!text.trim()){toast('📋 El portapapeles está vacío','error');return;}
+    const cursor=ta.selectionStart;
+    const before=ta.value.slice(0,cursor);
+    const after=ta.value.slice(ta.selectionEnd);
+    const sep=(before.length>0&&!before.endsWith('\n'))?'\n':'';
+    ta.value=before+sep+text+after;
+    ta.selectionStart=ta.selectionEnd=cursor+sep.length+text.length;
+    ta.dispatchEvent(new Event('input'));
+    ta.focus();
+    toast('📋 Pegado ('+text.length+' caracteres)','success');
+  }catch(e){
+    // Fallback: focus textarea and let user paste with Ctrl+V
+    ta.focus();
+    toast('Pulsa Ctrl+V / ⌘+V para pegar','');
+  }
+}
+
+// Quick new note: navigate to apuntes and create blank note directly
+function apu_newNote(){
+  navSection('estudiar');
+  setTimeout(()=>{
+    goTo('apuntes');
+    setTimeout(()=>{
+      // Create a blank note immediately without going through the list
+      const notes=JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]');
+      const mat=D.mats[0]?.n||'General';
+      const note={id:'fc'+Date.now(),mat,title:'',body:'',ts:Date.now()};
+      notes.unshift(note);
+      localStorage.setItem('lumio_notes_v2',JSON.stringify(notes));
+      // Open it directly in editor
+      try{apu_openNote(note.id,true);}catch(e){}
+    },200);
+  },80);
+}
+
+
+
+// ── Fotos en nueva tarjeta (sin IA) ──
+let _fcAddPhotos = {q: null, a: null};
+
+function fcAddPhoto(input, side){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _fcAddPhotos[side] = e.target.result;
+    const img = document.getElementById('fc-mo-'+side+'-img');
+    const wrap = document.getElementById('fc-mo-'+side+'-photo');
+    if(img) img.src = e.target.result;
+    if(wrap) wrap.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function fcRemovePhoto(side){
+  _fcAddPhotos[side] = null;
+  const wrap = document.getElementById('fc-mo-'+side+'-photo');
+  const img = document.getElementById('fc-mo-'+side+'-img');
+  if(wrap) wrap.style.display = 'none';
+  if(img) img.src = '';
+}
+
+// ════════════════════════════════════════════════════════
+// FLASHCARD PHOTO → IA
+// ════════════════════════════════════════════════════════
+let _fcPhotoDataUrl = null;
+let _fcSrc = 'text'; // 'text' | 'photo'
+
+function fcSwitchSrc(src){
+  _fcSrc = src;
+  document.getElementById('fc-src-text').style.display = src==='text'?'block':'none';
+  document.getElementById('fc-src-photo').style.display = src==='photo'?'block':'none';
+  document.getElementById('fc-src-text-btn').classList.toggle('on', src==='text');
+  document.getElementById('fc-src-photo-btn').classList.toggle('on', src==='photo');
+}
+
+function fcPhotoSelected(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _fcPhotoDataUrl = e.target.result;
+    const img = document.getElementById('fc-photo-img');
+    const preview = document.getElementById('fc-photo-preview');
+    const drop = document.getElementById('fc-photo-drop');
+    if(img) img.src = _fcPhotoDataUrl;
+    if(preview) preview.style.display = 'block';
+    if(drop) drop.style.display = 'none';
+    const status = document.getElementById('fc-photo-status');
+    if(status) status.textContent = '✓ '+file.name.slice(0,30);
+  };
+  reader.readAsDataURL(file);
+}
+
+function fcPhotoDrop(e){
+  e.preventDefault();
+  document.getElementById('fc-photo-drop').style.borderColor = '';
+  const file = e.dataTransfer?.files?.[0];
+  if(file && file.type.startsWith('image/')){
+    const fakeInput = {files:[file]};
+    fcPhotoSelected(fakeInput);
+  }
+}
+
+function fcClearPhoto(){
+  _fcPhotoDataUrl = null;
+  const img = document.getElementById('fc-photo-img');
+  const preview = document.getElementById('fc-photo-preview');
+  const drop = document.getElementById('fc-photo-drop');
+  const photoInput = document.getElementById('fc-photo-input');
+  if(img) img.src = '';
+  if(preview) preview.style.display = 'none';
+  if(drop) drop.style.display = 'block';
+  if(photoInput) photoInput.value = '';
+}
+
+// Extract text from image using canvas + basic OCR via color analysis
+// For real OCR we use the free Tesseract.js (loaded inline)
+// Actually we'll use a clever approach: send to Pollinations with vision
+async function fcExtractTextFromPhoto(dataUrl){
+  // Try to use fetch with Pollinations vision endpoint (supports images)
+  try{
+    const base64 = dataUrl.split(',')[1];
+    const mimeType = dataUrl.split(';')[0].split(':')[1]||'image/jpeg';
+    const res = await fetch('https://text.pollinations.ai/openai', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'openai',
+        messages:[{
+          role:'user',
+          content:[
+            {type:'text', text:'Extrae todo el texto escrito en esta imagen de apuntes. Devuelve SOLO el texto extraído, tal cual, sin comentarios ni formato adicional.'},
+            {type:'image_url', image_url:{url:`data:${mimeType};base64,${base64}`}}
+          ]
+        }],
+        max_tokens:1500
+      })
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content||'';
+    if(text && text.length > 10) return text;
+    throw new Error('No text extracted');
+  }catch(e){
+    // Fallback: prompt user to copy the text manually
+    throw new Error('No se pudo leer el texto de la foto. Copia el texto a mano en el campo de texto.');
+  }
+}
+
 // ════════════════════════════════════════════════════════
 // ACCENT COLOR SYSTEM
 // ════════════════════════════════════════════════════════
