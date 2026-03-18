@@ -1253,6 +1253,190 @@ button:active{transform:scale(.97)}
 </div></div>
 
 
+<!-- ══ AGENDA LANDING MENU ══ -->
+<div class="screen" id="s-agenda-menu"><div style="padding:18px 16px 24px;overflow-y:auto">
+  <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:4px">Agenda</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:20px">¿Qué quieres gestionar?</div>
+
+  <!-- TAREAS -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--orange);border-radius:2px;display:inline-block"></span>Tareas pendientes</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('agenda')" style="--ec:#fb923c">
+      <div class="est-card-ico">📋</div>
+      <div class="est-card-name">Deberes</div>
+      <div class="est-card-desc">Añade entregas con fecha y materia</div>
+    </div>
+    <div class="est-card" onclick="goTo('planificador')" style="--ec:#f87171">
+      <div class="est-card-ico">🗓️</div>
+      <div class="est-card-name">Exámenes</div>
+      <div class="est-card-desc">Planifica con cuenta atrás automática</div>
+    </div>
+    <div class="est-card" onclick="goTo('semana-view')" style="--ec:#60a5fa">
+      <div class="est-card-ico">📆</div>
+      <div class="est-card-name">Vista semanal</div>
+      <div class="est-card-desc">Todo de esta semana de un vistazo</div>
+    </div>
+    <div class="est-card" onclick="goTo('cronometro-deberes')" style="--ec:#f472b6">
+      <div class="est-card-ico">⏱️</div>
+      <div class="est-card-name">Cronómetro</div>
+      <div class="est-card-desc">Mide cuánto tardas en cada tarea</div>
+    </div>
+  </div>
+
+  <!-- PLANIFICACIÓN -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--teal);border-radius:2px;display:inline-block"></span>Planificación</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('horario')" style="--ec:#2dd4bf">
+      <div class="est-card-ico">📅</div>
+      <div class="est-card-name">Horario</div>
+      <div class="est-card-desc">Tus clases de cada día de la semana</div>
+    </div>
+    <div class="est-card" onclick="goTo('estimador')" style="--ec:#a3e635">
+      <div class="est-card-ico">🎯</div>
+      <div class="est-card-name">Estimador</div>
+      <div class="est-card-desc">Plan óptimo de estudio para tus exámenes</div>
+    </div>
+    <div class="est-card" onclick="goTo('vacaciones')" style="--ec:#c084fc">
+      <div class="est-card-ico">🏖️</div>
+      <div class="est-card-name">Vacaciones</div>
+      <div class="est-card-desc">Próximos días libres y festivos del curso</div>
+    </div>
+    <div class="est-card" onclick="goTo('notas-historial')" style="--ec:#fb923c">
+      <div class="est-card-ico">📊</div>
+      <div class="est-card-name">Mis notas</div>
+      <div class="est-card-desc">Registra tus notas y calcula la media</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ══ CLASE LANDING MENU ══ -->
+<div class="screen" id="s-clase-menu"><div style="padding:18px 16px 24px;overflow-y:auto">
+  <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:4px">Clases</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:20px">Únete o gestiona tus clases</div>
+
+  <!-- MIS CLASES -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--blue);border-radius:2px;display:inline-block"></span>Mis clases</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('clase-lista')" style="--ec:#60a5fa;grid-column:span 2">
+      <div class="est-card-ico">🏫</div>
+      <div class="est-card-name">Ver mis clases</div>
+      <div class="est-card-desc">Entra a una clase existente o únete con el código de tu profe</div>
+    </div>
+  </div>
+
+  <!-- DENTRO DE LA CLASE -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--purple);border-radius:2px;display:inline-block"></span>Dentro de la clase</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('mural')" style="--ec:#c084fc">
+      <div class="est-card-ico">💬</div>
+      <div class="est-card-name">Mural de dudas</div>
+      <div class="est-card-desc">Publica preguntas para el profe o compañeros</div>
+    </div>
+    <div class="est-card" onclick="goTo('anuncios')" style="--ec:#60a5fa">
+      <div class="est-card-ico">📢</div>
+      <div class="est-card-name">Tablón</div>
+      <div class="est-card-desc">Avisos importantes del profe o admin</div>
+    </div>
+    <div class="est-card" onclick="goTo('fc-clase')" style="--ec:#4ade80">
+      <div class="est-card-ico">🃏</div>
+      <div class="est-card-name">Tarjetas de clase</div>
+      <div class="est-card-desc">Flashcards compartidas por el profe</div>
+    </div>
+    <div class="est-card" onclick="goTo('clase-detalle')" style="--ec:#fb923c">
+      <div class="est-card-ico">📋</div>
+      <div class="est-card-name">Temario y deberes</div>
+      <div class="est-card-desc">Exámenes y actividades de la clase actual</div>
+    </div>
+  </div>
+
+  <!-- CÓMO FUNCIONA -->
+  <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:14px;padding:14px 16px">
+    <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:8px">🔑 ¿Cómo unirse?</div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.7">Tu profe crea la clase y te da un <b style="color:var(--t1)">código de 6 letras</b>. Escríbelo en "Ver mis clases" → "Unirse". Verás al instante el temario, deberes y exámenes.</div>
+  </div>
+</div></div>
+
+<!-- ══ PERFIL LANDING MENU ══ -->
+<div class="screen" id="s-perfil-menu"><div style="padding:18px 16px 24px;overflow-y:auto">
+  <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:4px">Perfil</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:20px">Tu progreso y configuración</div>
+
+  <!-- PROGRESO -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--green);border-radius:2px;display:inline-block"></span>Tu progreso</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('stats')" style="--ec:#4ade80">
+      <div class="est-card-ico">📊</div>
+      <div class="est-card-name">Estadísticas</div>
+      <div class="est-card-desc">Horas, pomodoros y materias esta semana</div>
+    </div>
+    <div class="est-card" onclick="goTo('heatmap')" style="--ec:#f5c518">
+      <div class="est-card-ico">🔥</div>
+      <div class="est-card-name">Heatmap</div>
+      <div class="est-card-desc">Cuadrícula de tus días de estudio del año</div>
+    </div>
+    <div class="est-card" onclick="goTo('informe')" style="--ec:#60a5fa">
+      <div class="est-card-ico">📋</div>
+      <div class="est-card-name">Informe semanal</div>
+      <div class="est-card-desc">Resumen de lo que has hecho esta semana</div>
+    </div>
+    <div class="est-card" onclick="goTo('logros')" style="--ec:#f472b6">
+      <div class="est-card-ico">🏆</div>
+      <div class="est-card-name">Logros y XP</div>
+      <div class="est-card-desc">Medallas desbloqueadas y retos activos</div>
+    </div>
+  </div>
+
+  <!-- ANÁLISIS -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--purple);border-radius:2px;display:inline-block"></span>Análisis inteligente</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div class="est-card" onclick="goTo('detector')" style="--ec:#c084fc">
+      <div class="est-card-ico">🔎</div>
+      <div class="est-card-name">Detector</div>
+      <div class="est-card-desc">Qué temas necesitas repasar más</div>
+    </div>
+    <div class="est-card" onclick="goTo('predictor')" style="--ec:#2dd4bf">
+      <div class="est-card-ico">🎯</div>
+      <div class="est-card-name">Predictor</div>
+      <div class="est-card-desc">Tu nota probable en cada materia</div>
+    </div>
+    <div class="est-card" onclick="goTo('ranking')" style="--ec:#fb923c">
+      <div class="est-card-ico">🏅</div>
+      <div class="est-card-name">Ranking</div>
+      <div class="est-card-desc">Compárate con amigos por XP</div>
+    </div>
+    <div class="est-card" onclick="goTo('calendario')" style="--ec:#60a5fa">
+      <div class="est-card-ico">📅</div>
+      <div class="est-card-name">Calendario</div>
+      <div class="est-card-desc">Días de estudio y sesiones del mes</div>
+    </div>
+  </div>
+
+  <!-- CONFIGURACIÓN -->
+  <div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:12px;background:var(--t3);border-radius:2px;display:inline-block"></span>Configuración</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+    <div class="est-card" onclick="goTo('materias')" style="--ec:#f5c518">
+      <div class="est-card-ico">📚</div>
+      <div class="est-card-name">Materias</div>
+      <div class="est-card-desc">Edita tus asignaturas y progreso</div>
+    </div>
+    <div class="est-card" onclick="goTo('ajustes')" style="--ec:#9ca3af">
+      <div class="est-card-ico">⚙️</div>
+      <div class="est-card-name">Ajustes</div>
+      <div class="est-card-desc">Tema, color, pomodoro y más</div>
+    </div>
+    <div class="est-card" onclick="goTo('bienestar')" style="--ec:#4ade80">
+      <div class="est-card-ico">🧘</div>
+      <div class="est-card-name">Bienestar</div>
+      <div class="est-card-desc">Estado de ánimo y pausas activas</div>
+    </div>
+    <div class="est-card" onclick="goTo('feedback')" style="--ec:#f472b6">
+      <div class="est-card-ico">💬</div>
+      <div class="est-card-name">Feedback</div>
+      <div class="est-card-desc">Envíanos sugerencias o reporta un bug</div>
+    </div>
+  </div>
+</div></div>
+
 <!-- ══ ESTUDIAR LANDING MENU ══ -->
 <div class="screen" id="s-estudiar-menu"><div style="padding:18px 16px 24px;overflow-y:auto">
   <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:4px">Estudiar</div>
@@ -3362,20 +3546,23 @@ const SECTIONS={
     landingScreen:'estudiar-menu',
   },
   clase:{
-    screens:['clase-lista','clase-detalle','mural','anuncios','fc-clase'],
-    labels:['🏫 Mis clases','📋 Clase actual','💬 Mural dudas','📢 Anuncios','🃏 Tarjetas clase'],
+    screens:['clase-menu','clase-lista','clase-detalle','mural','anuncios','fc-clase'],
+    labels:['🏠 Menú','🏫 Mis clases','📋 Clase actual','💬 Mural dudas','📢 Anuncios','🃏 Tarjetas clase'],
+    landingScreen:'clase-menu',
   },
   agenda:{
-    screens:['agenda','planificador','horario','vacaciones','semana-view','cronometro-deberes','estimador','notas-historial'],
-    labels:['📋 Deberes','🗓️ Exámenes','📅 Horario','🏖️ Vacaciones','📆 Semana','⏱️ Cronómetro','🎯 Estimador','📊 Mis notas'],
+    screens:['agenda-menu','agenda','planificador','horario','vacaciones','semana-view','cronometro-deberes','estimador','notas-historial'],
+    labels:['🏠 Menú','📋 Deberes','🗓️ Exámenes','📅 Horario','🏖️ Vacaciones','📆 Semana','⏱️ Cronómetro','🎯 Estimador','📊 Mis notas'],
+    landingScreen:'agenda-menu',
   },
   herramientas:{
     screens:['calc','formulas','conjugador','conversor','tabla','vocab','calcnotas','ppt','timeline'],
     labels:['🔢 Calculadora','📐 Fórmulas','🔤 Conjugador','⚖️ Conversor','⚗️ Tabla P.','🌐 Vocabulario','🎓 Calc. notas','📊 Presentación','📜 Historia'],
   },
   perfil:{
-    screens:['stats','heatmap','informe','detector','predictor','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','busqueda','feedback','ajustes'],
-    labels:['📊 Estadísticas','🔥 Heatmap','📋 Informe','🔎 Detector','🎯 Predictor','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','🔍 Buscar','💬 Feedback','⚙️ Ajustes'],
+    screens:['perfil-menu','stats','heatmap','informe','detector','predictor','logros','materias','bienestar','sonidos','recordatorios','calendario','ranking','anaya','amigos','busqueda','feedback','ajustes'],
+    labels:['🏠 Menú','📊 Estadísticas','🔥 Heatmap','📋 Informe','🔎 Detector','🎯 Predictor','🏆 Logros','📚 Materias','🧘 Bienestar','🎵 Sonidos','🔔 Avisos','📅 Calendario','🏅 Ranking','📘 Anaya','👥 Invitar','🔍 Buscar','💬 Feedback','⚙️ Ajustes'],
+    landingScreen:'perfil-menu',
   },
 };
 let currentSection='home';let currentScreen='home';
@@ -3392,8 +3579,8 @@ function navSection(sec){
     subNav.classList.add('show');
     // For estudiar: show grouped visual menu instead of plain tabs
 const _SCREEN_DESCS={"apuntes": "Escribe y organiza", "flashcards": "Memoriza con tarjetas", "pom-screen": "Estudia 25 min", "testia": "Preguntas de tus apuntes", "examen": "Simula un examen real", "resumenia": "Texto → bullets clave", "corrector": "Mejora tu redacción", "dictado": "Escucha y responde", "esquemas": "Texto → esquema visual", "mapa": "Conceptos conectados", "feynman": "¿Lo entiendes de verdad?", "lectura": "Lee y comprende mejor", "comparador": "Compara dos redacciones", "mnemonics": "Reglas para memorizar", "resaltador": "Marca lo importante", "simplificador": "Textos difíciles → fácil"};
-    if(sec==='estudiar'){
-      // Show sub-nav but hide the menu item (index 0)
+    if(s.landingScreen){
+      // Hide the menu item (index 0) from sub-nav, show real screens
       const visible=s.screens.slice(1);
       const visLabels=s.labels.slice(1);
       subNav.innerHTML=visible.map((scr,i)=>{
@@ -3413,7 +3600,7 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
-  const bldrs={home:bHome,'estudiar-menu':function(){},'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
+  const bldrs={home:bHome,'estudiar-menu':function(){},'agenda-menu':function(){},'clase-menu':function(){},'perfil-menu':function(){},'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
   const fabBar=document.getElementById('fab-bar');if(fabBar)fabBar.classList.toggle('hidden-fab',id==='chat');
 }
