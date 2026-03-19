@@ -62,7 +62,7 @@
 }
 html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 #phone{width:100%;max-width:100%;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
-#screens{flex:1;overflow:hidden;position:relative}
+#screens{flex:1;overflow:hidden;position:relative;background:var(--bg)}
 /* NAV */
 #nav{height:68px;background:rgba(11,13,18,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
 .nb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px 4px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .2s,transform .15s,background .15s;flex-shrink:0;min-width:56px;border-radius:12px;position:relative}.nb:active{background:rgba(245,197,24,.08);transform:scale(.94)}
@@ -471,9 +471,8 @@ button:active, [onclick]:active { transform: scale(0.97); transition: transform 
 
 /* ══ SCREEN TRANSITIONS ══ */
 .screen{display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:80px;flex-direction:column}
-.screen.active{display:flex;flex-direction:column;animation:screenIn .18s cubic-bezier(.4,0,.2,1)}
+.screen.active{display:flex;flex-direction:column}
 #s-chat.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
-@keyframes screenIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 #sub-nav.show{display:flex;animation:snFade .15s ease}
 @keyframes snFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 
@@ -649,8 +648,7 @@ button:active{transform:scale(.97)}
 
 /* Contenido que puede desbordarse */
 /* .screen defined above */
-.screen.active{display:flex;flex-direction:column;animation:screenIn .18s ease}
-@keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* screen.active: defined above — no animation to avoid black screen on mobile */
 
 /* Desktop layout — wider screens get centred content with max readable width */
 @media(min-width:768px){
