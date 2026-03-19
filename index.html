@@ -44,9 +44,7 @@
   document.head.appendChild(iconLink);
 })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- No external fonts — system font stack, instant on all devices -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -58,13 +56,15 @@
   --t1:#ece8df;--t2:#7c8799;--t3:#3d4555;
   --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.14);
   --card-shadow:0 2px 12px rgba(0,0,0,.45);
-  --font:'Geist',Arial,sans-serif;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
 }
-html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
-#phone{width:100%;max-width:100%;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+html,body{height:100%;min-height:-webkit-fill-available;background:#060709;font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+#phone{width:100%;max-width:100%;min-height:100vh;min-height:-webkit-fill-available;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
 #screens{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+#s-home{display:none}
+#s-home.active{display:flex;background:var(--bg)}
 /* NAV */
-#nav{height:68px;background:rgba(11,13,18,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
+#nav{height:68px;background:var(--bg1);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;overflow-x:hidden;flex-shrink:0;padding:0 4px;padding-bottom:env(safe-area-inset-bottom,0px)}
 .nb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px 4px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .2s,transform .15s,background .15s;flex-shrink:0;min-width:56px;border-radius:12px;position:relative}.nb:active{background:rgba(245,197,24,.08);transform:scale(.94)}
 .nb.active .ni,.nb.active svg{filter:drop-shadow(0 0 6px rgba(245,197,24,.5))}
 .nb:active{transform:scale(.92)}
@@ -76,7 +76,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 /* SPLASH */
 
 /* Offline indicator */
-#ai-offline-bar{display:none;position:fixed;top:0;left:0;right:0;background:rgba(248,113,113,.9);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:6px;z-index:9700;backdrop-filter:blur(4px)}
+#ai-offline-bar{display:none;position:fixed;top:0;left:0;right:0;background:#f87171;color:#fff;font-size:12px;font-weight:700;text-align:center;padding:6px;z-index:9700}
 #ai-offline-bar.show{display:block}
 #splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0);animation:splash-auto-hide 0.5s ease 3s forwards;animation-fill-mode:forwards}
 @keyframes splash-auto-hide{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden;pointer-events:none}}
@@ -352,7 +352,7 @@ button:active, [onclick]:active { transform: scale(0.97); transition: transform 
 /* ONBOARDING */
 #onboarding{position:fixed;inset:0;background:var(--bg);z-index:980;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;gap:0;transition:opacity .4s;overflow-y:auto}
 #onboarding.out{opacity:0;pointer-events:none}
-.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100dvh;padding:48px 24px 0}
+.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100vh;padding:48px 24px 0}
 .ob-step.active{display:flex}
 .ob-ico{font-size:56px;animation:spul 2s ease-in-out infinite}
 .ob-title{font-size:26px;font-weight:900;color:var(--t1)}
@@ -555,7 +555,7 @@ button:active, [onclick]:active { transform: scale(0.97); transition: transform 
 #exam-imminent-overlay.show{display:flex}
 
 /* ══ ONBOARDING TRANSITIONS ══ */
-.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100dvh;padding:48px 24px 0;animation:obSlide .25s ease}
+.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:520px;text-align:center;min-height:100vh;padding:48px 24px 0;animation:obSlide .25s ease}
 .ob-step.active{display:flex}
 @keyframes obSlide{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 .ob-step.back-anim{animation:obSlideBack .25s ease}
@@ -590,7 +590,7 @@ button:active{transform:scale(.97)}
 #phone{
   width:100%;
   max-width:100%;
-  min-height:100dvh;
+  min-height:100vh;
   margin:0 auto;
 }
 
@@ -11917,13 +11917,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     const savedUser=JSON.parse(localStorage.getItem('lumio_user')||'null');
     if(savedUser){D.user.name=savedUser.name;if(savedUser.studyTime)D.user.studyTime=savedUser.studyTime;}
 
-    // PWA Service Worker
-    // SW: si existe uno viejo, lo desregistramos para no bloquear actualizaciones
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>r.unregister());
-  }).catch(()=>{});
-}
+    // PWA Service Worker — keep existing SW, don't unregister on every load
+    // (unregistering caused black screen on Android during reload)
 
     // ── PWA Install — funciona en Chrome/Edge/Samsung/Android + guía para iOS ──
     window.window._pwaPrompt=null;
