@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Lumio — Tu compañero de estudio</title>
 <meta name="description" content="App de estudio gratuita para el colegio. Flashcards, pomodoro, apuntes, clases y mucho más. Sin anuncios.">
@@ -79,7 +80,7 @@ html,body{height:100%;min-height:-webkit-fill-available;background:#060709;font-
 #ai-offline-bar{display:none;position:fixed;top:0;left:0;right:0;background:#f87171;color:#fff;font-size:12px;font-weight:700;text-align:center;padding:6px;z-index:9700}
 #ai-offline-bar.show{display:block}
 #splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;will-change:opacity;-webkit-transition:opacity .5s ease .1s;transition:opacity .5s ease .1s,visibility .5s ease .1s;-webkit-transform:translate3d(0,0,0);animation:splash-auto-hide 0.5s ease 3s forwards;animation-fill-mode:forwards}
-@keyframes splash-auto-hide{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden;pointer-events:none}}
+@keyframes splash-auto-hide{0%,60%{opacity:1;visibility:visible}95%,100%{opacity:0;visibility:hidden;pointer-events:none}}
 #splash.out{opacity:0;pointer-events:none;visibility:hidden;display:none!important}
 .sp-ico{width:76px;height:76px;background:var(--y);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;animation:spul 1.6s ease-in-out infinite}
 @keyframes spul{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
@@ -471,6 +472,7 @@ button:active, [onclick]:active { transform: scale(0.97); transition: transform 
 
 /* ══ SCREEN TRANSITIONS ══ */
 .screen{display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:80px;flex-direction:column}
+/* #s-home shown by default via JS — fallback: splash CSS hides it */
 .screen.active{display:flex;flex-direction:column;background:var(--bg)}
 #s-chat.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
 #sub-nav.show{display:flex;animation:snFade .15s ease}
@@ -732,7 +734,7 @@ button:active{transform:scale(.97)}
 <body>
 <!-- SPLASH -->
 <div id="ai-offline-bar">📵 Sin conexión — IA en modo local</div>
-<div id="splash">
+<div id="splash" style="animation:splash-auto-hide 2.5s ease forwards">
   <div class="sp-ico">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="48" height="48">
       <circle cx="256" cy="210" r="108" fill="none" stroke="#0d0f14" stroke-width="28"/>
@@ -3853,8 +3855,9 @@ let currentSection='home';let currentScreen='home';
 
 function navSection(sec){
   currentSection=sec;
-  document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.section===sec));
+  try{document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.section===sec));}catch(e){}
   const s=SECTIONS[sec];
+  if(!s){console.warn('navSection: unknown section',sec);return;}
   const subNav=document.getElementById('sub-nav');
   if(s.single){
     subNav.classList.remove('show');subNav.innerHTML='';
@@ -3881,8 +3884,9 @@ const _SCREEN_DESCS={"apuntes": "Escribe y organiza", "flashcards": "Memoriza co
 
 function goTo(id){
   currentScreen=id;
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const sc=document.getElementById('s-'+id);if(sc)sc.classList.add('active');
+  try{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));}catch(e){}
+  const sc=document.getElementById('s-'+id);
+  if(sc){sc.classList.add('active');}else{console.warn('goTo: screen not found: s-'+id);}
   document.querySelectorAll('#sub-nav .snb').forEach(b=>b.classList.toggle('active',b.dataset.scr===id));
   const bldrs={home:bHome,'estudiar-menu':function(){},'agenda-menu':function(){},'clase-menu':function(){},'perfil-menu':function(){},'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
@@ -6136,7 +6140,7 @@ async function callAI(systemPrompt, userMsg, maxTokens=600){
         max_tokens:maxTokens,
         seed:Math.floor(Math.random()*9999)
       }),
-      signal:AbortSignal.timeout(12000)
+      signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),12000);return c.signal;})()
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data=await res.json();
@@ -8165,7 +8169,7 @@ Devuelve ÚNICAMENTE el texto extraído. Sin explicaciones ni comentarios adicio
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: ep.body,
-        signal: AbortSignal.timeout(20000) // 20s timeout
+        signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),20000);return c.signal;})()
       });
       if(!res.ok){
         lastError = 'HTTP '+res.status+' en '+ep.url;
@@ -11641,7 +11645,7 @@ async function autoCheckUpdate(){
         'pragma':'no-cache','cache-control':'no-cache',
         'Range':'bytes=0-2000' // only first 2KB, version is at top
       },
-      signal:AbortSignal.timeout(8000)
+      signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),8000);return c.signal;})()
     });
     if(!res.ok)return;
     const partial=await res.text();
@@ -11683,7 +11687,7 @@ async function checkUpdate(){
   const status=document.getElementById('update-status');
   if(btn){btn.disabled=true;btn.textContent='Buscando...';}
   try{
-    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{cache:'no-store',headers:{'pragma':'no-cache','cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});
+    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{cache:'no-store',headers:{'pragma':'no-cache','cache-control':'no-cache'},signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),30000);return c.signal;})()});
     if(!res.ok)throw new Error('Error '+res.status);
     const html=await res.text();
     const match=html.match(/const APP_VERSION='([^']+)'/);
@@ -11917,8 +11921,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     try{const t=document.getElementById('ia-t');if(t)t.addEventListener('input',function(){const el=document.getElementById('ia-cc');if(el)el.textContent=this.value.length+' caracteres';});}catch(e){}
     try{const rt=document.getElementById('res-txt');if(rt)rt.addEventListener('input',function(){const el=document.getElementById('res-cc');if(el)el.textContent=this.value.length+' caracteres';});}catch(e){}
 
-    // Load full persisted state FIRST
-    loadState();
+    // Load full persisted state FIRST — wrapped so any parse error doesn't kill boot
+    try{loadState();}catch(e){console.error('loadState failed:',e);}
     loadAccentColor();
     try{_updateOnlineStatus();}catch(e){}
 
@@ -11963,7 +11967,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     setTimeout(()=>{try{_notifSchedule();}catch(e){}},1000);
 
     // Recalculate materia progress on load (based on hours + flashcard levels)
-    try{recalcAllProgress();}catch(e){}
+    setTimeout(()=>{try{recalcAllProgress();}catch(e){}},2000); // defer heavy work
 
     // Start IndexedDB in background (never blocks startup)
     try{_initIDBWhenReady();}catch(e){}
