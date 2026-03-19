@@ -3964,23 +3964,26 @@ function bHome(){
       return`<div class="${cls}" title="${d.d}: ${Math.round(d.m)}m"></div>`;
     }).join('');
   }
-  // Exams
-  const upcoming=D.exams.filter(e=>new Date(e.fecha)>new Date()).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).slice(0,3);
-  if(upcoming.length){
-    const exEl=document.getElementById('exams-list');if(!exEl)return;exEl.innerHTML=upcoming.map(ex=>{
-      const d=Math.ceil((new Date(ex.fecha)-Date.now())/864e5);
-      const urg=d<=3;const warn=d<=7&&!urg;
-      return `<div onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)" style="background:var(--bg1);border:1px solid ${urg?'var(--danger)':warn?'rgba(245,197,24,.4)':'var(--bd)'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer${urg?' animation:dangerPulse 2s infinite':''}" class="${urg?'exam-danger':''}">
-        <div style="width:36px;height:36px;border-radius:9px;background:${ex.c}18;display:flex;align-items:center;justify-content:center;font-size:17px">${ex.e}</div>
-        <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${ex.mat}</div>
-        <div style="font-size:10px;color:var(--t2);margin-top:1px">${new Date(ex.fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div></div>
-        <div style="text-align:right"><div style="font-size:18px;font-weight:900;color:${urg?'var(--danger)':warn?'var(--y)':'var(--t2)'}">${d}d</div><div style="font-size:9px;color:var(--t3)">restantes</div></div>
-      </div>`;
-    }).join('');
-  }else{
-    if(exEl)exEl.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection(\'agenda\');setTimeout(()=>goTo(\'planificador\'),50)">Añadir →</span></div>';
+  // Exams — exEl declared outside if/else so both branches can use it
+  const exEl=document.getElementById('exams-list');
+  const upcoming=(D.exams||[]).filter(e=>new Date(e.fecha)>new Date()).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).slice(0,3);
+  if(exEl){
+    if(upcoming.length){
+      exEl.innerHTML=upcoming.map(ex=>{
+        const d=Math.ceil((new Date(ex.fecha)-Date.now())/864e5);
+        const urg=d<=3;const warn=d<=7&&!urg;
+        return `<div onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)" style="background:var(--bg1);border:1px solid ${urg?'var(--danger)':warn?'rgba(245,197,24,.4)':'var(--bd)'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer" class="${urg?'exam-danger':''}">
+          <div style="width:36px;height:36px;border-radius:9px;background:${ex.c}18;display:flex;align-items:center;justify-content:center;font-size:17px">${ex.e}</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--t1)">${ex.mat}</div>
+          <div style="font-size:10px;color:var(--t2);margin-top:1px">${new Date(ex.fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div></div>
+          <div style="text-align:right"><div style="font-size:18px;font-weight:900;color:${urg?'var(--danger)':warn?'var(--y)':'var(--t2)'}">${d}d</div><div style="font-size:9px;color:var(--t3)">restantes</div></div>
+        </div>`;
+      }).join('');
+    }else{
+      exEl.innerHTML=`<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)">Añadir →</span></div>`;
+    }
   }
-  // Deberes pendientes
+    // Deberes pendientes
   const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
   const pendientes=debs.filter(d=>!d.hecha).length;
   const debEl=document.getElementById('h-deberes-count');
@@ -4445,6 +4448,12 @@ function addHistorial(mins){
   saveState();
 }
 
+
+
+// Safe localStorage JSON parse — never throws
+function _lsGet(key, fallback=null){
+  try{const v=localStorage.getItem(key);return v?JSON.parse(v):fallback;}catch(e){return fallback;}
+}
 
 // ── Update streak whenever user does any study activity ──
 function touchStreak(){
@@ -11621,30 +11630,28 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(GITHUB_RAW_URL)setTimeout(autoCheckUpdate,3000);
 });
 
-// Auto-check silencioso: solo muestra banner si hay versión nueva
+// Auto-check: only fetch a tiny version file, never the full 700KB HTML
 async function autoCheckUpdate(){
+  if(!GITHUB_RAW_URL) return;
   try{
-    // Primero desregistrar SW para que el fetch vaya a la red real
-    if('serviceWorker' in navigator){
-      const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r=>r.unregister()));
-    }
-    // Cache-busting fetch: ignora caché del navegador y del SW
+    // Fetch ONLY the first 500 bytes — enough to read APP_VERSION
     const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{
       cache:'no-store',
-      headers:{'pragma':'no-cache','cache-control':'no-cache'}
+      headers:{
+        'pragma':'no-cache','cache-control':'no-cache',
+        'Range':'bytes=0-2000' // only first 2KB, version is at top
+      },
+      signal:AbortSignal.timeout(8000)
     });
     if(!res.ok)return;
-    const html=await res.text();
-    const match=html.match(/const APP_VERSION='([^']+)'/);
+    const partial=await res.text();
+    const match=partial.match(/const APP_VERSION='([^']+)'/);
     const remoteVersion=match?match[1]:null;
     if(!remoteVersion||remoteVersion===APP_VERSION)return;
-    // Hay versión nueva — guardar html en memoria y mostrar banner
-    window._pendingUpdate=html;
+    // Nueva versión disponible — solo entonces mostrar banner
+    // Don't download full file yet — only on user request
     showUpdateBanner(remoteVersion);
-  }catch(e){
-    // Sin conexión o fallo — silencioso
-  }
+  }catch(e){ /* sin conexión — silencioso */ }
 }
 
 // Banner no intrusivo en la parte superior
@@ -11676,7 +11683,7 @@ async function checkUpdate(){
   const status=document.getElementById('update-status');
   if(btn){btn.disabled=true;btn.textContent='Buscando...';}
   try{
-    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{cache:'no-store',headers:{'pragma':'no-cache','cache-control':'no-cache'}});
+    const res=await fetch(GITHUB_RAW_URL+'?v='+Date.now(),{cache:'no-store',headers:{'pragma':'no-cache','cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});
     if(!res.ok)throw new Error('Error '+res.status);
     const html=await res.text();
     const match=html.match(/const APP_VERSION='([^']+)'/);
@@ -11890,9 +11897,15 @@ window.addEventListener('DOMContentLoaded',()=>{
   const splashGuard=setTimeout(()=>{
     try{
       const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
-      try{bHome();}catch(e){}
-      try{navSection('home');}catch(e){}
+      if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';
+        setTimeout(()=>{sp.style.display='none';},300);}
+      // Show home directly without full navSection (cheaper)
+      try{
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        const sh=document.getElementById('s-home');
+        if(sh){sh.classList.add('active');}
+        try{bHome();}catch(e){}
+      }catch(e){}
       if(!localStorage.getItem('lumio_seen_onboarding')){
         try{showOnboarding();}catch(e){}
       }
@@ -11980,24 +11993,22 @@ window.addEventListener('DOMContentLoaded',()=>{
           if(!localStorage.getItem('lumio_seen_onboarding')){
             showOnboarding();
           }else{
-            // Ensure home screen is visible
-            try{navSection('home');}catch(e){
-              // Even if navSection fails, force-show #s-home
-              try{
-                document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-                const sh=document.getElementById('s-home');
-                if(sh)sh.classList.add('active');
-              }catch(e2){}
+            // Show home — use direct DOM first (cheap), then navSection
+            try{
+              document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+              const sh=document.getElementById('s-home');
+              if(sh)sh.classList.add('active');
+              document.querySelectorAll('#nav .nb').forEach(b=>b.classList.toggle('active',b.dataset.section==='home'));
+              try{bHome();}catch(e){}
+            }catch(e3){
+              try{navSection('home');}catch(e){}
             }
-            // Tutorial: only show once, never on every load
-            // startTutorial() checks lumio_seen_tutorial internally
           }
         }catch(e2){
-          // Last resort: if onboarding/tutorial fails, at least show home
-          try{navSection('home');}catch(e){}
+          try{document.getElementById('s-home')?.classList.add('active');}catch(e){}
         }
-      },600);
-    },1200); // reduced from 1800ms for faster load
+      },400);
+    },800); // reduced from 1200ms — app boots faster on Android
 
   }catch(e){
     console.error('Lumio init error:',e);
