@@ -119,6 +119,55 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 /* TOAST */
 #toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg1);border:1px solid var(--bd2);border-radius:999px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--t1);z-index:9800;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Anti-frustration */
+/* Anti-frustration: smooth button press feedback */
+button:active, [onclick]:active { transform: scale(0.97); transition: transform 0.08s; }
+.mbtn:active { opacity: 0.85; transform: scale(0.97); }
+
+/* Skeleton loader pulse */
+@keyframes skPulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+.sk-loading { background:var(--bg2); border-radius:8px; animation:skPulse 1.4s ease-in-out infinite; }
+
+/* Success flash on save */
+@keyframes successFlash { 0%{background:rgba(74,222,128,.25)} 100%{background:transparent} }
+.save-flash { animation: successFlash 0.6s ease forwards; }
+
+/* Gentle shake on error */
+@keyframes errShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+.err-shake { animation: errShake 0.4s ease; }
+
+/* Loading spinner inline */
+.spin-sm { width:16px;height:16px;border:2px solid var(--bg2);border-top-color:var(--y);border-radius:50%;animation:spn .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px; }
+
+/* Progress bar animated */
+.prog-fill { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+/* Tooltip on hold */
+[title]:active::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  border: 1px solid var(--bd2);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--t1);
+  white-space: nowrap;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Connection indicator */
+#offline-badge{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  background:#f87171;color:#fff;font-size:11px;font-weight:800;
+  padding:4px 14px;border-radius:0 0 10px 10px;z-index:9700;
+  display:none;pointer-events:none;letter-spacing:.03em;
+}
+
 /* FOCUS MODE */
 #focus-mode{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:990}
 #focus-mode.show{display:flex}
@@ -423,6 +472,7 @@ html,body{height:100%;background:#060709;font-family:var(--font);-webkit-font-sm
 /* ══ SCREEN TRANSITIONS ══ */
 .screen{display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:80px;flex-direction:column}
 .screen.active{display:flex;flex-direction:column;animation:screenIn .18s cubic-bezier(.4,0,.2,1)}
+#s-chat.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
 @keyframes screenIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 #sub-nav.show{display:flex;animation:snFade .15s ease}
 @keyframes snFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -1508,6 +1558,11 @@ button:active{transform:scale(.97)}
       <div class="est-card-name">Pomodoro</div>
       <div class="est-card-desc">25 min de estudio enfocado sin distracciones</div>
     </div>
+    <div class="est-card" onclick="goTo('chat')" style="--ec:#4ade80">
+      <div class="est-card-ico">💬</div>
+      <div class="est-card-name">Chat IA</div>
+      <div class="est-card-desc">Pregunta dudas de cualquier asignatura</div>
+    </div>
     <div class="est-card" onclick="goTo('testia')" style="--ec:#4ade80">
       <div class="est-card-ico">🧠</div>
       <div class="est-card-name">Test IA</div>
@@ -1614,7 +1669,7 @@ button:active{transform:scale(.97)}
   </div>
 
   <!-- Format toolbar -->
-  <div style="background:var(--bg2);border-bottom:1px solid var(--bd);padding:6px 14px;display:flex;gap:4px;flex-shrink:0;overflow-x:auto">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--bd);padding:6px 14px;display:flex;gap:4px;flex-shrink:0;overflow-x:auto;align-items:center">
     <button class="md-btn" onclick="apu_fmt('**','**')" title="Negrita"><b>N</b></button>
     <button class="md-btn" onclick="apu_fmt('*','*')" title="Cursiva"><em>C</em></button>
     <button class="md-btn" onclick="apu_fmt('`','`')" title="Código">{'<>'}</button>
@@ -1825,10 +1880,14 @@ button:active{transform:scale(.97)}
 </div>
 
 <!-- ══ CHAT IA ══ -->
-<div class="screen" id="s-chat" style="display:flex;flex-direction:column;padding-bottom:0 !important">
-  <div style="padding:16px 16px 10px;border-bottom:1px solid var(--bd);flex-shrink:0">
-    <div class="pt" style="margin-bottom:2px">Chat <em>IA</em> 💬</div>
-    <div style="font-size:11px;color:var(--t2)" id="chat-subtitle">Pregunta cualquier duda de tus clases</div>
+<div class="screen" id="s-chat">
+  <div style="padding:12px 16px 10px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;gap:10px">
+    <button onclick="goTo('estudiar-menu')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);padding:2px;line-height:1;flex-shrink:0">←</button>
+    <div>
+      <div class="pt" style="margin-bottom:1px">Chat <em>IA</em> 💬</div>
+      <div style="font-size:11px;color:var(--t2)" id="chat-subtitle">Funciona sin conexión · Conoce todo el temario ESO/Bach</div>
+    </div>
+    <button onclick="chatHistory=[];LumioAI._convCtx={lastTopic:null,lastMat:null,turnCount:0,askedAbout:[]};document.getElementById('chat-msgs').innerHTML='';bChat()" style="margin-left:auto;background:none;border:1px solid var(--bd);color:var(--t3);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font);flex-shrink:0">🗑 Borrar</button>
   </div>
   <div class="chat-msgs" id="chat-msgs">
     <div class="msg msg-ai">¡Hola! 👋 Soy tu tutor de IA de Lumio. Puedes preguntarme cualquier duda de tus clases. ¿En qué te ayudo?</div>
@@ -3156,6 +3215,31 @@ button:active{transform:scale(.97)}
       </div>
       <input type="file" accept="image/*" capture="environment" id="fc-photo-input" style="display:none" onchange="fcPhotoSelected(this)">
     </label>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+      <div style="font-size:11px;color:var(--t2);flex-shrink:0">Idioma del texto:</div>
+      <select id="fc-photo-lang" class="inp" style="flex:1;padding:6px 10px;font-size:12px">
+        <option value="auto">🌐 Detectar automáticamente</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ca">🟡 Català</option>
+        <option value="pt">🇵🇹 Português</option>
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="la">🏛️ Latín</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <div style="font-size:11px;color:var(--t2);flex-shrink:0">Traducir tarjetas a:</div>
+      <select id="fc-photo-translate" class="inp" style="flex:1;padding:6px 10px;font-size:12px">
+        <option value="es">🇪🇸 Español (sin traducir)</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ca">🟡 Català</option>
+        <option value="pt">🇵🇹 Português</option>
+      </select>
+    </div>
     <div style="margin-top:8px;background:rgba(245,197,24,.06);border:1px solid var(--yb);border-radius:10px;padding:8px 12px;font-size:11px;color:var(--t2);line-height:1.5">
       💡 La IA leerá el texto de la foto y generará tarjetas. Funciona mejor con <b style="color:var(--t1)">letra clara y buena iluminación</b>.
     </div>
@@ -3281,6 +3365,7 @@ button:active{transform:scale(.97)}
 <div id="exam-imminent-overlay"></div>
 
 <div id="toast"></div>
+<div id="offline-badge">📵 Sin conexión — IA local activa</div>
 
 <!-- ═══ FAB BAR — stacked above nav ═══ -->
 <div id="fab-bar">
@@ -3296,6 +3381,7 @@ button:active{transform:scale(.97)}
     <span class="fab-label">Nota rápida</span>
     <button class="fab-btn" id="fab-note" onclick="openQuickNote()" aria-label="Nota rápida">📝</button>
   </div>
+
 </div>
 
 
@@ -3677,8 +3763,8 @@ const RETOS=[
 const SECTIONS={
   home:{screens:['home'],labels:[],single:true},
   estudiar:{
-    screens:['estudiar-menu','apuntes','flashcards','pom-screen','testia','examen','resumenia','corrector','dictado','esquemas','mapa','feynman','lectura','comparador','mnemonics','resaltador','simplificador'],
-    labels:['🏠 Menú','📝 Apuntes','🃏 Flashcards','⏱️ Pomodoro','🧠 Test IA','📈 Examen','📄 Resumen IA','✍️ Corrector','🎙️ Dictado','🗂️ Esquemas','🗺️ Mapa','🧑‍🏫 Feynman','🔍 Lectura activa','⚖️ Comparador','🧠 Mnemonics','✨ Resaltador','📖 Simplificar'],
+    screens:['estudiar-menu','chat','apuntes','flashcards','pom-screen','testia','examen','resumenia','corrector','dictado','esquemas','mapa','feynman','lectura','comparador','mnemonics','resaltador','simplificador'],
+    labels:['🏠 Menú','💬 Chat IA','📝 Apuntes','🃏 Flashcards','⏱️ Pomodoro','🧠 Test IA','📈 Examen','📄 Resumen IA','✍️ Corrector','🎙️ Dictado','🗂️ Esquemas','🗺️ Mapa','🧑‍🏫 Feynman','🔍 Lectura activa','⚖️ Comparador','🧠 Mnemonics','✨ Resaltador','📖 Simplificar'],
     landingScreen:'estudiar-menu',
   },
   clase:{
@@ -3739,6 +3825,13 @@ function goTo(id){
   const bldrs={home:bHome,'estudiar-menu':function(){},'agenda-menu':function(){},'clase-menu':function(){},'perfil-menu':function(){},'pom-screen':bPomScreen,stats:bStats,apuntes:bApuntesScreen,materias:bMats,flashcards:bFC,testia:bIA,resumenia:bResumen,mapa:bMapa,chat:bChat,vocab:bVocab,calc:bCalc,conversor:bConv,tabla:bTabla,timeline:bTL,horario:bHorario,planificador:bPlan,examen:bExamen,logros:bLogros,recordatorios:bRecord,amigos:bAmigos,calendario:bCal,sonidos:bSonidos,agenda:bAgenda,vacaciones:bVacaciones,formulas:bFormulas,conjugador:bConjugador,calcnotas:bCalcNotas,ppt:bPPT,esquemas:bEsquemas,dictado:bDictado,corrector:bCorrector,ranking:bRanking,bienestar:bBienestar,anaya:bAnaya,ajustes:bAjustes,feedback:bFeedback,'clase-lista':bClaseLista,'clase-detalle':bClaseDetalle,mural:bMural,anuncios:bAnuncios,'fc-clase':bFcClase,feynman:bFeynman,lectura:bLectura,comparador:bComparador,mnemonics:bMnemonics,resaltador:bResaltador,simplificador:bSimplificador,'semana-view':bSemanaView,'cronometro-deberes':bCronometro,estimador:bEstimador,'notas-historial':bNotasHistorial,heatmap:bHeatmap,informe:bInforme,detector:bDetector,predictor:bPredictor,busqueda:bBusqueda};
   if(bldrs[id])bldrs[id]();
   const fabBar=document.getElementById('fab-bar');if(fabBar)fabBar.classList.toggle('hidden-fab',id==='chat');
+  // Hide bottom nav for chat (full-screen experience)
+  const nav=document.getElementById('nav');
+  if(id==='chat'){
+    if(nav)nav.style.display='none';
+  }else{
+    if(nav)nav.style.display='';
+  }
 }
 
 
@@ -4281,6 +4374,22 @@ function addHistorial(mins){
   if(existing){existing.mins+=Math.round(mins);}
   else{D.historial.unshift({d:iso,fecha:fechaLabel,hora,mins:Math.round(mins),mat:pomMatActiva||'Estudio'});}
   if(D.historial.length>365)D.historial.splice(365); // keep a full year
+  saveState();
+}
+
+
+// ── Update streak whenever user does any study activity ──
+function touchStreak(){
+  const today=_localISO(new Date());
+  const last=localStorage.getItem('lumio_last_study_day')||'';
+  if(last===today) return; // already counted today
+  const yesterday=_localISO(new Date(Date.now()-864e5));
+  if(last===yesterday){
+    D.user.streak=(D.user.streak||0)+1;
+  } else if(last!==today){
+    D.user.streak=1; // reset streak if gap
+  }
+  localStorage.setItem('lumio_last_study_day',today);
   saveState();
 }
 
@@ -5272,14 +5381,14 @@ async function genFlashcardsIA(){
       txt=mat;
     }
 
-    // Route through callClaude (tries Pollinations first, then local engine)
-    const targetLang=document.getElementById('fc-target-lang')?.value||'none';
-    const langInstr=targetLang&&targetLang!=='none'?`IMPORTANTE: Escribe todas las preguntas y respuestas en ${targetLang==='es'?'español':targetLang==='en'?'inglés':targetLang==='fr'?'francés':targetLang==='de'?'alemán':targetLang==='ca'?'catalán':targetLang}. Si el texto fuente está en otro idioma, tradúcelo.`:'Responde en español.';
+    // Route through callClaude — uses Pollinations (with lang/translation) or local fallback
+    const targetLang=document.getElementById('fc-photo-translate')?.value||'es';
+    const langMap={'en':'inglés','fr':'francés','de':'alemán','ca':'catalán','pt':'portugués','it':'italiano'};
+    const langInstr=targetLang&&targetLang!=='es'?`\nIMPORTANTE: Genera las preguntas y respuestas en ${langMap[targetLang]||'español'}.`:'Responde en español.';
     const prompt=`Eres un profesor de ${D.user.curso||'ESO'} experto en ${mat}. Genera exactamente ${fcGenN} flashcards de estudio sobre ${txt?`este contenido: "${txt.slice(0,800)}"`:mat}.
-${langInstr}
 Responde SOLO con JSON sin backticks:
 {"tarjetas":[{"pregunta":"...","respuesta":"..."}]}
-Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 frases.`;
+Las preguntas deben ser concisas. Las respuestas breves y claras, máximo 2 frases.${langInstr}`;
 
     const res=await callClaude(prompt,1500);
     const data=JSON.parse(res.replace(/```json|```/g,'').trim());
@@ -5430,53 +5539,190 @@ function clsMo(id){const el=document.getElementById(id+'-mo');if(el)el.style.dis
 // ── Utilidades de procesado de texto ──
 const AI_STOP = new Set(['que','con','una','por','las','los','del','más','pero','como','este','esta','para','son','sus','hay','han','fue','ser','sin','sobre','entre','cuando','todo','también','mismo','puede','cada','muy','bien','solo','ya','me','se','le','lo','la','él','en','de','a','y','o','un','el','al','es','su','no','si','te','mi','tu','ni','da','tan','tal','vez','así','otro','otra','tanto','sido','sido','hace','hacer','tiene','tener','partir']);
 
-function aiTokens(txt){return txt.toLowerCase().replace(/[^\wáéíóúñü\s]/g,' ').split(/\s+/).filter(w=>w.length>2&&!AI_STOP.has(w));}
-function aiSentences(txt){return (txt.match(/[^.!?\n]+[.!?\n]+/g)||txt.split('\n').filter(s=>s.trim().length>10)).map(s=>s.trim()).filter(s=>s.length>10);}
+// ═══════════════════════════════════════════════════════
+// MOTOR DE IA LOCAL v2 — TextRank + BM25 + NLP español
+// ═══════════════════════════════════════════════════════
 
-// Frecuencia de términos (TF)
+function aiCap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+
+function aiTokens(txt){
+  return txt.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // remove accents for matching
+    .replace(/[^\w\s]/g,' ')
+    .split(/\s+/)
+    .filter(w=>w.length>2&&!AI_STOP.has(w));
+}
+
+// Tokenize keeping accents (for display)
+function aiTokensRich(txt){
+  return txt.toLowerCase().replace(/[^\wáéíóúñüàèìòù\s]/g,' ').split(/\s+/).filter(w=>w.length>2&&!AI_STOP.has(w.normalize('NFD').replace(/[\u0300-\u036f]/g,'')));
+}
+
+function aiSentences(txt){
+  // Split on sentence boundaries, keep meaningful sentences
+  const raw=(txt.match(/[^.!?\n]{8,}[.!?]?/g)||[]);
+  return raw.map(s=>s.trim()).filter(s=>s.length>12&&s.split(' ').length>2);
+}
+
+// BM25-inspired term frequency with IDF boost
 function aiTF(sentences){
-  const tf={};
-  sentences.forEach(s=>aiTokens(s).forEach(w=>{tf[w]=(tf[w]||0)+1;}));
+  const tf={};const df={};const N=sentences.length||1;
+  sentences.forEach(s=>{
+    const words=new Set(aiTokens(s));
+    words.forEach(w=>{df[w]=(df[w]||0)+1;});
+    aiTokens(s).forEach(w=>{tf[w]=(tf[w]||0)+1;});
+  });
+  // Apply IDF: boost rare terms
+  Object.keys(tf).forEach(w=>{
+    const idf=Math.log((N+1)/(df[w]||1)+1);
+    tf[w]=tf[w]*idf;
+  });
   return tf;
 }
 
-// Score TextRank de una oración
+// Score sentence by importance (BM25-like)
 function aiScore(s,tf){
   const words=aiTokens(s);
   if(!words.length)return 0;
-  return words.reduce((sum,w)=>sum+(tf[w]||0),0)/words.length;
+  const sum=words.reduce((acc,w)=>acc+(tf[w]||0),0);
+  // Penalize very short or very long sentences
+  const lenPenalty=words.length<4?0.5:words.length>50?0.7:1;
+  return (sum/words.length)*lenPenalty;
 }
 
-// Capitalizar primera letra
-function aiCap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
-
-// Extraer términos clave del texto (sustantivos/conceptos)
+// Extract key terms ranked by TF-IDF
 function aiKeyTerms(txt,n=15){
-  const tf=aiTF(aiSentences(txt));
-  return Object.entries(tf).sort(([,a],[,b])=>b-a).slice(0,n).map(([w])=>w).filter(w=>w.length>3);
+  const sents=aiSentences(txt);
+  const tf=aiTF(sents);
+  // Prefer multi-word terms (bigrams)
+  const words=aiTokensRich(txt);
+  const bigrams=[];
+  for(let i=0;i<words.length-1;i++){
+    const bg=words[i]+' '+words[i+1];
+    if(words[i].length>3&&words[i+1].length>3)bigrams.push(bg);
+  }
+  const bgFreq={};
+  bigrams.forEach(b=>{bgFreq[b]=(bgFreq[b]||0)+1;});
+  const topBigrams=Object.entries(bgFreq).filter(([,v])=>v>1).sort(([,a],[,b])=>b-a).slice(0,5).map(([k])=>k);
+  const topUnigrams=Object.entries(tf).sort(([,a],[,b])=>b-a).slice(0,n+5).map(([w])=>w).filter(w=>w.length>3);
+  return [...topBigrams,...topUnigrams.filter(w=>!topBigrams.some(b=>b.includes(w)))].slice(0,n);
 }
 
-// Detectar patrones de definición "X es Y", "X: Y", "X se llama Y"
+// Extract definitions: "X es Y", "X: Y", "X se define como Y", "X significa Y"
 function aiDefinitions(txt){
   const defs=[];
   const patterns=[
-    /([A-ZÁÉÍÓÚÑÜ][^,.]{2,30})\s+(?:es|son|significa|representa|consiste en|se define como|se llama)\s+([^.!?]{10,100})/gi,
-    /([A-ZÁÉÍÓÚÑÜ][^:]{2,25}):\s+([^.\n]{10,100})/g,
-    /(?:llamamos|denominamos|conocemos como)\s+([^,.]{3,25})\s+(?:a|al|la|el)\s+([^.!?]{10,80})/gi,
+    /([A-ZÁÉÍÓÚÑÜ][\wáéíóúñü\s-]{2,35})\s+(?:es|son|era|fueron|significa|representa|consiste en|se define como|se llama|se denomina|se conoce como)\s+([^.!?\n]{15,120})/gi,
+    /([A-ZÁÉÍÓÚÑÜ][\wáéíóúñü\s-]{2,30}):\s+([^.\n]{15,120})/g,
+    /(?:llamamos|denominamos|conocemos como|entendemos por)\s+([\wáéíóúñü\s-]{3,30})\s+(?:a|al|la|el|los|las)\s+([^.!?\n]{10,100})/gi,
+    /(?:la|el|los|las)\s+([\wáéíóúñü\s-]{3,30})\s+(?:es|son)\s+(?:la|el|un|una)\s+([^.!?\n]{15,100})/gi,
   ];
+  const seen=new Set();
   patterns.forEach(p=>{
-    let m;
-    while((m=p.exec(txt))!==null&&defs.length<20){
-      defs.push({term:m[1].trim(),def:m[2].trim()});
+    let m;p.lastIndex=0;
+    while((m=p.exec(txt))!==null&&defs.length<25){
+      const term=m[1].trim().toLowerCase();
+      if(!seen.has(term)&&m[2].length>10){seen.add(term);defs.push({term:aiCap(m[1].trim()),def:m[2].trim()});}
     }
   });
   return defs;
 }
 
+// Extract numbered/bulleted lists
+function aiExtractLists(txt){
+  const items=[];
+  const listRx=/(?:^|\n)\s*(?:\d+[.)\-]|[•\-\*]|[a-z][.)]) ?(.{8,120})/gm;
+  let m;
+  while((m=listRx.exec(txt))!==null)items.push(m[1].trim());
+  return items.slice(0,30);
+}
+
+// Extract cause-effect pairs
+function aiCauseEffect(txt){
+  const pairs=[];
+  const rx=/([^.!?\n]{10,80})\s+(?:porque|ya que|debido a|provoca|causa|produce|genera|origina|lleva a|resulta en|implica)\s+([^.!?\n]{10,80})/gi;
+  let m;
+  while((m=rx.exec(txt))!==null&&pairs.length<10){
+    pairs.push({cause:m[1].trim(),effect:m[2].trim()});
+  }
+  return pairs;
+}
+
+// Extract comparisons
+function aiComparisons(txt){
+  const comps=[];
+  const rx=/([\wáéíóúñü\s]{4,30})\s+(?:a diferencia de|mientras que|en cambio|sin embargo|por el contrario|a diferencia)\s+([\wáéíóúñü\s]{4,30})/gi;
+  let m;
+  while((m=rx.exec(txt))!==null&&comps.length<8){
+    comps.push({a:m[1].trim(),b:m[2].trim()});
+  }
+  return comps;
+}
+
+// Extract dates and events
+function aiDates(txt){
+  const dates=[];
+  const rx=/([^.\n]{5,60})\s+(?:en|el|durante|hacia|desde|en el año)\s+((?:\d{4}|siglo\s+[IVX]+|[\d]+\s*[ad]\.?[cC]\.?))/gi;
+  let m;
+  while((m=rx.exec(txt))!==null&&dates.length<10){
+    dates.push({event:m[1].trim(),when:m[2].trim()});
+  }
+  return dates;
+}
+
+// Smart sentence selector for summary (MMR - Maximal Marginal Relevance)
+function aiMMR(sents,tf,n,lambda=0.7){
+  if(!sents.length)return[];
+  const scored=sents.map(s=>({s,score:aiScore(s,tf)}));
+  const selected=[];
+  const remaining=[...scored];
+  // Pick best first
+  remaining.sort((a,b)=>b.score-a.score);
+  selected.push(remaining.shift());
+  while(selected.length<n&&remaining.length){
+    // Score = relevance - similarity to already selected
+    let best=null,bestScore=-Infinity;
+    for(const cand of remaining){
+      const rel=cand.score;
+      const sim=Math.max(...selected.map(s=>{
+        const sw=new Set(aiTokens(s.s));
+        const cw=aiTokens(cand.s);
+        const inter=cw.filter(w=>sw.has(w)).length;
+        return inter/(sw.size+cw.length+1);
+      }));
+      const mmr=lambda*rel-(1-lambda)*sim;
+      if(mmr>bestScore){bestScore=mmr;best=cand;}
+    }
+    if(!best)break;
+    selected.push(best);
+    remaining.splice(remaining.indexOf(best),1);
+  }
+  // Return in original order
+  return selected.map(x=>x.s).sort((a,b)=>sents.indexOf(a)-sents.indexOf(b));
+}
+
 // callClaude — intenta Pollinations primero, luego motor local
 async function callClaude(prompt, maxTokens=1500){
-  await new Promise(r=>setTimeout(r,100));
+  await new Promise(r=>setTimeout(r,50));
   const p=prompt.toLowerCase();
+  // Always compute local result as fast fallback
+  const _localFallback=()=>{
+    const isFlashcards=p.includes('tarjetas')&&p.includes('json');
+    const isTest=p.includes('preguntas')&&(p.includes('opciones')||p.includes('test'))&&p.includes('json');
+    const isMapa=p.includes('ramas')&&p.includes('json');
+    const isPPT=p.includes('diapositivas')&&p.includes('json');
+    const isResumen=p.includes('resume')||p.includes('bullet')||(p.includes('texto:')&&!p.includes('json'));
+    const isEsquema=p.includes('esquema')||p.includes('jerarquic');
+    const isCorrector=p.includes('correg')||p.includes('redacción')||p.includes('redaccion');
+    if(isFlashcards){const m=prompt.match(/experto en ([^.\n]+)\./);const mat=m?m[1].trim():'General';const n=parseInt(prompt.match(/exactamente (\d+)/)?.[1])||5;const txt=prompt.match(/contenido: "([^"]+)"/)?.[1]||mat;const cards=aiGenFlashcards(txt,mat,n);return JSON.stringify({tarjetas:cards});}
+    if(isTest){const txt=prompt.match(/TEXTO: ([\s\S]+)$/)?.[1]||'';const n=parseInt(prompt.match(/(\d+) preguntas/)?.[1])||3;const mat=prompt.match(/sobre "([^"]+)"/)?.[1]||'General';return JSON.stringify({preguntas:aiGenerateTest(txt||mat,n,mat)});}
+    if(isMapa){const tema=prompt.match(/sobre "([^"]+)"/)?.[1]||'Tema';const terms=aiKeyTerms(prompt,20);const colors=['#f5c518','#4ade80','#60a5fa','#fb923c'];const ramas=terms.slice(0,4).map((t,i)=>({titulo:aiCap(t),color:colors[i],nodos:terms.slice(i*3+4,(i+1)*3+4).map(aiCap)}));return JSON.stringify({centro:aiCap(tema),ramas});}
+    if(isPPT){const tema=prompt.match(/sobre "([^"]+)"/)?.[1]||'Trabajo';const n=parseInt(prompt.match(/(\d+) diapositivas/)?.[1])||5;return JSON.stringify(aiGenPPT(tema,'',n));}
+    if(isResumen){const txt=prompt.match(/TEXTO:\n([\s\S]+)$/)?.[1]||prompt;return aiSummarize(txt,8);}
+    if(isEsquema){const txt=prompt.match(/TEXTO:\n([\s\S]+)$/)?.[1]||prompt;return aiGenEsquema(txt);}
+    if(isCorrector){const txt=prompt.match(/REDACCIÓN:\n([\s\S]+)$/)?.[1]||'';return aiCorregirRedaccion(txt,p);}
+    return aiChatLocal(prompt.split('\n').pop()||prompt);
+  };
 
   // Detectar tipo por contenido del prompt para routing eficiente
   const isFlashcards = p.includes('tarjetas') && p.includes('json');
@@ -5507,15 +5753,7 @@ async function callClaude(prompt, maxTokens=1500){
   }
 
   // Fallbacks locales si Pollinations no responde
-  if(isFlashcards){const m=prompt.match(/experto en ([^.\n]+)\./);const mat=m?m[1].trim():'General';const n=parseInt(prompt.match(/exactamente (\d+)/)?.[1])||5;const txt=prompt.match(/contenido: "([^"]+)"/)?.[1]||mat;const cards=aiGenFlashcards(txt,mat,n);return JSON.stringify({tarjetas:cards});}
-  if(isTest){const txt=prompt.match(/TEXTO: ([\s\S]+)$/)?.[1]||'';const n=parseInt(prompt.match(/(\d+) preguntas/)?.[1])||3;const mat=prompt.match(/sobre "([^"]+)"/)?.[1]||'General';return JSON.stringify({preguntas:aiGenerateTest(txt||mat,n,mat)});}
-  if(isMapa){const tema=prompt.match(/sobre "([^"]+)"/)?.[1]||'Tema';const terms=aiKeyTerms(prompt,20);const colors=['#f5c518','#4ade80','#60a5fa','#fb923c'];const ramas=terms.slice(0,4).map((t,i)=>({titulo:aiCap(t),color:colors[i],nodos:terms.slice(i*3+4,(i+1)*3+4).map(aiCap)}));return JSON.stringify({centro:aiCap(tema),ramas});}
-  if(isPPT){const tema=prompt.match(/sobre "([^"]+)"/)?.[1]||'Trabajo';const n=parseInt(prompt.match(/(\d+) diapositivas/)?.[1])||5;return JSON.stringify(aiGenPPT(tema,'',n));}
-  if(isResumen){const txt=prompt.match(/TEXTO:\n([\s\S]+)$/)?.[1]||prompt;return aiSummarize(txt,8);}
-  if(isEsquema){const txt=prompt.match(/TEXTO:\n([\s\S]+)$/)?.[1]||prompt;return aiGenEsquema(txt);}
-  if(isCorrector||isSpell){const txt=prompt.match(/REDACCIÓN:\n([\s\S]+)$/)?.[1]||'';return aiCorregirRedaccion(txt,p);}
-  // Chat genérico
-  return aiChatLocal(prompt.split('\n').pop()||prompt);
+  return _localFallback();
 }
 
 // Corrector de redacciones local
@@ -5557,59 +5795,77 @@ async function genTest(){
 }
 
 function aiGenerateTest(txt,n,mat){
-  const sentences=aiSentences(txt);
-  const tf=aiTF(sentences);
-  const terms=aiKeyTerms(txt,n*4);
-  const defs=aiDefinitions(txt);
   const questions=[];
   const used=new Set();
+  function addQ(q,opts,correct,explanation=''){
+    const key=q.slice(0,30).toLowerCase();
+    if(used.has(key)||!opts.every(o=>o))return;
+    used.add(key);
+    questions.push({pregunta:q,opciones:opts,correcta:correct,explicacion:explanation});
+  }
 
-  // Tipo 1: Preguntas de definición
+  const sents=aiSentences(txt||mat);
+  const tf=aiTF(sents);
+  const defs=aiDefinitions(txt||'');
+  const dates=aiDates(txt||'');
+  const lists=aiExtractLists(txt||'');
+  const causeEffects=aiCauseEffect(txt||'');
+
+  // TYPE 1: Definition questions
   defs.forEach(({term,def})=>{
     if(questions.length>=n)return;
-    if(used.has(term.toLowerCase()))return;
-    used.add(term.toLowerCase());
-    const distractors=terms.filter(t=>t!==term.toLowerCase()).slice(0,3).map(t=>aiCap(t));
-    const ops={};
-    const allOpts=[aiCap(term),...distractors].slice(0,4);
-    shuffle(allOpts).forEach((v,i)=>ops[String.fromCharCode(65+i)]=v);
-    const correctaLetra=Object.keys(ops).find(k=>ops[k]===aiCap(term));
-    questions.push({id:questions.length+1,pregunta:`¿Cómo se llama lo siguiente? "${def.slice(0,80)}"`,opciones:ops,correcta:correctaLetra,explicacion:`"${term}" es: ${def.slice(0,80)}`});
+    const wrong=aiKeyTerms(txt,20).filter(w=>w!==term.toLowerCase()&&w.length>3).slice(0,3).map(aiCap);
+    if(wrong.length>=3)addQ(`¿Qué es ${term}?`,[def.slice(0,80),...wrong].sort(()=>Math.random()-.5),def.slice(0,80),`${term}: ${def}`);
   });
 
-  // Tipo 2: Completar oración (fill-in-the-blank)
-  const scored=sentences.map(s=>({s,score:aiScore(s,tf)})).sort((a,b)=>b.score-a.score);
-  scored.forEach(({s})=>{
+  // TYPE 2: Date/event questions
+  dates.forEach(({event,when})=>{
     if(questions.length>=n)return;
-    const words=aiTokens(s);
-    const importantWords=words.filter(w=>w.length>4&&!used.has(w)&&terms.includes(w));
-    if(!importantWords.length)return;
-    const target=importantWords[0];
-    used.add(target);
-    const displaySentence=s.replace(new RegExp('\\b'+target+'\\b','i'),'_____');
-    if(!displaySentence.includes('_____'))return;
-    const distractors=terms.filter(t=>t!==target).slice(0,3).map(aiCap);
-    const ops={};
-    shuffle([aiCap(target),...distractors].slice(0,4)).forEach((v,i)=>ops[String.fromCharCode(65+i)]=v);
-    const correctaLetra=Object.keys(ops).find(k=>ops[k]===aiCap(target));
-    questions.push({id:questions.length+1,pregunta:`Completa: "${displaySentence.slice(0,100)}"`,opciones:ops,correcta:correctaLetra,explicacion:`La respuesta correcta es "${aiCap(target)}"`});
+    const fakeYears=[String(parseInt(when)+15||'1900'),String(parseInt(when)-20||'1800'),String(parseInt(when)+50||'2000')].filter(y=>y!==when);
+    if(fakeYears.length>=3)addQ(`¿Cuándo ocurrió: "${event.slice(0,60)}"?`,[when,...fakeYears.slice(0,3)].sort(()=>Math.random()-.5),when,`Ocurrió en ${when}`);
   });
 
-  // Tipo 3: Verdadero/Falso (invertimos datos de una oración)
+  // TYPE 3: Cause-effect
+  causeEffects.forEach(({cause,effect})=>{
+    if(questions.length>=n)return;
+    const wrongs=sents.filter(s=>s!==effect&&s.length<100).slice(0,3).map(s=>s.slice(0,70));
+    if(wrongs.length>=3)addQ(`¿Qué provoca o implica "${cause.slice(0,50)}"?`,[effect.slice(0,70),...wrongs].sort(()=>Math.random()-.5),effect.slice(0,70),`Causa: ${cause}. Efecto: ${effect}`);
+  });
+
+  // TYPE 4: List completion
+  if(lists.length>3){
+    const idx=Math.floor(Math.random()*lists.length);
+    const item=lists[idx];
+    const others=lists.filter((_,i)=>i!==idx).slice(0,3);
+    if(others.length>=3&&questions.length<n)addQ(`¿Cuál de estas opciones es correcta?`,[item,...others].sort(()=>Math.random()-.5),item,`Respuesta: ${item}`);
+  }
+
+  // TYPE 5: Blank fill from high-value sentences
   if(questions.length<n){
-    scored.slice(0,10).forEach(({s})=>{
+    const topSents=sents.map(s=>({s,sc:aiScore(s,tf)})).sort((a,b)=>b.sc-a.sc).slice(0,10);
+    topSents.forEach(({s})=>{
       if(questions.length>=n)return;
-      const words=aiTokens(s);if(words.length<5)return;
-      // Falsificar: reemplazar un término clave por otro del texto
-      const swapTarget=words.find(w=>terms.includes(w)&&!used.has(w+'_tf'));
-      if(!swapTarget)return;
-      const replacement=terms.find(t=>t!==swapTarget);
-      if(!replacement)return;
-      const falseSentence=s.replace(new RegExp('\\b'+swapTarget+'\\b','i'),aiCap(replacement));
-      const isTrue=Math.random()>0.5;
-      const ops={'A':'Verdadero','B':'Falso','C':'Depende del contexto','D':'No está en el texto'};
-      questions.push({id:questions.length+1,pregunta:`¿Es correcto? "${(isTrue?s:falseSentence).slice(0,100)}"`,opciones:ops,correcta:isTrue?'A':'B',explicacion:isTrue?`Correcto. ${s.slice(0,60)}`:`Incorrecto. ${s.slice(0,60)}`});
-      used.add(swapTarget+'_tf');
+      const words=aiTokensRich(s);
+      const keyWord=words.filter(w=>w.length>4&&(tf[w.normalize('NFD').replace(/[\u0300-\u036f]/g,'')]||0)>1)[0];
+      if(!keyWord)return;
+      const blank=s.replace(new RegExp(keyWord,'i'),'_____');
+      const wrong=aiKeyTerms(txt,15).filter(w=>w!==keyWord).slice(0,3).map(aiCap);
+      if(wrong.length>=3)addQ(blank,[aiCap(keyWord),...wrong].sort(()=>Math.random()-.5),aiCap(keyWord),`La respuesta correcta es: ${keyWord}`);
+    });
+  }
+
+  // TYPE 6: True/false
+  if(questions.length<n&&sents.length>2){
+    sents.slice(0,5).forEach(s=>{
+      if(questions.length>=n)return;
+      const words=aiTokensRich(s);
+      const key=words.find(w=>w.length>4);
+      if(!key)return;
+      const alt=aiKeyTerms(txt,20).find(w=>w!==key&&w.length>3);
+      if(!alt)return;
+      const falseVer=aiCap(s.replace(new RegExp(key,'i'),aiCap(alt)).slice(0,120));
+      const trueVer=aiCap(s.slice(0,120));
+      addQ('¿Cuál de estas afirmaciones es CORRECTA?',[trueVer,falseVer,'Ninguna de las anteriores','Ambas son correctas'].sort(()=>Math.random()-.5),trueVer,`La afirmación correcta: ${trueVer}`);
     });
   }
 
@@ -5636,17 +5892,17 @@ async function genResumen(){
 }
 
 function aiSummarize(txt,n=8){
+  if(!txt||txt.trim().length<20)return'Sin texto para resumir.';
   const sents=aiSentences(txt);
-  if(sents.length<=n)return sents.map(s=>'• '+s).join('\n');
+  if(!sents.length)return txt.slice(0,300);
   const tf=aiTF(sents);
-  // Puntuar: importancia + posición (primera y última partes valen más)
-  const total=sents.length;
-  const scored=sents.map((s,i)=>({s,score:aiScore(s,tf)*(1+(i<3||i>total-4?0.5:0))}));
-  scored.sort((a,b)=>b.score-a.score);
-  const top=scored.slice(0,n);
-  // Restaurar orden original
-  const origOrder=sents.filter(s=>top.some(t=>t.s===s));
-  return origOrder.map(s=>'• '+aiCap(s.trim())).join('\n');
+  // Use MMR for diverse summary
+  const best=aiMMR(sents,tf,Math.min(n,sents.length));
+  // Also extract key definitions as extra bullets
+  const defs=aiDefinitions(txt).slice(0,3);
+  const defBullets=defs.filter(d=>!best.some(s=>s.toLowerCase().includes(d.term.toLowerCase().slice(0,6)))).map(d=>`**${d.term}**: ${d.def.slice(0,80)}`);
+  const bullets=best.map(s=>'• '+aiCap(s.trim().replace(/^[-•*]\s*/,'')));
+  return[...bullets,...defBullets.map(b=>'• '+b)].join('\n');
 }
 
 // ── Missing builder stubs ──
@@ -5761,19 +6017,30 @@ function renderMindMap(data){
 // CHAT IA — respuestas basadas en apuntes + patrones
 // ════════════════════════════════════════════════════════
 let chatHistory=[];
+
+function appendMsg(text, role){
+  const msgs=document.getElementById('chat-msgs');
+  if(!msgs)return null;
+  const div=document.createElement('div');
+  div.className='msg msg-'+role;
+  div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
 function bChat(){
   const msgs=document.getElementById('chat-msgs');
   if(msgs&&msgs.children.length===0){
-    const greeting=document.createElement('div');
-    greeting.className='msg msg-ai';
-    greeting.textContent=`¡Hola, ${D.user.name}! 👋 Soy tu tutor IA de Lumio para ${D.user.curso||'ESO'}. Tengo acceso a tus apuntes y flashcards. Puedes preguntarme cualquier cosa de ${D.mats.map(m=>m.n).slice(0,4).join(', ')} y más. ¿En qué te ayudo?`;
-    msgs.appendChild(greeting);
+    try{resetChatCtx();}catch(e){}
+    appendMsg(LumioAI._greeting(),'ai');
   }
 }
 
 // ── Sistema de IA: Pollinations.ai (gratis, sin key) + fallback local ──
 async function callAI(systemPrompt, userMsg, maxTokens=600){
-  // Pollinations.ai — API gratuita real (GPT-4o-mini), sin registro, sin key
+  // Try Pollinations if online, else use local immediately
+  if(!navigator.onLine) return aiChatLocal(userMsg);
   try{
     const res=await fetch('https://text.pollinations.ai/openai',{
       method:'POST',
@@ -5782,20 +6049,20 @@ async function callAI(systemPrompt, userMsg, maxTokens=600){
         model:'openai',
         messages:[
           {role:'system',content:systemPrompt},
-          ...chatHistory.slice(-6),
+          ...chatHistory.slice(-8),
           {role:'user',content:userMsg}
         ],
         max_tokens:maxTokens,
         seed:Math.floor(Math.random()*9999)
-      })
+      }),
+      signal:AbortSignal.timeout(12000)
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data=await res.json();
     const text=data.choices?.[0]?.message?.content||data.output||'';
-    if(text) return text;
-    throw new Error('Respuesta vacía');
+    if(text&&text.trim().length>2) return text;
+    throw new Error('empty');
   }catch(e){
-    // Fallback local si no hay internet
     return aiChatLocal(userMsg);
   }
 }
@@ -5829,7 +6096,9 @@ Adapta el nivel a ${D.user.curso||'ESO'}. Si preguntan algo de sus apuntes, úsa
 
   try{
     const res=await callAI(systemPrompt, msg, 500);
-    typing.textContent=res;
+    // Render basic markdown: **bold**, *italic*, newlines
+    const rendered=res.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*]+)\*/g,'<i>$1</i>').replace(/\n/g,'<br>').replace(/`([^`]+)`/g,'<code style="background:var(--bg2);padding:1px 5px;border-radius:4px;font-family:monospace">$1</code>');
+    typing.innerHTML=rendered;
     chatHistory.push({role:'assistant',content:res});
     if(chatHistory.length>20)chatHistory=chatHistory.slice(-14);
   }catch(e){
@@ -5839,24 +6108,674 @@ Adapta el nivel a ${D.user.curso||'ESO'}. Si preguntan algo de sus apuntes, úsa
   if(msgs)msgs.scrollTop=msgs.scrollHeight;
 }
 
-// ── Fallback local (sin internet) ──
-function aiChatLocal(msg){
-  const q=msg.toLowerCase();
-  for(const mat of D.mats){
-    const notes=apuntesDB[mat.n]||'';
-    if(notes.length>50){
-      const sents=aiSentences(notes);
-      const msgTokens=aiTokens(msg);
-      const match=sents.find(s=>msgTokens.some(t=>s.toLowerCase().includes(t)&&t.length>4));
-      if(match)return`📝 Según tus apuntes de ${mat.n}: "${match.slice(0,180)}"`;
+// ════════════════════════════════════════════════════════════════════════════
+// LUMIO LOCAL AI ENGINE v3 — Motor conversacional 100% offline
+// Sin dependencias externas. ~1000 líneas de lógica de IA local.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── BASE DE CONOCIMIENTO CURRICULAR (ESO / Bachillerato España) ──────────
+const LUMIO_KB = {
+
+  // MATEMÁTICAS
+  matematicas: {
+    conceptos: {
+      "número primo": "Un número primo es aquel que solo es divisible entre 1 y él mismo. Ejemplos: 2, 3, 5, 7, 11, 13...",
+      "mínimo común múltiplo": "El MCM de varios números es el menor número que es múltiplo de todos ellos. Se calcula descomponiendo en factores primos y tomando los de mayor exponente.",
+      "máximo común divisor": "El MCD es el mayor número que divide exactamente a todos los números dados. Se calcula con factores primos comunes al menor exponente.",
+      "fracción": "Una fracción representa partes de un entero: a/b donde a es el numerador y b el denominador. Para sumar fracciones se igualan los denominadores.",
+      "ecuación de primer grado": "Ecuación con incógnita x de forma ax+b=0. Se despeja x: x=-b/a. Ejemplo: 2x+4=0 → x=-2",
+      "ecuación de segundo grado": "ax²+bx+c=0. Se resuelve con la fórmula: x=(-b±√(b²-4ac))/2a. El discriminante b²-4ac indica el número de soluciones.",
+      "teorema de pitágoras": "En un triángulo rectángulo: a²+b²=c², donde c es la hipotenusa (lado opuesto al ángulo recto).",
+      "área triángulo": "Área = (base × altura) / 2",
+      "área círculo": "Área = π × r². Perímetro (circunferencia) = 2πr",
+      "porcentaje": "Para calcular el x% de N: N×x/100. Para pasar a decimal: dividir entre 100.",
+      "función lineal": "f(x)=mx+b. La pendiente m indica la inclinación y b el punto de corte con el eje Y.",
+      "sistema de ecuaciones": "Dos ecuaciones con dos incógnitas. Métodos: sustitución, igualación, reducción (suma/resta).",
+      "logaritmo": "log_b(x)=n significa b^n=x. Propiedades: log(ab)=log a+log b; log(a/b)=log a-log b; log(a^n)=n·log a",
+      "derivada": "Mide la tasa de cambio de una función. Reglas: (x^n)'=nx^(n-1); (sin x)'=cos x; (cos x)'=-sin x; (e^x)'=e^x",
+      "integral": "La integral es la operación inversa a la derivada. ∫x^n dx = x^(n+1)/(n+1) + C. El área bajo una curva.",
+      "trigonometría": "sen(α)=cateto opuesto/hipotenusa; cos(α)=cateto adyacente/hipotenusa; tan(α)=sen/cos",
+      "probabilidad": "P(A)=casos favorables/casos totales. Entre 0 y 1. P(A∪B)=P(A)+P(B)-P(A∩B)",
+      "estadística": "Media=suma/n; Mediana=valor central; Moda=valor más frecuente; Desviación típica=dispersión respecto a la media",
+    },
+    formulas: [
+      "Área rectángulo = base × altura",
+      "Área triángulo = (b×h)/2",
+      "Área círculo = π×r²",
+      "Volumen esfera = (4/3)πr³",
+      "Volumen cubo = a³",
+      "Teorema Pitágoras: a²+b²=c²",
+      "Ecuación 2º grado: x=(-b±√(b²-4ac))/2a",
+      "Interés simple: I=C×r×t",
+    ]
+  },
+
+  // FÍSICA Y QUÍMICA
+  fisicaquimica: {
+    conceptos: {
+      "velocidad": "v = espacio/tiempo (v=e/t). Unidades: m/s o km/h. La velocidad media es la distancia total entre el tiempo total.",
+      "aceleración": "a = (v_final - v_inicial)/tiempo. Unidades: m/s². La aceleración de la gravedad en la Tierra es g=9,8 m/s².",
+      "fuerza": "F = m × a (Segunda ley de Newton). Unidades: Newton (N). La masa se mide en kg.",
+      "energía cinética": "E_c = (1/2)mv². Depende de la masa y la velocidad del objeto.",
+      "energía potencial": "E_p = m × g × h. Depende de la masa, la gravedad y la altura.",
+      "trabajo": "W = F × d × cos(θ). Trabajo realizado por una fuerza al desplazar un objeto.",
+      "presión": "P = F/A. Presión es fuerza entre área. Unidades: Pascal (Pa). La presión atmosférica es ~101325 Pa.",
+      "densidad": "ρ = m/V (masa entre volumen). Unidades: kg/m³ o g/cm³.",
+      "calor": "Q = m × c × ΔT. Calor absorbido o cedido por un cuerpo. c es el calor específico.",
+      "átomo": "Partícula fundamental de la materia. Compuesto de núcleo (protones y neutrones) y electrones en órbita.",
+      "enlace covalente": "Compartición de electrones entre átomos no metálicos. Ej: H₂O, CO₂.",
+      "enlace iónico": "Transferencia de electrones entre metal y no metal. Ej: NaCl (sal común).",
+      "tabla periódica": "Organiza los elementos por número atómico. Grupos (columnas) tienen propiedades similares. Períodos (filas) = capas electrónicas.",
+      "pH": "Medida de acidez: pH<7 ácido, pH=7 neutro, pH>7 básico. pH = -log[H⁺].",
+      "ley de boyle": "A temperatura constante: P₁V₁ = P₂V₂. Presión y volumen son inversamente proporcionales.",
+      "ley de charles": "A presión constante: V₁/T₁ = V₂/T₂. Volumen y temperatura son directamente proporcionales.",
+      "reacción química": "Proceso donde reactivos se transforman en productos. Se conserva la masa (Lavoisier). Se equilibran las ecuaciones.",
+      "oxido-reducción": "Reacción con transferencia de electrones. El oxidante gana electrones (se reduce), el reductor los pierde (se oxida).",
+      "movimiento rectilíneo uniforme": "MRU: velocidad constante, sin aceleración. e = v × t",
+      "movimiento rectilíneo uniformemente acelerado": "MRUA: aceleración constante. e = v₀t + (1/2)at². v = v₀ + at",
     }
+  },
+
+  // BIOLOGÍA
+  biologia: {
+    conceptos: {
+      "célula": "Unidad básica de la vida. Célula procariota (sin núcleo, ej: bacterias) y eucariota (con núcleo, ej: células animales y vegetales).",
+      "mitosis": "División celular que produce 2 células hijas genéticamente idénticas. Fases: profase, metafase, anafase, telofase.",
+      "meiosis": "División celular que produce 4 células hijas con la mitad de cromosomas (gametos). Fundamental para la reproducción sexual.",
+      "adn": "Ácido desoxirribonucleico. Molécula que contiene la información genética. Doble hélice compuesta de nucleótidos (A-T, G-C).",
+      "gen": "Segmento de ADN que codifica una proteína. La expresión génica sigue el dogma central: ADN→ARN→proteína.",
+      "fotosíntesis": "6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂. Las plantas convierten luz solar en glucosa. Ocurre en los cloroplastos.",
+      "respiración celular": "C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP. Libera energía de la glucosa. Ocurre en las mitocondrias.",
+      "ecosistema": "Sistema formado por los seres vivos (biocenosis) y su entorno físico (biotopo). Incluye ciclos de materia y flujo de energía.",
+      "cadena trófica": "Serie de organismos donde cada uno se alimenta del anterior: productores → consumidores → descomponedores.",
+      "evolución": "Cambio en las especies a lo largo del tiempo. Teoría de Darwin: selección natural. Mutaciones y selección crean nuevas especies.",
+      "sistema nervioso": "Sistema nervioso central (cerebro + médula espinal) y periférico (nervios). Transmite impulsos eléctricos (potenciales de acción).",
+      "sistema circulatorio": "El corazón bombea sangre por vasos sanguíneos. Arteriasy llevan sangre oxigenada; venas la retornan.",
+      "homeostasis": "Capacidad del organismo de mantener condiciones internas estables (temperatura, pH, glucosa).",
+      "herencia mendeliana": "Leyes de Mendel: 1ª uniformidad F1, 2ª segregación, 3ª independencia. Alelos dominantes y recesivos.",
+    }
+  },
+
+  // HISTORIA
+  historia: {
+    conceptos: {
+      "revolución francesa": "1789. Caída del Antiguo Régimen. Causas: crisis económica, desigualdad estamental. Consecuencias: Declaración de Derechos del Hombre, República, Terror, Napoleón.",
+      "revolución industrial": "Siglo XVIII-XIX, Inglaterra. Máquina de vapor, fábricas, proletariado, capitalismo industrial. Cambio de sociedad agraria a industrial.",
+      "primera guerra mundial": "1914-1918. Causas: nacionalismo, imperialismo, asesinato Archiduque Francisco Fernando. Aliados vs Imperios Centrales. Consecuencias: Tratado de Versalles.",
+      "segunda guerra mundial": "1939-1945. Invasión de Polonia por Hitler. Aliados (EEUU, URSS, UK, Francia) vs Eje (Alemania, Italia, Japón). Holocausto. ONU.",
+      "guerra fría": "1945-1991. Tensión EEUU vs URSS. Sin conflicto directo. Carrera armamentística, espacial. Muro de Berlín. Caída URSS 1991.",
+      "guerra civil española": "1936-1939. República vs Nacionales (Franco). Apoyo de Hitler y Mussolini a Franco. Dictadura hasta 1975.",
+      "transición española": "1975-1978. Muerte de Franco, Juan Carlos I, Constitución 1978. Adolfo Suárez, amnistía, legalización partidos.",
+      "antigua roma": "753 a.C. - 476 d.C. República (Senado) → Imperio (César, Augusto). Derecho romano, latín, ingeniería (acueductos, calzadas).",
+      "edad media": "S.V-XV. Feudalismo, señores y siervos, iglesia poderosa. Cruzadas, Reconquista, Peste Negra (1348).",
+      "renacimiento": "S.XIV-XVI. Italia. Humanismo, vuelta a la Antigüedad clásica. Da Vinci, Miguel Ángel, Erasmo. Imprenta (Gutenberg 1450).",
+      "ilustración": "S.XVIII. Razón, libertad, igualdad. Voltaire, Rousseau, Montesquieu. Enciclopedia. Base ideológica de las revoluciones.",
+      "imperialismo": "S.XIX. Europa coloniza África y Asia. Reparto de África (1885). Motivaciones: materias primas, mercados, prestigio.",
+    }
+  },
+
+  // GEOGRAFÍA
+  geografia: {
+    conceptos: {
+      "clima mediterráneo": "Veranos secos y calurosos, inviernos suaves y lluviosos. Vegetación: encinas, alcornoques, olivos. España, sur Francia, Italia.",
+      "clima oceánico": "Lluvias todo el año, temperaturas suaves. Norte España (Galicia, Cantabria, País Vasco), norte Europa.",
+      "clima continental": "Veranos calurosos, inviernos muy fríos, poca lluvia. Interior de los continentes, Meseta española.",
+      "relieve español": "Meseta central (submeseta norte y sur), sistemas montañosos (Pirineos, Cantábrica, Ibérica, Bética), depresiones (Ebro, Guadalquivir).",
+      "ríos de españa": "Vertiente atlántica: Duero, Tajo, Guadiana, Guadalquivir, Miño. Vertiente mediterránea: Ebro, Júcar, Segura.",
+      "unión europea": "27 países miembros. Euro (moneda común). Parlamento Europeo, Comisión, Consejo. Libre circulación de personas, bienes y capitales.",
+      "globalización": "Interconexión mundial económica, cultural y política. Multinacionales, internet, migraciones, cultura global.",
+      "demografía": "Estudio de la población. Tasa de natalidad, mortalidad, crecimiento natural. Pirámide de población.",
+      "desarrollo sostenible": "Satisfacer necesidades presentes sin comprometer las futuras. ODS (Objetivos de Desarrollo Sostenible) de la ONU.",
+    }
+  },
+
+  // LENGUA Y LITERATURA
+  lengua: {
+    conceptos: {
+      "sintagma nominal": "Grupo de palabras con un sustantivo como núcleo. Ej: 'El gran libro azul'. Puede ser sujeto o complemento.",
+      "sintagma verbal": "Grupo de palabras con un verbo como núcleo. Ej: 'Come una manzana'. Es el predicado de la oración.",
+      "oración compuesta": "Tiene más de un verbo conjugado. Coordinada (y, pero, o) o Subordinada (que, porque, cuando, si).",
+      "figuras retóricas": "Metáfora (comparación implícita), Símil (comparación con 'como'), Hipérbole (exageración), Personificación (cualidades humanas a cosas).",
+      "narrador": "Omnisciente (lo sabe todo), 1ª persona (protagonista), 2ª persona (tú), 3ª persona (él/ella).",
+      "sustantivo": "Nombre de personas, animales o cosas. Género (masculino/femenino) y número (singular/plural). Propio o común.",
+      "adjetivo": "Califica o determina al sustantivo. Concuerda en género y número. Grados: positivo, comparativo, superlativo.",
+      "verbo": "Expresa acción o estado. Conjugado en persona, número, tiempo y modo. Transitivos e intransitivos.",
+      "complemento directo": "Sobre quien recae la acción del verbo transitivo. Se sustituye por lo/la/los/las. '¿Qué/a quién + verbo?'",
+      "complemento indirecto": "A quien se dirige la acción. Se sustituye por le/les. '¿A quién/para quién + verbo?'",
+      "gerundio": "Forma no personal del verbo (-ando, -iendo). Expresa acción simultánea o en desarrollo.",
+    }
+  },
+
+  // INGLÉS
+  ingles: {
+    conceptos: {
+      "present simple": "Acciones habituales o verdades generales. He/she/it: añade -s. I work, he works. Negación: don't/doesn't + infinitivo.",
+      "past simple": "Acciones completadas en el pasado. Verbos regulares: +ed (worked). Irregulares: go→went, have→had, see→saw.",
+      "present perfect": "Acciones pasadas con relevancia presente. have/has + participio. I have seen, he has gone. Con: already, yet, just, ever, never.",
+      "conditional": "1st conditional (real): if + present, will + infinitive. 2nd (unreal): if + past simple, would + infinitive.",
+      "passive voice": "El sujeto recibe la acción. To be + past participle. 'The book was written by her.'",
+      "reported speech": "Estilo indirecto. Presente→pasado. 'I am tired' → He said he was tired.",
+      "modal verbs": "can (poder/capacidad), must (deber/obligación), should (consejo), may/might (posibilidad), would (condicional).",
+      "relative clauses": "who (personas), which (cosas), whose (posesivo), where (lugar), when (tiempo).",
+      "phrasal verbs": "Verbo + preposición con nuevo significado. give up (rendirse), look up (buscar), turn on (encender), find out (descubrir).",
+    }
+  },
+
+  // QUÍMICA ORGÁNICA
+  quimica: {
+    conceptos: {
+      "hidrocarburo": "Compuesto de carbono e hidrógeno. Alcanos (C-C, saturados), Alquenos (C=C), Alquinos (C≡C), Aromáticos (benceno).",
+      "isómero": "Misma fórmula molecular, distinta estructura. Isómeros de cadena, posición o función.",
+      "reacción de combustión": "Hidrocarburo + O₂ → CO₂ + H₂O + energía. Completa si hay suficiente O₂.",
+      "alcohol": "Grupo -OH. Metanol (CH₃OH), Etanol (C₂H₅OH). Se oxidan a aldehídos y ácidos.",
+      "ácido carboxílico": "Grupo -COOH. Ácido acético (vinagre). Reaccionan con alcoholes para formar ésteres.",
+      "polímero": "Macromolécula formada por monómeros repetidos. Polietileno, nylon, proteínas, ADN son polímeros.",
+    }
+  },
+
+  // FILOSOFÍA
+  filosofia: {
+    conceptos: {
+      "metafísica": "Rama de la filosofía que estudia la naturaleza del ser y la realidad. Preguntas sobre qué existe y por qué.",
+      "epistemología": "Estudio del conocimiento: qué podemos conocer, cómo y cuáles son sus límites.",
+      "ética": "Estudio de la moral y la conducta humana. Ética descriptiva (qué hacemos), normativa (qué debemos hacer).",
+      "platón": "Mundo de las Ideas: la realidad es el mundo ideal, lo sensible es su copia. Alegoría de la caverna. Alma inmortal.",
+      "aristóteles": "Empirismo: conocemos por los sentidos. Lógica formal. Ética de la virtud (término medio). Política.",
+      "kant": "Imperativo categórico: 'Actúa como si tu acción fuera ley universal'. Crítica de la Razón Pura.",
+      "descartes": "'Cogito ergo sum' (pienso luego existo). Dualismo mente-cuerpo. Duda metódica.",
+      "nietzsche": "Voluntad de poder, Superman (Übermensch), Eterno Retorno. Crítica de la moral cristiana.",
+    }
+  },
+
+
+  // MATEMÁTICAS AVANZADAS
+  matematicasAvanzadas: {
+    conceptos: {
+      "límite": "El límite de f(x) cuando x→a es el valor al que se aproxima f(x). lim(x→0) sen(x)/x = 1. Se usa para definir derivadas e integrales.",
+      "continuidad": "f(x) es continua en a si: f(a) existe, el límite en a existe, y ambos son iguales. Los polinomios son siempre continuos.",
+      "regla de la cadena": "(f∘g)'(x) = f'(g(x))·g'(x). Para derivar funciones compuestas. Ej: d/dx[sen(x²)] = cos(x²)·2x",
+      "integral definida": "∫[a,b] f(x)dx = F(b)-F(a). El área bajo la curva entre a y b. Teorema fundamental del cálculo.",
+      "sucesión": "Conjunto ordenado de números con patrón. Aritmética: aₙ=a₁+(n-1)d. Geométrica: aₙ=a₁·r^(n-1)",
+      "combinatoria": "Combinaciones C(n,k)=n!/(k!(n-k)!). Permutaciones P(n,k)=n!/(n-k)!. Variaciones con repetición: n^k",
+      "vector": "Tiene módulo (longitud), dirección y sentido. Suma: componente a componente. Producto escalar: a·b = |a||b|cos(θ)",
+      "matriz": "Array rectangular de números. Suma: mismo tamaño, elemento a elemento. Multiplicación: fila por columna. Determinante para inversas.",
+    }
+  },
+
+  // CIENCIAS NATURALES (Primaria/ESO básico)
+  ciencias: {
+    conceptos: {
+      "estados de la materia": "Sólido (forma y volumen fijos), Líquido (volumen fijo, forma variable), Gas (forma y volumen variables). Los cambios de estado son: fusión, ebullición, condensación, solidificación, sublimación.",
+      "célula vegetal vs animal": "Célula vegetal tiene: pared celular, cloroplastos, vacuola grande. Célula animal no tiene pared ni cloroplastos, vacuolas pequeñas.",
+      "sistema solar": "El Sol en el centro. Planetas por distancia: Mercurio, Venus, Tierra, Marte, Júpiter, Saturno, Urano, Neptuno. Los 4 primeros son rocosos, los 4 últimos son gaseosos.",
+      "nutrición de plantas": "Las plantas absorben agua y sales minerales por las raíces, CO₂ por los estomas. Fabrican glucosa por fotosíntesis usando la luz solar.",
+      "cadena alimentaria": "Plantas (productores) → Herbívoros (consumidores 1º) → Carnívoros (consumidores 2º) → Descomponedores (hongos y bacterias).",
+      "fuerza de rozamiento": "Se opone al movimiento. Depende del tipo de superficie y del peso del objeto. Fórmula: Fr = μ × N (μ=coeficiente de rozamiento, N=normal).",
+      "energías renovables": "Solar, eólica, hidráulica, geotérmica, biomasa. No se agotan y contaminan menos. Frente a fósiles (petróleo, carbón, gas) que se agotan.",
+      "contaminación": "Tipos: atmosférica (CO₂, metano), hídrica (vertidos), suelo (pesticidas), acústica. El efecto invernadero aumenta la temperatura global.",
+    }
+  },
+
+  // TECNOLOGÍA E INFORMÁTICA
+  tecnologia: {
+    conceptos: {
+      "algoritmo": "Secuencia de pasos para resolver un problema. Características: finito, preciso, efectivo. Representación: pseudocódigo, diagrama de flujo.",
+      "sistema binario": "Base 2, solo 0 y 1. 1 byte = 8 bits. Para convertir: potencias de 2. Ej: 1010₂ = 8+0+2+0 = 10₁₀",
+      "internet": "Red mundial de redes. Protocolos TCP/IP. HTTP/HTTPS para web. DNS convierte nombres en IPs. El router conecta a internet.",
+      "hardware vs software": "Hardware: componentes físicos (CPU, RAM, disco duro, pantalla). Software: programas y datos (sistema operativo, aplicaciones).",
+      "proyecto tecnológico": "Fases: identificar problema → diseñar → planificar → construir → evaluar. Siempre documentar cada fase.",
+    }
+  },
+
+  // EDUCACIÓN FÍSICA (conceptos teóricos)
+  educacionFisica: {
+    conceptos: {
+      "condición física": "Conjunto de cualidades físicas. Básicas: fuerza, resistencia, velocidad, flexibilidad. Para mejorarlas: entrenamiento progresivo.",
+      "frecuencia cardíaca": "FC máxima = 220 - edad. Zona aeróbica: 60-80% de FC máxima. La FC en reposo baja con el entrenamiento.",
+      "metabolismo": "Proceso de obtención de energía. Aeróbico (con O₂, larga duración), Anaeróbico (sin O₂, alta intensidad corta).",
+      "calentamiento": "Antes del ejercicio: 10-15 min de actividad suave + estiramientos dinámicos. Evita lesiones y prepara el cuerpo.",
+      "vuelta a la calma": "Al terminar: estiramientos estáticos 20-30s cada músculo. Baja la FC gradualmente. Favorece la recuperación.",
+    }
+  },
+
+  // MÚSICA
+  musica: {
+    conceptos: {
+      "nota musical": "7 notas: Do, Re, Mi, Fa, Sol, La, Si. En la escala mayor los semitonos están entre Mi-Fa y Si-Do.",
+      "compás": "Unidad de tiempo musical. 2/4 (dos negras), 3/4 (tres negras, vals), 4/4 (cuatro negras, el más común).",
+      "intervalos": "Distancia entre dos notas. Unísono (misma nota), 2ª, 3ª... hasta 8ª (octava, misma nota una octava más arriba).",
+      "instrumentos": "Cuerda (guitarra, violín), Viento madera (flauta, clarinete), Viento metal (trompeta, trombón), Percusión (batería, timbales).",
+    }
+  },
+
+  // PLÁSTICA Y ARTE
+  plastica: {
+    conceptos: {
+      "teoría del color": "Colores primarios: rojo, amarillo, azul. Secundarios: naranja (R+A), verde (A+Az), violeta (R+Az). Cálidos vs fríos. Círculo cromático.",
+      "perspectiva": "Técnica para representar la profundidad en 2D. Un punto de fuga: perspectiva frontal. Dos puntos: perspectiva cónica.",
+      "elementos plásticos": "Punto, línea, forma, color, textura, espacio, volumen. Con ellos se construye cualquier composición.",
+      "renacimiento artístico": "S.XV-XVI. Perspectiva, estudio anatómico, uso de la luz. Artistas clave: Leonardo da Vinci, Miguel Ángel, Rafael.",
+    }
+  },
+
+  // QUÍMICA AVANZADA
+  quimicaAvanzada: {
+    conceptos: {
+      "número de oxidación": "Carga formal que tendría un átomo. Reglas: metales alcalinos +1, alcalinotérreos +2, O siempre -2 (excepto peróxidos), H +1 (excepto hidruros -1).",
+      "mol": "Unidad del SI para cantidad de sustancia. 1 mol = 6,022×10²³ partículas (Número de Avogadro). Masa molar = masa atómica en gramos.",
+      "solubilidad": "Cantidad máxima de soluto en un solvente a determinada temperatura. Solución saturada = máxima concentración posible.",
+      "velocidad de reacción": "Depende de: concentración de reactivos, temperatura, catalizador, superficie de contacto. A mayor temperatura, mayor velocidad.",
+      "equilibrio químico": "Estado dinámico donde la velocidad directa = velocidad inversa. Principio de Le Chatelier: el sistema se opone a los cambios.",
+      "electroquímica": "Pila electrolítica: energía eléctrica → reacción química. Pila galvánica (batería): reacción química → energía eléctrica.",
+    }
+  },
+  // TÉCNICAS DE ESTUDIO
+  estudio: {
+    tecnicas: {
+      "pomodoro": "Estudia 25 min sin distracciones → descansa 5 min. Repite 4 veces → descanso largo 15-30 min. Mejora la concentración.",
+      "feynman": "Explica el tema en palabras simples como si lo enseñaras a un niño. Lo que no puedes explicar fácil, no lo has entendido.",
+      "spaced repetition": "Repasa el material en intervalos crecientes: 1 día, 3 días, 1 semana, 1 mes. Máxima eficiencia para la memoria a largo plazo.",
+      "active recall": "En lugar de releer, cierra el libro y recuerda. Las flashcards son un ejemplo. Mucho más efectivo que subrayar.",
+      "interleaving": "Alterna entre diferentes materias o tipos de problemas en lugar de estudiar todo de una materia. Mejora la retención.",
+      "elaborative interrogation": "Pregúntate '¿por qué es así?' y '¿cómo se relaciona con lo que ya sé?' al estudiar cada concepto.",
+      "mind mapping": "Crea mapas mentales con el concepto central y ramas. Ayuda a ver conexiones entre ideas.",
+      "cornell notes": "Divide la hoja: notas principales (derecha grande), preguntas clave (izquierda), resumen (abajo).",
+    },
+    consejos: [
+      "Estudia en el mismo lugar siempre para condicionar tu cerebro",
+      "El sueño es fundamental: consolida la memoria durante la noche",
+      "Haz ejercicio: aumenta el flujo sanguíneo al cerebro",
+      "Desactiva el móvil mientras estudias: cada interrupción cuesta 20 min de recuperación",
+      "Explica en voz alta lo que estudias, aunque sea a ti mismo",
+      "Los errores son aprendizaje: el cerebro recuerda mejor lo que costó aprender",
+    ]
   }
-  const cardMatch=D.cards.find(c=>{const qt=aiTokens(msg);return qt.some(t=>c.q.toLowerCase().includes(t)||c.a.toLowerCase().includes(t));});
-  if(cardMatch)return`🃏 En tus flashcards: "${cardMatch.q}" → ${cardMatch.a}`;
-  if(/hola|hey/.test(q))return`¡Hola, ${D.user.name}! Sin conexión ahora, pero puedo buscar en tus apuntes 📝`;
-  if(/examen|estudiar/.test(q))return`Para el examen: Pomodoro 🍅 → Resumen IA 📄 → Test IA 🧠 → Flashcards 🃏`;
-  return`Sin conexión ahora mismo. Prueba "Resumen IA" o "Test IA" para estudiar con tus apuntes guardados.`;
+};
+
+// ── PATRONES DE INTENCIÓN ─────────────────────────────────────────────────
+const LUMIO_INTENTS = [
+  // Saludos
+  { pattern: /^(hola|hey|buenas|hi|buenos días|buenas tardes|buenas noches)/i, type: 'greeting' },
+  // Qué es
+  { pattern: /^qué es|^que es|qué son|que son|define|definición de|significado de/i, type: 'define' },
+  // Cómo funciona/se hace
+  { pattern: /cómo funciona|como funciona|cómo se hace|como se hace|cómo se calcula|cómo se resuelve/i, type: 'howto' },
+  // Explica
+  { pattern: /explica|explícame|cuéntame|describe/i, type: 'explain' },
+  // Cuándo
+  { pattern: /cuándo|cuando ocurrió|en qué año|fecha de/i, type: 'when' },
+  // Quién
+  { pattern: /quién fue|quien fue|quién es|quien es|quién inventó/i, type: 'who' },
+  // Para qué sirve
+  { pattern: /para qué sirve|para que sirve|utilidad de|para qué se usa/i, type: 'purpose' },
+  // Diferencia entre
+  { pattern: /diferencia entre|diferencias entre|qué diferencia|compara/i, type: 'compare' },
+  // Ayuda estudio
+  { pattern: /cómo estudio|como estudio|técnica de estudio|método de estudio|cómo memorizo|como memorizo/i, type: 'study_tip' },
+  // Pomodoro
+  { pattern: /pomodoro|cuánto tiempo|tiempo de estudio/i, type: 'pomodoro' },
+  // Examen
+  { pattern: /tengo examen|me examino|preparar examen|repasar para/i, type: 'exam_prep' },
+  // Fórmula
+  { pattern: /fórmula de|formula de|ecuación de|cómo se calcula/i, type: 'formula' },
+  // Ayuda
+  { pattern: /no entiendo|no lo entiendo|no sé|estoy perdido|ayúdame|ayuda/i, type: 'help' },
+  // Resumen
+  { pattern: /resumen de|resume|puntos clave|lo más importante de/i, type: 'summary' },
+  // Ejemplo
+  { pattern: /ejemplo de|un ejemplo|dame un ejemplo|ponme un ejemplo/i, type: 'example' },
+  // Gracias
+  { pattern: /^gracias|^perfecto|^ok|^genial|^guay|^bien/i, type: 'thanks' },
+];
+
+// ── MOTOR DE CHAT LOCAL v3 ────────────────────────────────────────────────
+const LumioAI = {
+
+  _convCtx: {   // contexto de conversación
+    lastTopic: null,
+    lastMat: null,
+    turnCount: 0,
+    askedAbout: [],
+  },
+
+  // Normaliza texto para búsqueda
+  _norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); },
+
+  // Detecta la intención del mensaje
+  _detectIntent(msg){
+    for(const i of LUMIO_INTENTS){
+      if(i.pattern.test(msg)) return i.type;
+    }
+    return 'general';
+  },
+
+  // Detecta la materia mencionada en el mensaje
+  _detectMat(msg){
+    const n=this._norm(msg);
+    const matMap={
+      'matematicas':['matematica','mates','algebra','geometria','calculo','estadistica','probabilidad','ecuacion','fraccion','funcion'],
+      'fisica':['fisica','fuerza','velocidad','energia','movimiento','newton','aceleracion','trabajo','potencia','calor','termodinamica'],
+      'quimica':['quimica','atomo','molecula','enlace','reaccion','ph','acido','base','organica','tabla periodica'],
+      'biologia':['biologia','celula','adn','gen','evolucion','ecosistema','fotosintesis','respiracion','mitosis','meiosis'],
+      'historia':['historia','guerra','revolucion','medieval','antigua','moderna','siglo','civilizacion','empire','franco','napoleon'],
+      'geografia':['geografia','clima','relieve','rio','pais','continente','poblacion','economia','europa','espana'],
+      'lengua':['lengua','gramatica','sintaxis','oracion','sustantivo','verbo','adjetivo','literatura','poesia','novela'],
+      'ingles':['ingles','english','verbo irregular','tense','grammar','vocabulary','phrasal'],
+      'filosofia':['filosofia','platon','aristoteles','kant','descartes','etica','moral','logica','metafisica'],
+    };
+    for(const [mat,keywords] of Object.entries(matMap)){
+      if(keywords.some(k=>n.includes(k))) return mat;
+    }
+    return null;
+  },
+
+  // Busca en la base de conocimiento
+  _searchKB(msg, mat){
+    const n=this._norm(msg);
+    const results=[];
+    const kbMats=mat?[mat]:Object.keys(LUMIO_KB);
+    for(const m of kbMats){
+      const kb=LUMIO_KB[m];
+      if(!kb) continue;
+      for(const section of Object.values(kb)){
+        if(typeof section!=='object') continue;
+        for(const [key,val] of Object.entries(section)){
+          const keyN=this._norm(key);
+          const score=this._similarity(n,keyN);
+          if(score>0.3||n.includes(keyN)||keyN.split(' ').some(w=>w.length>3&&n.includes(w))){
+            results.push({key,val:typeof val==='string'?val:val.join(', '),score,mat:m});
+          }
+        }
+      }
+    }
+    return results.sort((a,b)=>b.score-a.score).slice(0,3);
+  },
+
+  // Busca en los apuntes y flashcards del usuario
+  _searchUserContent(msg){
+    const tokens=aiTokens(msg);
+    const results=[];
+    // New notes system
+    try{
+      const notes=JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]');
+      for(const note of notes){
+        const body=note.body||'';
+        const sents=aiSentences(body);
+        const tf=aiTF(sents);
+        for(const s of sents){
+          const score=aiScore(s,tf);
+          const hasToken=tokens.some(t=>t.length>3&&s.toLowerCase().includes(t));
+          if(hasToken&&s.length>20) results.push({text:s,mat:note.mat||'',score:score+2,source:'apunte'});
+        }
+      }
+    }catch(e){}
+    // Flashcards
+    for(const c of (D.cards||[])){
+      const hasToken=tokens.some(t=>t.length>3&&(c.q.toLowerCase().includes(t)||c.a.toLowerCase().includes(t)));
+      if(hasToken) results.push({text:`${c.q} → ${c.a}`,mat:c.m||'',score:1.5,source:'flashcard'});
+    }
+    return results.sort((a,b)=>b.score-a.score).slice(0,3);
+  },
+
+  // Similitud entre dos strings (Jaccard sobre tokens)
+  _similarity(a,b){
+    const ta=new Set(a.split(/\s+/).filter(w=>w.length>2));
+    const tb=new Set(b.split(/\s+/).filter(w=>w.length>2));
+    if(!ta.size||!tb.size) return 0;
+    const inter=[...ta].filter(w=>tb.has(w)).length;
+    return inter/(ta.size+tb.size-inter);
+  },
+
+  // Formatea una respuesta de la KB con emoji y estructura
+  _fmtKB(key, val, mat){
+    const emojis={matematicas:'🔢',fisica:'⚡',quimica:'⚗️',biologia:'🧬',historia:'📜',geografia:'🌍',lengua:'📖',ingles:'🇬🇧',filosofia:'🤔',estudio:'📚'};
+    const e=emojis[mat]||'💡';
+    return `${e} **${key.charAt(0).toUpperCase()+key.slice(1)}**\n\n${val}`;
+  },
+
+  // Genera variaciones de respuestas para no ser repetitivo
+  _pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; },
+
+  // Respuesta a saludos
+  _greeting(){
+    const name=D.user.name||'estudiante';
+    const hour=new Date().getHours();
+    const sal=hour<13?'Buenos días':'¿Qué tal?';
+    const greets=[
+      `¡${sal}, ${name}! 👋 Soy tu tutor IA de Lumio. Puedo explicarte cualquier tema del colegio, ayudarte con dudas, darte técnicas de estudio o repasar tus apuntes. ¿En qué te ayudo hoy?`,
+      `¡Hola, ${name}! 😊 Estoy aquí para ayudarte con ${D.mats?.slice(0,3).map(m=>m.n).join(', ')||'tus materias'}. Pregúntame cualquier cosa.`,
+      `¡Hola! 👋 Dime tu duda y te explico paso a paso. Conozco el temario de ESO y Bachillerato y tengo acceso a tus apuntes y flashcards.`,
+    ];
+    return this._pick(greets);
+  },
+
+  // Respuesta de agradecimiento
+  _thanks(){
+    const thanks=[
+      '¡De nada! 😊 Si tienes más dudas, aquí estoy.',
+      '¡Con mucho gusto! Pregunta lo que necesites.',
+      '¡Encantado de ayudar! ¿Hay algo más que quieras saber?',
+      '¡Perfecto! Recuerda que puedes preguntarme cualquier cosa del temario.',
+    ];
+    return this._pick(thanks);
+  },
+
+  // Respuesta si no sabe
+  _dunno(msg){
+    const fallbacks=[
+      `No tengo información específica sobre eso, pero puedo intentar ayudarte si me das más contexto. ¿Es de alguna asignatura concreta?`,
+      `Hmm, no encuentro eso en mi base de conocimiento. Intenta preguntarlo de otra forma o dime de qué asignatura es.`,
+      `No tengo datos sobre ese tema concreto. Si me pegas el texto de tus apuntes, puedo analizarlo y explicártelo.`,
+    ];
+    return this._pick(fallbacks);
+  },
+
+  // Consejo de estudio
+  _studyTip(){
+    const tips=Object.entries(LUMIO_KB.estudio.tecnicas);
+    const [name,desc]=this._pick(tips);
+    return `📚 **Técnica: ${name.charAt(0).toUpperCase()+name.slice(1)}**\n\n${desc}\n\n💡 También puedes usar Lumio directamente: Pomodoro para el tiempo, Flashcards para repasar, Test IA para practicar preguntas.`;
+  },
+
+  // Preparación para examen
+  _examPrep(msg){
+    const name=D.user.name||'';
+    return `📋 **Plan para tu examen, ${name}**\n\n` +
+      `1. **Identifica los temas clave** — mira el temario y marca lo que más pesa\n` +
+      `2. **Repasa con tus apuntes** — usa Resumen IA para extraer lo esencial\n` +
+      `3. **Crea flashcards** — las tarjetas activan la memoria mejor que releer\n` +
+      `4. **Practica con Test IA** — simula preguntas de examen\n` +
+      `5. **Pomodoro x3** — 3 sesiones de 25 min con descansos\n` +
+      `6. **Duerme bien** — el cerebro consolida la memoria al dormir\n\n` +
+      `¿De qué asignatura es el examen? Te puedo ayudar con los temas concretos.`;
+  },
+
+  // Respuesta de comparación
+  _compare(msg, kbResults){
+    if(kbResults.length>=2){
+      return `🔍 **Comparación**\n\n**${kbResults[0].key}**: ${kbResults[0].val.slice(0,120)}\n\n**${kbResults[1].key}**: ${kbResults[1].val.slice(0,120)}\n\n💡 La diferencia principal es que...`;
+    }
+    return null;
+  },
+
+  // Respuesta con ejemplo
+  _example(msg, kbResults){
+    if(kbResults.length>0){
+      const r=kbResults[0];
+      // Extract any examples from the val
+      const exMatch=r.val.match(/[Ee]j[.:]\s*([^.]+)/);
+      if(exMatch) return `💡 **Ejemplo de ${r.key}**:\n\n${exMatch[1].trim()}\n\n${r.val.slice(0,100)}`;
+    }
+    return null;
+  },
+
+  // Genera resumen de un tema
+  _topicSummary(msg, kbResults, userResults){
+    const lines=[];
+    if(kbResults.length>0){
+      lines.push(`📌 **${kbResults[0].key}**\n${kbResults[0].val}`);
+    }
+    if(userResults.length>0){
+      lines.push(`📝 **De tus apuntes:**\n${userResults[0].text.slice(0,150)}`);
+    }
+    if(kbResults.length>1){
+      lines.push(`📌 **${kbResults[1].key}**\n${kbResults[1].val.slice(0,100)}...`);
+    }
+    return lines.join('\n\n');
+  },
+
+  // Respuesta a fórmulas
+  _formula(msg, mat){
+    const n=this._norm(msg);
+    const formulas=LUMIO_KB[mat||'matematicas']?.formulas||LUMIO_KB.matematicas.formulas;
+    const match=formulas?.find(f=>aiTokens(f).some(t=>t.length>3&&n.includes(t)));
+    if(match) return `🔢 **Fórmula:**\n\n\`${match}\`\n\nRecuerda guardarla en tus flashcards para memorizarla mejor.`;
+    // Search in KB
+    const kbRes=this._searchKB(msg,mat);
+    if(kbRes.length>0&&kbRes[0].val.match(/[=²³⁴÷±√∫π]/)){
+      return `🔢 **${kbRes[0].key}:**\n\n${kbRes[0].val}`;
+    }
+    return null;
+  },
+
+  // Smart number detection for math problems
+  _solveMath(msg){
+    const n=msg;
+    // Simple equation ax+b=c
+    const eq1=n.match(/([-\d.]+)\s*x\s*([+-]\s*[\d.]+)?\s*=\s*([-\d.]+)/i);
+    if(eq1){
+      const a=parseFloat(eq1[1])||1;
+      const b=parseFloat((eq1[2]||'0').replace(/\s/g,''))||0;
+      const c=parseFloat(eq1[3]);
+      const x=(c-b)/a;
+      return `🔢 **Ecuación:** ${n.trim()}\n\nDespejando x:\nx = (${c} - (${b})) / ${a} = **${+x.toFixed(4)}**\n\n✅ Comprobación: ${a}×${+x.toFixed(4)} + ${b} = ${+(a*x+b).toFixed(4)}`;
+    }
+    // Percentage: X% of N
+    const pct=n.match(/([\d.]+)\s*%\s*(?:de|of|del)\s*([\d.]+)/i);
+    if(pct){
+      const result=(parseFloat(pct[1])*parseFloat(pct[2])/100);
+      return `🔢 El ${pct[1]}% de ${pct[2]} = **${+result.toFixed(4)}**\n\nFórmula: ${pct[1]} × ${pct[2]} ÷ 100`;
+    }
+    // Pythagorean theorem: if two sides given
+    const pyt=n.match(/(?:catetos?|lados?).*?(\d+).*?(\d+)/i);
+    if(pyt&&/pitágor|pitagor|hipotenusa/i.test(n)){
+      const a=parseFloat(pyt[1]),b=parseFloat(pyt[2]);
+      const h=Math.sqrt(a*a+b*b);
+      return `📐 **Teorema de Pitágoras**\na²+b²=c²\n${a}²+${b}² = ${a*a}+${b*b} = ${a*a+b*b}\nc = √${a*a+b*b} = **${+h.toFixed(4)}**`;
+    }
+    return null;
+  },
+
+  // Generate step-by-step explanation
+  _stepByStep(concept, val){
+    if(!val) return null;
+    const steps=val.split(/[.;]/).filter(s=>s.trim().length>5).slice(0,4);
+    if(steps.length<2) return null;
+    return `📋 **${aiCap(concept)} — paso a paso:**\n\n`+steps.map((s,i)=>`${i+1}. ${s.trim()}`).join('\n');
+  },
+
+  // FUNCIÓN PRINCIPAL: genera respuesta
+  respond(msg){
+    this._convCtx.turnCount++;
+    const intent=this._detectIntent(msg);
+    const mat=this._detectMat(msg)||this._convCtx.lastMat;
+    if(mat) this._convCtx.lastMat=mat;
+
+    // 1. Intenciones directas
+    if(intent==='greeting') return this._greeting();
+    if(intent==='thanks') return this._thanks();
+    if(intent==='study_tip') return this._studyTip();
+    if(intent==='pomodoro') return `⏱️ **Método Pomodoro:**\n\n${LUMIO_KB.estudio.tecnicas.pomodoro}\n\nEn Lumio tienes el Pomodoro integrado: ve a Estudiar → Pomodoro y elige tu materia.`;
+    if(intent==='exam_prep') return this._examPrep(msg);
+
+    // 2. Try to solve math inline
+    const mathResult=this._solveMath(msg);
+    if(mathResult) return mathResult;
+
+    // 3. Search KB + user content
+    const kbResults=this._searchKB(msg,mat);
+    const userResults=this._searchUserContent(msg);
+
+    // 4. Formula request
+    if(intent==='formula'){
+      const f=this._formula(msg,mat);
+      if(f) return f;
+    }
+
+    // 5. Compare
+    if(intent==='compare'){
+      const c=this._compare(msg,kbResults);
+      if(c) return c;
+    }
+
+    // 6. Example
+    if(intent==='example'){
+      const e=this._example(msg,kbResults);
+      if(e) return e;
+    }
+
+    // 7. Summary
+    if(intent==='summary'&&(kbResults.length>0||userResults.length>0)){
+      return this._topicSummary(msg,kbResults,userResults);
+    }
+
+    // 8. User notes/flashcards — highest priority context
+    if(userResults.length>0&&userResults[0].score>1.8){
+      const r=userResults[0];
+      const src=r.source==='flashcard'?'🃏 Tu flashcard':'📝 Tus apuntes';
+      let resp=`${src}${r.mat?' de '+r.mat:''}:\n\n"${r.text.slice(0,220)}"`;
+      if(kbResults.length>0) resp+=`\n\n📚 Contexto adicional: ${kbResults[0].val.slice(0,120)}`;
+      if(this._convCtx.turnCount>1) resp+=`\n\n¿Necesitas que profundice en algún punto?`;
+      return resp;
+    }
+
+    // 9. KB hit — rich response
+    if(kbResults.length>0){
+      const r=kbResults[0];
+      this._convCtx.lastTopic=r.key;
+      // Try step-by-step for how-to intents
+      if(intent==='howto'||intent==='explain'){
+        const steps=this._stepByStep(r.key,r.val);
+        if(steps) return steps+(kbResults.length>1?`\n\n🔗 Ver también: **${kbResults[1].key}**`:'');
+      }
+      let resp=this._fmtKB(r.key,r.val,r.mat);
+      if(kbResults.length>1) resp+=`\n\n🔗 Relacionado: **${kbResults[1].key}** — ${kbResults[1].val.slice(0,80)}`;
+      if(intent!=='define') resp+=`\n\n¿Quieres un ejemplo o que lo explique con más detalle?`;
+      return resp;
+    }
+
+    // 10. Help intent
+    if(intent==='help'){
+      return `No te preocupes, vamos paso a paso 😊\n\nDime:\n• ¿De qué asignatura es la duda?\n• ¿Qué parte no entiendes?\n\nTambién puedes pegar tu texto y te lo analizo.`;
+    }
+
+    // 11. Last resort — context-aware fallback
+    const mats=['Matemáticas','Física','Química','Biología','Historia','Geografía','Lengua','Inglés','Filosofía'];
+    const lastMat=this._convCtx.lastMat;
+    if(lastMat) return `No encontré información específica sobre eso en ${lastMat}. ¿Puedes darme más contexto o pegar el texto de tus apuntes?`;
+    return `${this._dunno(msg)}\n\nPuedo ayudarte con: ${mats.join(', ')} o técnicas de estudio.`;
+  }
+};
+
+// ── REEMPLAZAR aiChatLocal CON EL NUEVO MOTOR ─────────────────────────────
+function aiChatLocal(msg){
+  try{
+    return LumioAI.respond(msg);
+  }catch(e){
+    // Último fallback
+    const cardMatch=D.cards?.find(c=>{const t=aiTokens(msg);return t.some(w=>w.length>3&&(c.q.toLowerCase().includes(w)||c.a.toLowerCase().includes(w)));});
+    if(cardMatch)return`🃏 En tus flashcards: "${cardMatch.q}" → ${cardMatch.a}`;
+    return`Puedo ayudarte con cualquier duda del colegio. Dime la asignatura y el tema. 📚`;
+  }
 }
+
+// Resetear contexto al abrir el chat
+function resetChatCtx(){
+  LumioAI._convCtx={lastTopic:null,lastMat:null,turnCount:0,askedAbout:[]};
+  chatHistory=[];
+}
+
+
 
 // ── La misma IA para TODAS las funciones (Test, Resumen, Flashcards, etc.) ──
 async function callAIForTask(systemPrompt, userContent, maxTokens=1200){
@@ -6847,6 +7766,37 @@ function launchConfetti(){
 // ════════════════════════════════════════════════════════
 let isDark=true;
 
+
+// ── Connection indicator ──
+function _updateOnlineStatus(){
+  const badge=document.getElementById('offline-badge');
+  if(badge)badge.style.display=navigator.onLine?'none':'block';
+}
+window.addEventListener('online',_updateOnlineStatus);
+window.addEventListener('offline',_updateOnlineStatus);
+
+
+// ── Quick photo → note ──
+function savePhotoAsNote(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    compressImage(e.target.result,1200,0.75).then(compressed=>{
+      const mat=D.mats[0]?.n||'General';
+      const now=new Date();
+      const title='📷 Foto '+now.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+' '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      const body='![foto]('+compressed+')';
+      const notes=JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]');
+      notes.unshift({id:'n'+Date.now(),mat,title,body,ts:Date.now()});
+      localStorage.setItem('lumio_notes_v2',JSON.stringify(notes));
+      toast('📷 Foto guardada en Apuntes','success');
+      touchStreak();
+    });
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+
 // ════════════════════════════════════════════════════════
 // APUNTES — ENTRADA RÁPIDA
 // ════════════════════════════════════════════════════════
@@ -6984,6 +7934,25 @@ async function apuInsertPhoto(input){
   };
   reader.readAsDataURL(file);
 }
+
+// ── Compress image before saving (canvas, no external libs) ──
+function compressImage(dataUrl, maxW=800, quality=0.65){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width, h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',quality));
+    };
+    img.onerror=()=>resolve(dataUrl); // fallback: keep original
+    img.src=dataUrl;
+  });
+}
+
 // ── Fotos en nueva tarjeta (sin IA) ──
 let _fcAddPhotos = {q: null, a: null};
 
@@ -7078,7 +8047,13 @@ async function fcExtractTextFromPhoto(dataUrl, srcLang='auto'){
   };
   const textContent = {
     type:'text',
-    text:'Extrae todo el texto escrito en esta imagen de apuntes.'+(srcLang&&srcLang!=='auto'?' El texto está en '+({es:'español',en:'inglés',fr:'francés',de:'alemán',it:'italiano',pt:'portugués',ca:'catalán',la:'latín',zh:'chino',ja:'japonés'}[srcLang]||srcLang)+'.':'')+' Devuelve SOLO el texto extraído, sin comentarios ni formato adicional.'
+    text:`Eres un sistema OCR experto en textos escolares. Analiza esta imagen y extrae TODO el texto visible:
+- Mantén títulos, subtítulos y estructura de párrafos
+- Las listas: usa guión (- elemento)
+- Fórmulas matemáticas: escríbelas en plano (a²+b²=c², x=(-b±√(b²-4ac))/2a)
+- Tablas: usa | para separar columnas
+${srcLang&&srcLang!=='auto'?'El texto está en idioma: '+({es:'español',en:'inglés',fr:'francés',de:'alemán',it:'italiano',pt:'portugués',ca:'catalán',la:'latín'}[srcLang]||srcLang)+'.':''}
+Devuelve ÚNICAMENTE el texto extraído. Sin explicaciones ni comentarios adicionales.`
   };
 
   // Endpoint 1: Pollinations openai (GPT-4o vision)
@@ -7225,6 +8200,39 @@ function renderAccentGrid(){
 }
 
 // bAjustes defined below (full version)
+function bAjustes(){
+  try{bAjustesAccent();}catch(e){}
+  // PWA install button
+  try{
+    const iw=document.getElementById('aj-install-wrap');
+    if(iw){const inst=localStorage.getItem('lumio_pwa_installed')||window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;iw.style.display=inst?'none':'block';}
+  }catch(e){}
+  // Theme button
+  try{const ttb=document.getElementById('theme-toggle-btn');if(ttb)ttb.textContent=isDark?'🌙 Oscuro':'☀️ Claro';}catch(e){}
+  // Objetivo chips
+  try{
+    const oc=document.getElementById('aj-obj-chips');
+    if(oc){const opts=[30,45,60,90,120];oc.innerHTML=opts.map(v=>`<div class="chip${D.objetivoDiario===v?' on':''}" onclick="D.objetivoDiario=${v};saveState();bAjustes()">${v} min</div>`).join('');}
+    const st=document.getElementById('aj-obj-status');if(st)st.textContent='Objetivo actual: '+D.objetivoDiario+' min/día';
+  }catch(e){}
+  // Pomodoro inputs
+  try{
+    const pw=document.getElementById('pom-work-inp');const pb=document.getElementById('pom-break-inp');
+    if(pw)pw.value=Math.round((pomSettings&&pomSettings.W||1500)/60);
+    if(pb)pb.value=Math.round((pomSettings&&pomSettings.B||300)/60);
+  }catch(e){}
+  // Version label
+  try{document.querySelectorAll('#update-version-lbl,#about-version').forEach(el=>{if(el)el.textContent=APP_VERSION;});}catch(e){}
+  // Curso label + chips
+  try{
+    const cl=document.getElementById('aj-curso-actual');if(cl)cl.textContent=D.user.curso||'Sin definir';
+    const cc=document.getElementById('aj-curso-chips');
+    if(cc&&typeof CURSOS!=='undefined')cc.innerHTML=CURSOS.map(c=>`<div class="chip${D.user.curso===c.label?' on':''}" onclick="changeCurso('${c.id}')">${c.ico} ${c.label}</div>`).join('');
+  }catch(e){}
+  // Notifications
+  try{_notifRenderStatus();}catch(e){}
+}
+
 function bAjustesAccent(){
   renderAccentGrid();
   const saved=JSON.parse(localStorage.getItem('lumio_accent')||'{"hex":"#f5c518"}');
@@ -7504,20 +8512,32 @@ function getTutSteps(){
     visual:null,
     tip:'💡 Cada pomodoro completado te da XP y suma horas a tu progreso' },
 
-  // 7 — IA
+  // 7 — Chat IA
+  { ico:'💬', color:'var(--green)',
+    title:'Chat IA — tu tutor personal offline',
+    text:'Ve a <b>Estudiar → Chat IA</b>. Pregunta cualquier duda de tus asignaturas: explica conceptos, resuelve ejercicios, técnicas de estudio. Funciona <b>sin internet</b>.',
+    nav:'estudiar:chat', highlight:'#s-chat',
+    visual:`<div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+      <div style="background:var(--bg2);border-radius:10px;padding:8px 12px;color:var(--t2)">¿Qué es la fotosíntesis?</div>
+      <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:8px 12px;color:var(--t1)">🧬 <b>Fotosíntesis</b>: proceso por el que las plantas convierten luz + CO₂ + agua en glucosa y O₂. Ocurre en los cloroplastos.</div>
+    </div>`,
+    tip:'💡 Conoce todo el temario de ESO y Bachillerato: Mates, Bio, Historia, Física, Inglés...' },
+
+  // 8 — IA tools
   { ico:'🧠', color:'var(--purple)',
-    title:'Inteligencia Artificial — sin internet',
-    text:'La IA de Lumio funciona <b>sin internet</b>. Pega el texto de tu libro en <b>Test IA</b> y genera preguntas al instante. También resume, crea mapas mentales y más.',
+    title:'Herramientas IA — sin internet',
+    text:'Pega texto de tu libro en <b>Test IA</b>, <b>Resumen</b> o <b>Mapa mental</b>. La IA genera preguntas, bullets clave y esquemas al instante, sin WiFi.',
     nav:'estudiar:testia', highlight:'#s-testia',
     visual:`<div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">🧠 Test IA</div>
       <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">📄 Resumen</div>
       <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">🗺️ Mapa mental</div>
       <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">✍️ Corrector</div>
+      <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.2);border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--purple)">🃏 FC desde foto</div>
     </div>`,
-    tip:null },
+    tip:'💡 También puedes hacer foto a tus apuntes escritos y la IA genera las tarjetas' },
 
-  // 8 — Agenda
+  // 9 — Agenda
   { ico:'📋', color:'var(--orange)',
     title:'Agenda — deberes y exámenes',
     text:'Pulsa <b>Agenda</b> en el menú. Añade tus deberes con fecha de entrega y tus exámenes con el temario. Lumio te avisa el día antes.',
@@ -7525,7 +8545,7 @@ function getTutSteps(){
     visual:null,
     tip:'💡 Los deberes de hoy aparecen también en el inicio' },
 
-  // 9 — Agenda detail
+  // 10 — Agenda detail
   { ico:'🗓️', color:'var(--teal)',
     title:'Añadir un deber — es muy fácil',
     text:'Pulsa el botón <b>+ Añadir</b>, escribe la tarea, elige la materia y la fecha. Cuando lo hagas, marca el ✓ y ganas XP.',
@@ -7533,7 +8553,7 @@ function getTutSteps(){
     visual:null,
     tip:'💡 La Vista semanal te muestra todo de golpe con código de colores' },
 
-  // 10 — Clase
+  // 11 — Clase
   { ico:'🏫', color:'var(--blue)',
     title:'Clases — conéctate con tu profe',
     text:'Pulsa <b>Clase</b> en el menú. Puedes unirte a la clase de tu profe con un <b>código de 6 letras</b> que te dará. Verás el temario, los deberes y los exámenes que publique.',
@@ -7541,7 +8561,7 @@ function getTutSteps(){
     visual:null,
     tip:'💡 También puedes crear tu propia clase y compartir el código' },
 
-  // 11 — Perfil
+  // 12 — Perfil
   { ico:'📊', color:'var(--green)',
     title:'Perfil — tu progreso y estadísticas',
     text:'Pulsa <b>Perfil</b>. Aquí ves tu heatmap de estudio (como GitHub), el informe semanal, los logros y el ranking con amigos.',
@@ -7549,7 +8569,7 @@ function getTutSteps(){
     visual:null,
     tip:'💡 El Detector te dice cuáles son tus puntos débiles en cada materia' },
 
-  // 12 — Materials
+  // 13 — Materials
   { ico:'📚', color:'var(--y)',
     title:'Tus materias — personaliza la app',
     text:'Ve a Perfil → Materias → ✏️ Editar para añadir o quitar asignaturas. La app se adapta a las que tú tengas.',
@@ -7557,7 +8577,7 @@ function getTutSteps(){
     visual:null,
     tip:null },
 
-  // 13 — Done
+  // 14 — Done
   { ico:'🚀', color:'var(--y)',
     title:`¡Ya lo sabes todo, ${nm}!`,
     text:'Empieza añadiendo tus primeras <b>flashcards</b> o escribe los <b>apuntes</b> de hoy. Si necesitas ayuda, ve a Perfil → Ajustes → Ver tutorial.',
@@ -10126,55 +11146,6 @@ function openAnaya(){
   if(saved.url)window.open(saved.url,'_blank');
   else toast('⚠️ Añade el enlace de Anaya Digital primero');
 }
-function bAjustes(){
-  // Hide install button if already installed as PWA
-  const installWrap=document.getElementById('aj-install-wrap');
-  if(installWrap){
-    const installed=localStorage.getItem('lumio_pwa_installed')||window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-    installWrap.style.display=installed?'none':'block';
-  }
-  // Sync theme button
-  const ttb=document.getElementById('theme-toggle-btn');
-  if(ttb)ttb.textContent=isDark?'🌙 Oscuro':'☀️ Claro';
-  // Objetivo chips
-  const chips=document.getElementById('aj-obj-chips');
-  if(chips){
-    const objs=[30,45,60,90,120];
-    chips.innerHTML=objs.map(o=>`<div class="chip${o===D.objetivoDiario?' on':''}" onclick="setObj(${o},this)">${o} min</div>`).join('');
-  }
-  const st=document.getElementById('aj-obj-status');
-  if(st)st.textContent='Objetivo actual: '+D.objetivoDiario+' min/día';
-  // Sync pom inputs
-  const pw=document.getElementById('pom-work-inp');
-  const pb=document.getElementById('pom-break-inp');
-  if(pw)pw.value=Math.round(pomSettings.W/60);
-  if(pb)pb.value=Math.round(pomSettings.B/60);
-  // Version label
-  document.querySelectorAll('#update-version-lbl,#about-version').forEach(el=>{if(el)el.textContent=APP_VERSION;});
-  // Curso label
-  const curLbl=document.getElementById('aj-curso-actual');
-  if(curLbl)curLbl.textContent=D.user.curso||'2º ESO';
-  // Curso chips
-  const ccEl=document.getElementById('aj-curso-chips');
-  if(ccEl){
-    ccEl.innerHTML=CURSOS.map(cur=>`<div class="chip${D.user.curso===cur.label?' on':''}" onclick="changeCurso('${cur.id}')">${cur.ico} ${cur.label}</div>`).join('');
-  }
-  // Load saved GAS URL
-  const savedGas=localStorage.getItem('lumio_gas_url')||'';
-  const gasInp=document.getElementById('gas-url-inp');
-  if(gasInp)gasInp.value=savedGas;
-  // Show status if already configured
-  const gasCard=document.getElementById('gas-setup-card');
-  if(gasCard&&savedGas){
-    const badge=gasCard.querySelector('.gas-status')||document.createElement('div');
-    badge.className='gas-status';
-    badge.style.cssText='font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px';
-    badge.textContent='✅ Envío automático activo';
-    if(!gasCard.querySelector('.gas-status'))gasCard.insertBefore(badge,gasCard.firstChild);
-  }
-  // Notificaciones
-  _notifRenderStatus();
-}
 // Update all hardcoded course references throughout the UI
 // Returns current school year string e.g. "2025-2026"
 function getSchoolYear(){
@@ -10570,7 +11541,16 @@ function toast(msg,type){
   el.style.borderColor=type==='error'?'rgba(248,113,113,.4)':type==='success'?'rgba(74,222,128,.3)':'var(--bd2)';
   el.style.color=type==='error'?'#f87171':type==='success'?'var(--green)':'var(--t1)';
   el.classList.add('on');clearTimeout(tt);
-  tt=setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{el.style.borderColor='';el.style.color='';},300);},2800);
+  // Haptic feedback
+  try{
+    if(navigator.vibrate){
+      if(type==='error')navigator.vibrate([50,30,50]);
+      else if(type==='success')navigator.vibrate(40);
+      else navigator.vibrate(20);
+    }
+  }catch(e){}
+  const dur=type==='error'?3500:2800;
+  tt=setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{el.style.borderColor='';el.style.color='';},300);},dur);
 }
 
 // ════════════════════════════════════════════════════════
@@ -10598,6 +11578,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     // Load full persisted state FIRST
     loadState();
     loadAccentColor();
+    try{_updateOnlineStatus();}catch(e){}
 
     // Restore theme
     const savedTheme=localStorage.getItem('lumio_theme');
