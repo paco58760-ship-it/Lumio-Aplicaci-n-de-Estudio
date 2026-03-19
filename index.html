@@ -3903,6 +3903,7 @@ function goTo(id){
 // HOME
 // ════════════════════════════════════════════════════════
 function bHome(){
+  if(!D||!D.user){return;} // guard: D not initialized yet
   const h=new Date().getHours();
   const sal=h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches';
   document.getElementById('h-nm').textContent=sal+', '+D.user.name;
@@ -5507,8 +5508,12 @@ function exRep(){
   document.getElementById('fc-er').style.display='none';
   const qEl=document.getElementById('fc-q');
   const aEl=document.getElementById('fc-a');
-  if(qEl){qEl.innerHTML=c.q+(c.imgQ?`<br><img src="${c.imgQ}" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:contain">`:'');}
-  if(aEl){aEl.innerHTML=c.a+(c.imgA?`<br><img src="${c.imgA}" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:contain">`:'');}
+  const imgStyle='max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:contain';
+  if(qEl){qEl.innerHTML=c.q+(c.imgQ?'<br><img id="fc-q-img" style="'+imgStyle+'">':'');}
+  if(aEl){aEl.innerHTML=c.a+(c.imgA?'<br><img id="fc-a-img" style="'+imgStyle+'">':'');}
+  // Load images async from IDB
+  if(c.imgQ){loadImgFromIDB(c.imgQ).then(src=>{const el=document.getElementById('fc-q-img');if(el&&src)el.src=src;}).catch(()=>{});}
+  if(c.imgA){loadImgFromIDB(c.imgA).then(src=>{const el=document.getElementById('fc-a-img');if(el&&src)el.src=src;}).catch(()=>{});}
   document.getElementById('rp-m').textContent=c.m.split(' ')[0];
   document.getElementById('rp-p').textContent=(rI+1)+'/'+rC.length;
   document.getElementById('rp-f').style.width=((rI+1)/rC.length*100)+'%';
@@ -7129,10 +7134,7 @@ let ia={mat:'Biología y Geo.',n:3,test:null,idx:0,ans:{}};
 function bIA(){document.getElementById('ia-ch').innerHTML=D.mats.map(m=>`<div class="chip${m.n===ia.mat?' on':''}" onclick="pIaM(this,'${m.n}')">${m.e} ${m.n.split(' ')[0]}</div>`).join('');}
 function pIaM(el,n){document.querySelectorAll('#ia-ch .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');ia.mat=n;}
 function pickN(el,src){const row=el.closest('div');row.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');if(src==='ia')ia.n=parseInt(el.dataset.n);}
-document.addEventListener('DOMContentLoaded',()=>{
-  const t=document.getElementById('ia-t');if(t)t.addEventListener('input',function(){document.getElementById('ia-cc').textContent=this.value.length+' caracteres';});
-  const rt=document.getElementById('res-txt');if(rt)rt.addEventListener('input',function(){document.getElementById('res-cc').textContent=this.value.length+' caracteres';});
-});
+// char counters — wired below in main init
 // ════════════════════════════════════════════════════════
 // VOCABULARIO
 // ════════════════════════════════════════════════════════
@@ -8019,6 +8021,7 @@ function compressImage(dataUrl, maxW=800, quality=0.65){
 
 // ── Fotos en nueva tarjeta (sin IA) ──
 let _fcAddPhotos = {q: null, a: null};
+let _fcAddPhotosPreview = {q: null, a: null};
 
 function fcAddPhoto(input, side){
   const file = input.files[0];
@@ -8169,41 +8172,247 @@ Devuelve ÚNICAMENTE el texto extraído. Sin explicaciones ni comentarios adicio
 
 
 // ── Check localStorage usage and warn if near limit ──
-function checkStorageUsage(){
+async function checkStorageUsage(){
   try{
-    let total=0;
+    // Text data in localStorage
+    let lsTotal=0;
     for(const key of Object.keys(localStorage)){
-      total+=localStorage.getItem(key).length;
+      try{lsTotal+=(localStorage.getItem(key)||'').length;}catch(e){}
     }
-    const kb=Math.round(total/1024);
-    const pct=Math.round(total/5242880*100); // 5MB limit
+    const lsKB=Math.round(lsTotal/1024);
+    const lsPct=Math.round(lsTotal/5242880*100);
+
+    // Image data in IndexedDB
+    const idb=await LumioImgDB.usage().catch(()=>({usedMB:0,quotaMB:500,pct:0}));
+
     const el=document.getElementById('aj-storage-bar');
     const lbl=document.getElementById('aj-storage-lbl');
+    const quotaLbl=document.getElementById('aj-storage-quota');
+
     if(el){
-      el.style.width=Math.min(pct,100)+'%';
-      el.style.background=pct>80?'#f87171':pct>60?'var(--orange)':'var(--teal)';
+      el.style.width=Math.min(lsPct,100)+'%';
+      el.style.background=lsPct>80?'#f87171':lsPct>60?'var(--orange)':'var(--teal)';
     }
-    if(lbl) lbl.textContent=kb+'KB de ~5120KB usados ('+pct+'%)';
-    if(pct>85){
-      toast('⚠️ Almacenamiento al '+pct+'% — borra fotos de tarjetas para liberar espacio','error');
+    if(lbl) lbl.textContent=lsKB+'KB de texto · '+idb.usedMB+'MB de fotos (IndexedDB: '+idb.quotaMB+'MB disponibles)';
+    if(lsPct>85){
+      toast('⚠️ Texto al '+lsPct+'% — borra datos innecesarios en Ajustes','error');
     }
-    return {kb,pct};
-  }catch(e){return {kb:0,pct:0};}
+    return {lsKB,lsPct,idb};
+  }catch(e){return {lsKB:0,lsPct:0,idb:{usedMB:0,quotaMB:500}};}
 }
 
 // ── Clear card images to free space ──
-function clearCardImages(){
+async function clearCardImages(){
   if(!confirm('¿Borrar todas las fotos de las tarjetas? El texto se conserva.')) return;
   let count=0;
   D.cards.forEach(c=>{
     if(c.imgQ){delete c.imgQ;count++;}
     if(c.imgA){delete c.imgA;count++;}
   });
-  // Also clear note images
+  // Clear IndexedDB images too
+  try{await LumioImgDB.clearAll();}catch(e){}
+  // Clear legacy localStorage images
   try{localStorage.removeItem('lumio_note_imgs');}catch(e){}
   saveState();
   checkStorageUsage();
   toast('🗑️ '+count+' fotos eliminadas — espacio liberado','success');
+}
+
+
+// ════════════════════════════════════════════════════════
+// LUMIO IMAGE STORE — IndexedDB (hasta ~1GB según dispositivo)
+// Las fotos salen del localStorage (límite 5MB) y van aquí
+// ════════════════════════════════════════════════════════
+const LumioImgDB = {
+  _db: null,
+  _ready: false,
+  _queue: [], // calls waiting for db to open
+
+  init(){
+    return new Promise((resolve, reject)=>{
+      if(this._db){resolve(this._db);return;}
+      const req = indexedDB.open('lumio_images', 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if(!db.objectStoreNames.contains('imgs')){
+          db.createObjectStore('imgs'); // key = any string ID
+        }
+      };
+      req.onsuccess = e => {
+        this._db = e.target.result;
+        this._ready = true;
+        resolve(this._db);
+      };
+      req.onerror = () => {
+        console.warn('LumioImgDB: could not open IndexedDB, falling back to inline storage');
+        reject(req.error);
+      };
+    });
+  },
+
+  async save(key, dataUrl){
+    try{
+      const db = await this.init();
+      return new Promise((resolve, reject)=>{
+        const tx = db.transaction('imgs','readwrite');
+        tx.objectStore('imgs').put(dataUrl, key);
+        tx.oncomplete = ()=>resolve(true);
+        tx.onerror = ()=>reject(tx.error);
+      });
+    }catch(e){
+      // Fallback: inline (old behaviour)
+      try{localStorage.setItem('lumio_img_'+key, dataUrl);}catch(e2){}
+      return false;
+    }
+  },
+
+  async get(key){
+    try{
+      const db = await this.init();
+      return new Promise((resolve)=>{
+        const tx = db.transaction('imgs','readonly');
+        const req = tx.objectStore('imgs').get(key);
+        req.onsuccess = ()=>resolve(req.result||null);
+        req.onerror = ()=>{
+          // Fallback to localStorage
+          resolve(localStorage.getItem('lumio_img_'+key)||null);
+        };
+      });
+    }catch(e){
+      return localStorage.getItem('lumio_img_'+key)||null;
+    }
+  },
+
+  async delete(key){
+    try{
+      const db = await this.init();
+      return new Promise((resolve)=>{
+        const tx = db.transaction('imgs','readwrite');
+        tx.objectStore('imgs').delete(key);
+        tx.oncomplete = ()=>resolve(true);
+        tx.onerror = ()=>resolve(false);
+      });
+    }catch(e){return false;}
+  },
+
+  async list(){
+    try{
+      const db = await this.init();
+      return new Promise((resolve)=>{
+        const tx = db.transaction('imgs','readonly');
+        const req = tx.objectStore('imgs').getAllKeys();
+        req.onsuccess = ()=>resolve(req.result||[]);
+        req.onerror = ()=>resolve([]);
+      });
+    }catch(e){return[];}
+  },
+
+  async usage(){
+    // Estimate storage used in MB
+    try{
+      if(navigator.storage&&navigator.storage.estimate){
+        const {usage,quota}=await navigator.storage.estimate();
+        return {
+          usedMB:+(usage/1048576).toFixed(1),
+          quotaMB:+(quota/1048576).toFixed(0),
+          pct:Math.round(usage/quota*100)
+        };
+      }
+      // Fallback: count keys
+      const keys=await this.list();
+      return {usedMB:keys.length*0.15,quotaMB:500,pct:0};
+    }catch(e){return{usedMB:0,quotaMB:500,pct:0};}
+  },
+
+  async clearAll(){
+    try{
+      const db = await this.init();
+      return new Promise((resolve)=>{
+        const tx = db.transaction('imgs','readwrite');
+        tx.objectStore('imgs').clear();
+        tx.oncomplete = ()=>resolve(true);
+        tx.onerror = ()=>resolve(false);
+      });
+    }catch(e){return false;}
+  }
+};
+
+// ── Helper: save image to IndexedDB and return a reference key ──
+async function saveImgToIDB(dataUrl, prefix='img'){
+  const key = prefix+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  await LumioImgDB.save(key, dataUrl);
+  return key; // store this key in the card, not the dataUrl
+}
+
+// ── Helper: load image from IDB (returns dataUrl or null) ──
+async function loadImgFromIDB(keyOrUrl){
+  if(!keyOrUrl) return null;
+  // If it's already a dataUrl (old format), return directly
+  if(keyOrUrl.startsWith('data:')) return keyOrUrl;
+  // Otherwise it's an IDB key
+  return await LumioImgDB.get(keyOrUrl);
+}
+
+// ── Migrate existing inline card images to IDB ──
+async function migrateCardImagesToIDB(){
+  let migrated=0;
+  for(const card of D.cards){
+    if(card.imgQ&&card.imgQ.startsWith('data:')){
+      const key=await saveImgToIDB(card.imgQ,'fcq_'+card.id);
+      card.imgQ=key;migrated++;
+    }
+    if(card.imgA&&card.imgA.startsWith('data:')){
+      const key=await saveImgToIDB(card.imgA,'fca_'+card.id);
+      card.imgA=key;migrated++;
+    }
+  }
+  if(migrated>0){saveState();console.log('Lumio: migrated '+migrated+' card images to IndexedDB');}
+  return migrated;
+}
+
+// ── Migrate notes images too ──
+async function migrateNoteImagesToIDB(){
+  try{
+    const notes=JSON.parse(localStorage.getItem('lumio_notes_v2')||'[]');
+    let changed=false;
+    for(const note of notes){
+      if(!note.body) continue;
+      // Find inline base64 images in markdown: ![...](data:...)
+      const imgRx=/!\[([^\]]*)\]\((data:[^)]+)\)/g;
+      let m;
+      let newBody=note.body;
+      while((m=imgRx.exec(note.body))!==null){
+        const key=await saveImgToIDB(m[2],'note_'+note.id);
+        newBody=newBody.replace(m[2],key);
+        changed=true;
+      }
+      note.body=newBody;
+    }
+    if(changed){
+      localStorage.setItem('lumio_notes_v2',JSON.stringify(notes));
+      console.log('Lumio: migrated note images to IndexedDB');
+    }
+  }catch(e){}
+}
+
+// ── Init IDB after DOM ready (never blocks startup) ──
+// Uses a 2s delay so it never competes with the main init sequence
+function _initIDBWhenReady(){
+  setTimeout(async ()=>{
+    try{
+      await Promise.race([
+        LumioImgDB.init(),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('IDB timeout')),3000))
+      ]);
+      // Migrate old inline images after 5s (low priority)
+      setTimeout(async ()=>{
+        try{await migrateCardImagesToIDB();}catch(e){}
+        try{await migrateNoteImagesToIDB();}catch(e){}
+      }, 5000);
+    }catch(e){
+      console.warn('IndexedDB not available or timed out — images stored inline');
+    }
+  }, 2000); // wait 2s after DOM ready before touching IDB
 }
 
 // ════════════════════════════════════════════════════════
@@ -11665,20 +11874,33 @@ window.addEventListener('DOMContentLoaded',()=>{
   // ── Garantía absoluta: la splash siempre desaparece ──────────────
   // Si cualquier cosa falla, este timer fuerza la salida a los 4s
   // Safety net: if splash still visible after 5s, force-remove it and boot app
+  // NUCLEAR OPTION: after 4s the splash ALWAYS disappears, no exceptions
+  setTimeout(()=>{
+    const sp=document.getElementById('splash');
+    if(sp&&sp.style.opacity!=='0'){
+      sp.style.cssText='opacity:0!important;pointer-events:none!important;display:none!important';
+      console.warn('Lumio: nuclear splash kill at 4s');
+      try{navSection('home');}catch(e){}
+    }
+  }, 4000);
+
   const splashGuard=setTimeout(()=>{
     try{
       const sp=document.getElementById('splash');
       if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
-      // Ensure screens are initialized even if normal flow failed
       try{bHome();}catch(e){}
       try{navSection('home');}catch(e){}
       if(!localStorage.getItem('lumio_seen_onboarding')){
         try{showOnboarding();}catch(e){}
       }
     }catch(e){}
-  },3000); // 3s max — if still stuck after 3s, force boot
+  },3000);
 
   try{
+    // Char counters for IA screens
+    try{const t=document.getElementById('ia-t');if(t)t.addEventListener('input',function(){const el=document.getElementById('ia-cc');if(el)el.textContent=this.value.length+' caracteres';});}catch(e){}
+    try{const rt=document.getElementById('res-txt');if(rt)rt.addEventListener('input',function(){const el=document.getElementById('res-cc');if(el)el.textContent=this.value.length+' caracteres';});}catch(e){}
+
     // Load full persisted state FIRST
     loadState();
     loadAccentColor();
@@ -11727,9 +11949,13 @@ if('serviceWorker' in navigator){
     try{checkRankUrlImport();}catch(e){}
     try{checkClaseUrlImport();}catch(e){}
     try{checkNotaUrlImport();}catch(e){}
+    setTimeout(()=>{try{_notifSchedule();}catch(e){}},1000);
 
     // Recalculate materia progress on load (based on hours + flashcard levels)
     try{recalcAllProgress();}catch(e){}
+
+    // Start IndexedDB in background (never blocks startup)
+    try{_initIDBWhenReady();}catch(e){}
 
     // Init screens — each wrapped so one crash doesn't stop the rest
     try{bHome();}catch(e){}
@@ -11758,7 +11984,8 @@ if('serviceWorker' in navigator){
           }else{
             // Ensure home screen is visible
             try{navSection('home');}catch(e){}
-            setTimeout(()=>{try{startTutorial();}catch(e){}},600);
+            // Tutorial: only show once, never on every load
+            // startTutorial() checks lumio_seen_tutorial internally
           }
         }catch(e2){
           // Last resort: if onboarding/tutorial fails, at least show home
@@ -12343,12 +12570,7 @@ self.addEventListener('fetch',e=>{
   }catch(e){}
 })();
 // Inicializar notificaciones y URL imports al arrancar
-document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    try{_notifSchedule();}catch(e){}
-    try{checkNotaUrlImport();}catch(e){}
-  },1000);
-});
+// _notifSchedule and checkNotaUrlImport called in main init
 
 </script>
 </body>
