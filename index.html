@@ -2339,6 +2339,14 @@ button:active{transform:scale(.97)}
       <button onclick="checkUpdate()" id="update-btn" style="background:var(--yd);border:1px solid var(--yb);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;color:var(--y);cursor:pointer;font-family:var(--font)">🔍 Buscar</button>
     </div>
     <div style="font-size:11px;color:var(--t3);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);line-height:1.5">💡 La app se actualiza automáticamente al abrirla si hay conexión. Tus datos siempre se conservan.</div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)">
+        <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">💾 Almacenamiento local</div>
+        <div style="background:var(--bg2);border-radius:8px;height:8px;overflow:hidden;margin-bottom:6px">
+          <div id="aj-storage-bar" style="height:100%;width:0%;background:var(--teal);border-radius:8px;transition:width .5s"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3)" id="aj-storage-lbl">Calculando...</div>
+        <button onclick="clearCardImages()" style="margin-top:8px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--font)">🗑️ Liberar espacio (borrar fotos)</button>
+      </div>
   </div>
 
   <!-- Curso -->
@@ -3595,11 +3603,30 @@ function updateStudyStreak(){
 function saveState(){
   try{
     const wk=new Date().getFullYear()+'-W'+_getISOWeek();
-    localStorage.setItem('lumio_state',JSON.stringify({
+    const payload={
       user:D.user,mats:D.mats,cards:D.cards,week:D.week,weekKey:wk,
       exams:D.exams,historial:D.historial,horario:D.horario,objetivoDiario:D.objetivoDiario
-    }));
-  }catch(e){}
+    };
+    localStorage.setItem('lumio_state',JSON.stringify(payload));
+  }catch(e){
+    // QuotaExceededError — localStorage full (probably from photos)
+    if(e.name==='QuotaExceededError'||e.code===22){
+      try{
+        // Try saving without card images (strip imgQ/imgA from cards)
+        const cardsLite=D.cards.map(c=>{const {imgQ,imgA,...rest}=c;return rest;});
+        const wk=new Date().getFullYear()+'-W'+_getISOWeek();
+        localStorage.setItem('lumio_state',JSON.stringify({
+          user:D.user,mats:D.mats,cards:cardsLite,week:D.week,weekKey:wk,
+          exams:D.exams,historial:D.historial,horario:D.horario,objetivoDiario:D.objetivoDiario
+        }));
+        console.warn('Lumio: localStorage almost full — card images stripped to free space');
+        toast('⚠️ Almacenamiento casi lleno. Las fotos de tarjetas se guardaron aparte.','error');
+      }catch(e2){
+        console.error('Lumio: could not save state even after stripping images',e2);
+        toast('❌ No se pudo guardar. Borra datos de la app en Ajustes del móvil.','error');
+      }
+    }
+  }
 }
 // IDs de las tarjetas predefinidas originales — nunca se restauran
 const DEFAULT_CARD_IDS=new Set(['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10',
@@ -3627,36 +3654,73 @@ function _getISOWeek(){
 
 function loadState(){
   try{
-    const saved=JSON.parse(localStorage.getItem('lumio_state')||'null');
-    if(!saved)return;
-    if(saved.user)Object.assign(D.user,saved.user);
-    if(!D.user.curso)D.user.curso='2eso';
-    if(saved.mats&&saved.mats.length)D.mats=saved.mats;
-    if(saved.cards){
-      const userCards=cleanDefaultCards(saved.cards);
-      D.cards=userCards;
+    const raw=localStorage.getItem('lumio_state');
+    if(!raw)return; // first run, no data yet
+
+    let saved;
+    try{saved=JSON.parse(raw);}catch(parseErr){
+      // Corrupted JSON — backup and clear
+      console.error('Lumio: corrupted state JSON, resetting',parseErr);
+      localStorage.setItem('lumio_state_backup_'+Date.now(), raw.slice(0,500));
+      localStorage.removeItem('lumio_state');
+      return; // D stays as default
     }
-    // Only restore week data if it's the same ISO week — otherwise reset
-    const currentWeek=_getISOWeek();
-    const currentYear=new Date().getFullYear();
-    const savedWeekKey=saved.weekKey||'';
-    const expectedKey=currentYear+'-W'+currentWeek;
-    if(saved.week&&saved.week.length&&savedWeekKey===expectedKey){
+
+    if(!saved||typeof saved!=='object') return;
+
+    // User — never lose the name
+    if(saved.user&&typeof saved.user==='object'){
+      Object.assign(D.user,saved.user);
+    }
+    if(!D.user.curso) D.user.curso='2eso';
+    if(!D.user.name) D.user.name='';
+
+    // Mats — validate array
+    if(Array.isArray(saved.mats)&&saved.mats.length>0){
+      D.mats=saved.mats.filter(m=>m&&typeof m==='object'&&m.n);
+    }
+
+    // Cards — validate + clean
+    if(Array.isArray(saved.cards)){
+      D.cards=cleanDefaultCards(saved.cards).filter(c=>c&&c.q&&c.a&&c.id);
+    }
+
+    // Week — only if same ISO week
+    const expectedKey=new Date().getFullYear()+'-W'+_getISOWeek();
+    if(Array.isArray(saved.week)&&saved.week.length===7&&saved.weekKey===expectedKey){
       D.week=saved.week;
-    }else{
-      // New week — keep the 7-day structure but zero the minutes
+    } else {
       D.week=[{d:'L',m:0},{d:'M',m:0},{d:'X',m:0},{d:'J',m:0},{d:'V',m:0},{d:'S',m:0},{d:'D',m:0}];
     }
-    if(saved.exams)D.exams=saved.exams;
-    if(saved.historial)D.historial=saved.historial;
-    if(saved.horario)D.horario=saved.horario;
-    if(saved.objetivoDiario)D.objetivoDiario=saved.objetivoDiario;
-    // Recalculate total hours from historial (source of truth)
+
+    // Exams — validate
+    if(Array.isArray(saved.exams)){
+      D.exams=saved.exams.filter(e=>e&&e.mat&&e.fecha);
+    }
+
+    // Historial — cap at 365 entries
+    if(Array.isArray(saved.historial)){
+      D.historial=saved.historial.slice(0,365);
+    }
+
+    // Horario — safe
+    if(saved.horario&&typeof saved.horario==='object') D.horario=saved.horario;
+
+    // Objetivo
+    if(typeof saved.objetivoDiario==='number'&&saved.objetivoDiario>0){
+      D.objetivoDiario=saved.objetivoDiario;
+    }
+
+    // Recalculate total hours from historial
     if(D.historial&&D.historial.length){
-      const totalMins=D.historial.reduce((s,h)=>s+(h.mins||0),0);
+      const totalMins=D.historial.reduce((s,h)=>s+(typeof h.mins==='number'?h.mins:0),0);
       D.user.hours=+(totalMins/60).toFixed(2);
     }
-  }catch(e){}
+
+  }catch(e){
+    // Unexpected error — log but don't crash app
+    console.error('Lumio: loadState error',e);
+  }
 }
 
 
@@ -8103,6 +8167,45 @@ Devuelve ÚNICAMENTE el texto extraído. Sin explicaciones ni comentarios adicio
   throw new Error('No se pudo leer la foto. Error: '+lastError+'. Prueba con mejor iluminación o escribe el texto a mano.');
 }
 
+
+// ── Check localStorage usage and warn if near limit ──
+function checkStorageUsage(){
+  try{
+    let total=0;
+    for(const key of Object.keys(localStorage)){
+      total+=localStorage.getItem(key).length;
+    }
+    const kb=Math.round(total/1024);
+    const pct=Math.round(total/5242880*100); // 5MB limit
+    const el=document.getElementById('aj-storage-bar');
+    const lbl=document.getElementById('aj-storage-lbl');
+    if(el){
+      el.style.width=Math.min(pct,100)+'%';
+      el.style.background=pct>80?'#f87171':pct>60?'var(--orange)':'var(--teal)';
+    }
+    if(lbl) lbl.textContent=kb+'KB de ~5120KB usados ('+pct+'%)';
+    if(pct>85){
+      toast('⚠️ Almacenamiento al '+pct+'% — borra fotos de tarjetas para liberar espacio','error');
+    }
+    return {kb,pct};
+  }catch(e){return {kb:0,pct:0};}
+}
+
+// ── Clear card images to free space ──
+function clearCardImages(){
+  if(!confirm('¿Borrar todas las fotos de las tarjetas? El texto se conserva.')) return;
+  let count=0;
+  D.cards.forEach(c=>{
+    if(c.imgQ){delete c.imgQ;count++;}
+    if(c.imgA){delete c.imgA;count++;}
+  });
+  // Also clear note images
+  try{localStorage.removeItem('lumio_note_imgs');}catch(e){}
+  saveState();
+  checkStorageUsage();
+  toast('🗑️ '+count+' fotos eliminadas — espacio liberado','success');
+}
+
 // ════════════════════════════════════════════════════════
 // ACCENT COLOR SYSTEM
 // ════════════════════════════════════════════════════════
@@ -8231,6 +8334,7 @@ function bAjustes(){
   }catch(e){}
   // Notifications
   try{_notifRenderStatus();}catch(e){}
+  try{setTimeout(checkStorageUsage,200);}catch(e){}
 }
 
 function bAjustesAccent(){
@@ -11572,7 +11676,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         try{showOnboarding();}catch(e){}
       }
     }catch(e){}
-  },5000);
+  },3000); // 3s max — if still stuck after 3s, force boot
 
   try{
     // Load full persisted state FIRST
@@ -11661,20 +11765,24 @@ if('serviceWorker' in navigator){
           try{navSection('home');}catch(e){}
         }
       },600);
-    },1800);
+    },1200); // reduced from 1800ms for faster load
 
   }catch(e){
-    // Si algo falla, el splashGuard sigue activo como último recurso
-    // NO cancelamos splashGuard aquí
     console.error('Lumio init error:',e);
-    // Forzar salida de splash en 500ms
+    // Force exit splash immediately on error
     setTimeout(()=>{
       try{
         const sp=document.getElementById('splash');
-        if(sp){sp.classList.add('out');sp.style.opacity='0';}
-        if(!localStorage.getItem('lumio_seen_onboarding')) showOnboarding();
-      }catch(e2){}
-    },500);
+        if(sp){sp.classList.add('out');sp.style.opacity='0';sp.style.pointerEvents='none';}
+        setTimeout(()=>{
+          if(!localStorage.getItem('lumio_seen_onboarding')){
+            try{showOnboarding();}catch(e2){navSection('home');}
+          }else{
+            try{navSection('home');}catch(e2){}
+          }
+        },400);
+      }catch(e2){console.error('Lumio: fatal init',e2);}
+    },300);
   }
 });
 
