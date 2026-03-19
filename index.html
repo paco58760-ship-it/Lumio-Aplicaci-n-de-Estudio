@@ -471,7 +471,7 @@ button:active, [onclick]:active { transform: scale(0.97); transition: transform 
 
 /* ══ SCREEN TRANSITIONS ══ */
 .screen{display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:80px;flex-direction:column}
-.screen.active{display:flex;flex-direction:column}
+.screen.active{display:flex;flex-direction:column;background:var(--bg)}
 #s-chat.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
 #sub-nav.show{display:flex;animation:snFade .15s ease}
 @keyframes snFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -3901,21 +3901,23 @@ function goTo(id){
 // HOME
 // ════════════════════════════════════════════════════════
 function bHome(){
-  if(!D||!D.user){return;} // guard: D not initialized yet
+  if(!D||!D.user) return; // guard: D not initialized yet
+  try{
   const h=new Date().getHours();
   const sal=h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches';
-  document.getElementById('h-nm').textContent=sal+', '+D.user.name;
+  const nmEl=document.getElementById('h-nm');if(nmEl)nmEl.textContent=sal+', '+(D.user.name||'');
   const days=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const now=new Date();
   const dateEl=document.getElementById('h-date');
   if(dateEl)dateEl.textContent=days[now.getDay()]+' '+now.getDate()+' de '+months[now.getMonth()];
-  const tot=D.week.reduce((a,b)=>a+b.m,0);
-  document.getElementById('pc-h').textContent=tot>=60?Math.floor(tot/60)+'h '+(tot%60)+'m':Math.round(tot)+'m';
-  const pct=D.mats.length?Math.round(D.mats.reduce((a,m)=>a+m.p,0)/D.mats.length):0;
-  document.getElementById('pc-p').textContent=pct+'%';
+  const week=Array.isArray(D.week)?D.week:[{d:'L',m:0},{d:'M',m:0},{d:'X',m:0},{d:'J',m:0},{d:'V',m:0},{d:'S',m:0},{d:'D',m:0}];
+  const tot=week.reduce((a,b)=>a+(b.m||0),0);
+  const pcHEl=document.getElementById('pc-h');if(pcHEl)pcHEl.textContent=tot>=60?Math.floor(tot/60)+'h '+(tot%60)+'m':Math.round(tot)+'m';
+  const pct=(D.mats&&D.mats.length)?Math.round(D.mats.reduce((a,m)=>a+(m.p||0),0)/D.mats.length):0;
+  const pcPEl=document.getElementById('pc-p');if(pcPEl)pcPEl.textContent=pct+'%';
   setTimeout(()=>{const el=document.getElementById('pc-f');if(el)el.style.width=pct+'%';},350);
-  document.getElementById('h-fc').textContent=D.cards.length?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
+  const fcEl=document.getElementById('h-fc');if(fcEl)fcEl.textContent=(D.cards&&D.cards.length)?D.cards.length+' tarjeta'+(D.cards.length!==1?'s':''):'Crea tu primera';
   // Guided first-steps checklist
   try{
     const sh=document.getElementById('h-start-hint');
@@ -3965,7 +3967,7 @@ function bHome(){
   // Exams
   const upcoming=D.exams.filter(e=>new Date(e.fecha)>new Date()).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).slice(0,3);
   if(upcoming.length){
-    document.getElementById('exams-list').innerHTML=upcoming.map(ex=>{
+    const exEl=document.getElementById('exams-list');if(!exEl)return;exEl.innerHTML=upcoming.map(ex=>{
       const d=Math.ceil((new Date(ex.fecha)-Date.now())/864e5);
       const urg=d<=3;const warn=d<=7&&!urg;
       return `<div onclick="navSection('agenda');setTimeout(()=>goTo('planificador'),50)" style="background:var(--bg1);border:1px solid ${urg?'var(--danger)':warn?'rgba(245,197,24,.4)':'var(--bd)'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer${urg?' animation:dangerPulse 2s infinite':''}" class="${urg?'exam-danger':''}">
@@ -3976,16 +3978,19 @@ function bHome(){
       </div>`;
     }).join('');
   }else{
-    document.getElementById('exams-list').innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection(\'agenda\');setTimeout(()=>goTo(\'planificador\'),50)">Añadir →</span></div>';
+    if(exEl)exEl.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Sin exámenes · <span style="color:var(--y);cursor:pointer" onclick="navSection(\'agenda\');setTimeout(()=>goTo(\'planificador\'),50)">Añadir →</span></div>';
   }
   // Deberes pendientes
   const debs=JSON.parse(localStorage.getItem('lumio_deberes')||'[]');
   const pendientes=debs.filter(d=>!d.hecha).length;
   const debEl=document.getElementById('h-deberes-count');
   if(debEl)debEl.textContent=pendientes?pendientes+' pendiente'+(pendientes>1?'s':''):'Todo al día ✓';
-  updateXP();updateObjStatus();renderStudyToday();
-  upPom();
-  saveState();
+  try{updateXP();}catch(e){}
+  try{updateObjStatus();}catch(e){}
+  try{renderStudyToday();}catch(e){}
+  try{upPom();}catch(e){}
+  try{saveState();}catch(e){}
+  }catch(e){console.error('bHome error',e);}
 }
 
 function renderStudyToday(){
@@ -3997,7 +4002,7 @@ function renderStudyToday(){
   if(nextExam){const d=Math.ceil((new Date(nextExam.fecha)-Date.now())/864e5);recs.push({ico:nextExam.e,color:nextExam.c,title:`Preparar ${nextExam.mat}`,sub:`Examen en ${d} días · Ver plan`,action:"navSection('agenda');setTimeout(()=>goTo('planificador'),50)"});}
   const worst=[...D.mats].sort((a,b)=>a.p-b.p)[0];
   if(worst)recs.push({ico:worst.e,color:worst.c,title:`Subir progreso en ${worst.n.split(' ')[0]}`,sub:`Solo ${worst.p}% de progreso`,action:"navSection('estudiar');setTimeout(()=>goTo('testia'),50)"});
-  if(D.week[getCurrentDayIdx()].m===0)recs.push({ico:'⏱',color:'var(--y)',title:'Empieza el primer Pomodoro',sub:'25 minutos de estudio enfocado',action:"showPomPre()"});
+  try{if((D.week&&D.week[getCurrentDayIdx()]&&D.week[getCurrentDayIdx()].m===0))recs.push({ico:'⏱',color:'var(--y)',title:'Empieza el primer Pomodoro',sub:'25 minutos de estudio enfocado',action:"showPomPre()"});}catch(e){}
   el.innerHTML=recs.slice(0,3).map(r=>`
     <div class="today-card" onclick="${r.action}">
       <div style="display:flex;align-items:center;gap:10px">
@@ -11981,7 +11986,14 @@ if('serviceWorker' in navigator){
             showOnboarding();
           }else{
             // Ensure home screen is visible
-            try{navSection('home');}catch(e){}
+            try{navSection('home');}catch(e){
+              // Even if navSection fails, force-show #s-home
+              try{
+                document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+                const sh=document.getElementById('s-home');
+                if(sh)sh.classList.add('active');
+              }catch(e2){}
+            }
             // Tutorial: only show once, never on every load
             // startTutorial() checks lumio_seen_tutorial internally
           }
